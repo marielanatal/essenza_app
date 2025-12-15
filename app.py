@@ -1,44 +1,76 @@
 import streamlit as st
 import pandas as pd
+from PIL import Image
 
-st.set_page_config(page_title="Essenza Dashboard", layout="wide")
+# ==============================
+# CONFIGURAÇÃO GERAL
+# ==============================
+st.set_page_config(page_title="Dashboard Essenza", layout="wide")
 
-st.title("📊 Dashboard Essenza - Versão Teste Avançada")
+# Carregar logo
+logo = Image.open("logo.png")
+st.sidebar.image(logo, use_column_width=True)
 
-# Carregar planilha
+st.sidebar.markdown("---")
+
+# ==============================
+# TÍTULO CENTRALIZADO
+# ==============================
+st.markdown(
+    "<h1 style='text-align: center; color: #2C80FF;'>📊 Essenza – Dashboard Financeiro</h1>",
+    unsafe_allow_html=True
+)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# ==============================
+# LEITURA DA PLANILHA
+# ==============================
 df = pd.read_excel("dados.xlsx")
 
-# Sidebar - seleção de cliente
+# ==============================
+# SIDEBAR – SELEÇÃO DE CLIENTE
+# ==============================
 clientes = df["Cliente"].dropna().unique()
 cliente_selecionado = st.sidebar.selectbox("Selecione o Cliente:", clientes)
 
-# Filtrar pelo cliente
 df_filtro = df[df["Cliente"] == cliente_selecionado]
 
-st.header(f"📌 Cliente: {cliente_selecionado}")
+st.header(f"📌 Cliente Selecionado: {cliente_selecionado}")
+st.markdown("---")
 
-# ============================
-#       KPIs PRINCIPAIS
-# ============================
+
+# ==============================
+# KPI CARDS – INDICADORES
+# ==============================
 total_valor = df_filtro["Valor"].sum()
 total_pago = df_filtro[df_filtro["Já Pago? (Sim/Não)"] == "Sim"]["Valor"].sum()
 total_aberto = df_filtro[df_filtro["Já Pago? (Sim/Não)"] == "Não"]["Valor"].sum()
 
 col1, col2, col3 = st.columns(3)
+
 col1.metric("💰 Total de Despesas", f"R$ {total_valor:,.2f}")
-col2.metric("✔ Pago", f"R$ {total_pago:,.2f}")
+col2.metric("✔ Total Pago", f"R$ {total_pago:,.2f}")
 col3.metric("⏳ Em Aberto", f"R$ {total_aberto:,.2f}")
 
-# ============================
-#       STATUS
-# ============================
+st.markdown("---")
+
+
+# ==============================
+# STATUS – GRÁFICO AUTOMÁTICO
+# ==============================
+st.subheader("📌 Status dos Lançamentos")
+
 status_counts = df_filtro["Status (Falta Info / Pronto / Lançado)"].value_counts()
 
-st.subheader("📌 Status dos lançamentos")
 st.bar_chart(status_counts)
 
-# ============================
-#       TABELA
-# ============================
-st.subheader("📄 Dados detalhados")
-st.dataframe(df_filtro)
+st.markdown("---")
+
+
+# ==============================
+# TABELA DETALHADA
+# ==============================
+st.subheader("📄 Lançamentos Detalhados")
+
+st.dataframe(df_filtro, use_container_width=True)
