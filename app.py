@@ -3,7 +3,6 @@ import pandas as pd
 import plotly.express as px
 from PIL import Image
 import os
-from fpdf import FPDF
 import base64
 from io import BytesIO
 
@@ -375,6 +374,7 @@ with aba3:
             file_name="Relatorio_Essenza.pdf",
             mime="application/pdf"
         )
+
 
 
 
