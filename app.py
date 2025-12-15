@@ -34,7 +34,6 @@ if len(arquivos) == 0:
     st.error("Nenhum arquivo .xlsx encontrado no diretório.")
     st.stop()
 
-# Formatar nome do cliente baseado no nome do arquivo
 def limpar_nome(nome):
     nome = nome.replace(".xlsx", "")
     nome = nome.replace("_", " ")
@@ -55,13 +54,8 @@ st.sidebar.markdown("---")
 df = pd.read_excel(arquivo_cliente)
 df.columns = df.columns.str.strip()
 
-# Criar coluna de data
 df["Data"] = pd.to_datetime(df["Pagamento ou recebimento"], dayfirst=True)
-
-# Criar Mês no formato "Nov/2025"
 df["Mes"] = df["Data"].dt.strftime("%b/%Y")
-
-# Corrigir valores: despesa negativa → positivo
 df["Valor_corrigido"] = df["Valor da Categoria"].apply(lambda x: abs(x))
 
 
@@ -126,7 +120,10 @@ with aba1:
                 text_auto=True,
                 color="Categoria"
             )
-            fig.update_layout(showlegend=False)
+            fig.update_layout(
+                showlegend=False,
+                xaxis_tickformat="R$,.2f"
+            )
             st.plotly_chart(fig, use_container_width=True)
 
         with col_rank:
@@ -148,6 +145,7 @@ with aba1:
             text="Valor_fmt",
             title="Evolução Mensal das Despesas"
         )
+        fig2.update_layout(yaxis_tickformat="R$,.2f")
         st.plotly_chart(fig2, use_container_width=True)
 
         st.subheader("📄 Despesas Detalhadas")
@@ -198,7 +196,10 @@ with aba2:
                 text_auto=True,
                 color="Categoria"
             )
-            fig_rec.update_layout(showlegend=False)
+            fig_rec.update_layout(
+                showlegend=False,
+                xaxis_tickformat="R$,.2f"
+            )
             st.plotly_chart(fig_rec, use_container_width=True)
 
         with col_rank2:
@@ -220,6 +221,7 @@ with aba2:
             title="Evolução Mensal das Receitas",
             markers=True
         )
+        fig2.update_layout(yaxis_tickformat="R$,.2f")
         st.plotly_chart(fig2, use_container_width=True)
 
         st.subheader("📄 Receitas Detalhadas")
@@ -239,5 +241,3 @@ with aba3:
     df_fmt["Valor_corrigido"] = df_fmt["Valor_corrigido"].apply(formatar)
 
     st.dataframe(df_fmt, use_container_width=True)
-
-
