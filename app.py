@@ -30,7 +30,7 @@ if len(arquivos) == 0:
     st.error("Nenhum arquivo .xlsx encontrado no diretório.")
     st.stop()
 
-# Limpar nome do cliente baseado no nome do arquivo
+# Formatar nome do cliente baseado no nome do arquivo
 def limpar_nome(nome):
     nome = nome.replace(".xlsx", "")
     nome = nome.replace("_", " ")
@@ -54,10 +54,10 @@ df.columns = df.columns.str.strip()
 # Criar coluna de data
 df["Data"] = pd.to_datetime(df["Pagamento ou recebimento"], dayfirst=True)
 
-# Criar Mês no formato Essenza: "Nov/2025"
+# Criar Mês no formato "Nov/2025"
 df["Mes"] = df["Data"].dt.strftime("%b/%Y")
 
-# Corrigir valores (despesa negativa → vira positivo)
+# Corrigir valores: despesa negativa → positivo
 df["Valor_corrigido"] = df["Valor da Categoria"].apply(lambda x: abs(x))
 
 
@@ -78,7 +78,7 @@ aba1, aba2, aba3 = st.tabs(["💸 Despesas", "💰 Receitas", "🛠 Operacional"
 
 
 # =========================================================
-#                        ABA 1 – DESPESAS
+#                   ABA 1 – DESPESAS
 # =========================================================
 with aba1:
     st.header(f"💸 Despesas – {cliente_escolhido}")
@@ -98,22 +98,47 @@ with aba1:
 
         st.markdown("---")
 
-        # Pizza categorias
-        fig = px.pie(
-            df_desp,
-            names="Categoria",
-            values="Valor_corrigido",
-            title="Distribuição por Categoria",
-            color_discrete_sequence=px.colors.qualitative.Set2
+        # -------------------------
+        # GRÁFICO DE BARRAS + RANKING
+        # -------------------------
+        st.subheader("📊 Despesas por Categoria")
+
+        df_rank = (
+            df_desp.groupby("Categoria")["Valor_corrigido"]
+            .sum()
+            .sort_values(ascending=False)
+            .reset_index()
         )
-        st.plotly_chart(fig, use_container_width=True)
+
+        col_graf, col_rank = st.columns([3, 1])
+
+        with col_graf:
+            fig = px.bar(
+                df_rank,
+                x="Valor_corrigido",
+                y="Categoria",
+                orientation="h",
+                title="Despesas por Categoria (Maior → Menor)",
+                text_auto=True,
+                color="Categoria"
+            )
+            fig.update_layout(showlegend=False)
+            st.plotly_chart(fig, use_container_width=True)
+
+        with col_rank:
+            st.markdown("### 🏆 Ranking")
+            for i, row in df_rank.iterrows():
+                st.write(f"**{i+1}. {row['Categoria']} – R$ {row['Valor_corrigido']:,.2f}**")
+
+        st.markdown("---")
 
         # Evolução mensal
+        st.subheader("📈 Evolução Mensal das Despesas")
         fig2 = px.bar(
             df_desp.groupby("Mes")["Valor_corrigido"].sum().reset_index(),
             x="Mes",
             y="Valor_corrigido",
-            title="Evolução Mensal das Despesas"
+            text_auto=True
         )
         st.plotly_chart(fig2, use_container_width=True)
 
@@ -122,7 +147,7 @@ with aba1:
 
 
 # =========================================================
-#                        ABA 2 – RECEITAS
+#                   ABA 2 – RECEITAS
 # =========================================================
 with aba2:
     st.header(f"💰 Receitas – {cliente_escolhido}")
@@ -137,20 +162,46 @@ with aba2:
         col1, col2 = st.columns(2)
         col1.metric("💵 Total Recebido", f"R$ {total:,.2f}")
 
-        rec_top = df_rec.groupby("Categoria")["Valor_corrigido"].sum().sort_values(ascending=True)
+        rec_top = df_rec.groupby("Categoria")["Valor_corrigido"].sum().sort_values(ascending=False)
         col2.metric("📈 Categoria de Maior Receita", f"{rec_top.index[0]} (R$ {rec_top.iloc[0]:,.2f})")
 
         st.markdown("---")
 
-        fig = px.pie(
-            df_rec,
-            names="Categoria",
-            values="Valor_corrigido",
-            title="Receita por Categoria",
-            color_discrete_sequence=px.colors.qualitative.Set3
-        )
-        st.plotly_chart(fig, use_container_width=True)
+        # -------------------------
+        # GRÁFICO DE BARRAS + RANKING
+        # -------------------------
+        st.subheader("📊 Receitas por Categoria")
 
+        df_rank_rec = (
+            df_rec.groupby("Categoria")["Valor_corrigido"]
+            .sum()
+            .sort_values(ascending=False)
+            .reset_index()
+        )
+
+        col_graf2, col_rank2 = st.columns([3, 1])
+
+        with col_graf2:
+            fig_rec = px.bar(
+                df_rank_rec,
+                x="Valor_corrigido",
+                y="Categoria",
+                orientation="h",
+                title="Receitas por Categoria (Maior → Menor)",
+                text_auto=True,
+                color="Categoria"
+            )
+            fig_rec.update_layout(showlegend=False)
+            st.plotly_chart(fig_rec, use_container_width=True)
+
+        with col_rank2:
+            st.markdown("### 🏆 Ranking")
+            for i, row in df_rank_rec.iterrows():
+                st.write(f"**{i+1}. {row['Categoria']} – R$ {row['Valor_corrigido']:,.2f}**")
+
+        st.markdown("---")
+
+        st.subheader("📈 Evolução Mensal das Receitas")
         fig2 = px.line(
             df_rec.groupby("Mes")["Valor_corrigido"].sum().reset_index(),
             x="Mes",
@@ -165,7 +216,7 @@ with aba2:
 
 
 # =========================================================
-#                        ABA 3 – OPERACIONAL
+#                   ABA 3 – OPERACIONAL
 # =========================================================
 with aba3:
     st.header("🛠 Operacional – Dados Brutos")
