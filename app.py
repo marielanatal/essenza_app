@@ -286,10 +286,3 @@ with aba3:
         st.markdown("### 📄 Detalhamento A Receber")
         st.dataframe(pend_receber, use_container_width=True)
 
-# ======================================================================================
-#                               ABA 4 – OPERACIONAL  
-# ======================================================================================
-with aba4:
-    st.header("🛠 Área Operacional")
-    st.write("Espaço reservado para recursos administrativos futuros.")
-
