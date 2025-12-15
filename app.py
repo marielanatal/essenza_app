@@ -22,7 +22,6 @@ if os.path.exists("logo.png"):
     st.sidebar.image(logo, use_column_width=True)
 
 st.sidebar.markdown("---")
-
 st.markdown(
     "<h1 style='text-align: center; color: #2C80FF;'>📊 Essenza – Dashboard Financeiro</h1>",
     unsafe_allow_html=True
@@ -30,8 +29,7 @@ st.markdown(
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ----------------------------------------------------------
-# IDENTIFICAR PLANILHAS DO DIRETÓRIO
-# (SOMENTE AS PRINCIPAIS, IGNORANDO AS DE PENDÊNCIAS)
+# LISTAR APENAS PLANILHAS PRINCIPAIS (IGNORA *_pendencias.xlsx)
 # ----------------------------------------------------------
 arquivos = [
     f for f in os.listdir()
@@ -55,7 +53,6 @@ st.sidebar.markdown("---")
 df = pd.read_excel(arquivo_cliente)
 df.columns = df.columns.str.strip()
 
-# Ajuste de datas
 df["Data"] = pd.to_datetime(df["Pagamento ou recebimento"], errors="coerce", dayfirst=True)
 df["Mes"] = df["Data"].dt.strftime("%b/%Y")
 df["Valor_corrigido"] = df["Valor da Categoria"].abs()
@@ -73,9 +70,7 @@ if os.path.exists(pendencias_arquivo):
         pend_pagar = pd.read_excel(pendencias_arquivo, sheet_name="PAGAR")
         pend_receber = pd.read_excel(pendencias_arquivo, sheet_name="RECEBER")
     except:
-        st.warning("⚠ Não foi possível carregar as abas PAGAR e RECEBER. Verifique o arquivo.")
-else:
-    st.info("ℹ Nenhum arquivo de pendências encontrado para este cliente.")
+        st.warning("⚠ Erro ao carregar as abas PAGAR e RECEBER. Verifique o arquivo.")
 
 # ----------------------------------------------------------
 # FILTRO DE MÊS
@@ -142,18 +137,6 @@ with aba1:
             for i, row in df_rank.iterrows():
                 st.write(f"**{i+1}. {row['Categoria']} – {row['Valor_fmt']}**")
 
-        st.markdown("---")
-
-        st.subheader("📈 Evolução Mensal das Despesas")
-
-        df_mes = df_desp.groupby("Mes")["Valor_corrigido"].sum().reset_index()
-        df_mes["Valor_fmt"] = df_mes["Valor_corrigido"].apply(formatar)
-
-        fig2 = px.bar(df_mes, x="Mes", y="Valor_corrigido", text="Valor_fmt")
-        fig2.update_layout(yaxis_tickformat="R$,.2f")
-
-        st.plotly_chart(fig2, use_container_width=True)
-
 # ======================================================================================
 #                                      ABA 2 – RECEITAS
 # ======================================================================================
@@ -194,7 +177,7 @@ with aba2:
         st.plotly_chart(fig, use_container_width=True)
 
 # ======================================================================================
-#                              ABA 3 – PENDÊNCIAS (NOVA)
+#                              ABA 3 – PENDÊNCIAS COMPLETA
 # ======================================================================================
 with aba3:
     st.header(f"📅 Pendências – {cliente_escolhido}")
@@ -202,22 +185,43 @@ with aba3:
     if pend_pagar is None or pend_receber is None:
         st.info("📄 Nenhuma planilha de pendências disponível.")
     else:
-        st.subheader("🔵 A Pagar")
+        hoje = pd.Timestamp.today().normalize()
 
-        # Conversão robusta
+        # -----------------------------
+        # PREPARAR PLANILHA A PAGAR
+        # -----------------------------
         pend_pagar["Vencimento"] = pd.to_datetime(
             pend_pagar["Vencimento"], errors="coerce", dayfirst=True
         )
         pend_pagar = pend_pagar.dropna(subset=["Vencimento"])
-
-        hoje = pd.Timestamp.today().normalize()
         pend_pagar["Dias_para_vencer"] = (pend_pagar["Vencimento"] - hoje).dt.days
 
+        # -----------------------------
+        # CALCULAR MÉTRICAS A PAGAR
+        # -----------------------------
         total_pagar = pend_pagar["Valor categoria/centro de custo"].sum()
+        atraso_pagar = pend_pagar[pend_pagar["Dias_para_vencer"] < 0]["Valor categoria/centro de custo"].sum()
+        hoje_pagar = pend_pagar[pend_pagar["Dias_para_vencer"] == 0]["Valor categoria/centro de custo"].sum()
+        prox7_pagar = pend_pagar[(pend_pagar["Dias_para_vencer"] > 0) & (pend_pagar["Dias_para_vencer"] <= 7)]["Valor categoria/centro de custo"].sum()
+        mes_pagar = pend_pagar[pend_pagar["Vencimento"].dt.month == hoje.month]["Valor categoria/centro de custo"].sum()
 
-        st.metric("💰 Total A Pagar", formatar(total_pagar))
+        # -----------------------------
+        # TÍTULO + LINHA DIVISÓRIA
+        # -----------------------------
+        st.markdown("## 📘 A Pagar")
+        st.markdown("---")
 
-        # Gráfico por categoria
+        # -----------------------------
+        # CARDS A PAGAR
+        # -----------------------------
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("🔴 Em Atraso", formatar(atraso_pagar))
+        c2.metric("🟡 Hoje", formatar(hoje_pagar))
+        c3.metric("🔵 Próx. 7 dias", formatar(prox7_pagar))
+        c4.metric("🟢 Este mês", formatar(mes_pagar))
+
+        st.markdown("### 📊 A Pagar por Categoria")
+
         pagar_cat = pend_pagar.groupby("Categoria")["Valor categoria/centro de custo"].sum().reset_index()
         pagar_cat["Valor_fmt"] = pagar_cat["Valor categoria/centro de custo"].apply(formatar)
 
@@ -226,45 +230,60 @@ with aba3:
             x="Valor categoria/centro de custo",
             y="Categoria",
             orientation="h",
-            text="Valor_fmt",
-            title="A Pagar por Categoria"
+            text="Valor_fmt"
         )
         fig_pagar.update_layout(xaxis_tickformat="R$,.2f")
         st.plotly_chart(fig_pagar, use_container_width=True)
 
-        st.markdown("---")
-        st.subheader("🟢 A Receber")
+        st.markdown("### 📄 Detalhamento A Pagar")
+        st.dataframe(pend_pagar, use_container_width=True)
 
-        # Conversão robusta
+        # ======================================================================================
+        #                           A RECEBER (SEGUNDA LINHA)
+        # ======================================================================================
+        st.markdown("## 📗 A Receber")
+        st.markdown("---")
+
+        # -----------------------------
+        # PREPARAR RECEBER
+        # -----------------------------
         pend_receber["Vencimento"] = pd.to_datetime(
             pend_receber["Vencimento"], errors="coerce", dayfirst=True
         )
         pend_receber = pend_receber.dropna(subset=["Vencimento"])
-
         pend_receber["Dias_para_vencer"] = (pend_receber["Vencimento"] - hoje).dt.days
 
         total_receber = pend_receber["Valor categoria/centro de custo"].sum()
+        atraso_rec = pend_receber[pend_receber["Dias_para_vencer"] < 0]["Valor categoria/centro de custo"].sum()
+        hoje_rec = pend_receber[pend_receber["Dias_para_vencer"] == 0]["Valor categoria/centro de custo"].sum()
+        prox7_rec = pend_receber[(pend_receber["Dias_para_vencer"] > 0) & (pend_receber["Dias_para_vencer"] <= 7)]["Valor categoria/centro de custo"].sum()
+        mes_rec = pend_receber[pend_receber["Vencimento"].dt.month == hoje.month]["Valor categoria/centro de custo"].sum()
 
-        st.metric("💵 Total A Receber", formatar(total_receber))
+        # -----------------------------
+        # CARDS RECEBER
+        # -----------------------------
+        r1, r2, r3, r4 = st.columns(4)
+        r1.metric("🔴 Em Atraso", formatar(atraso_rec))
+        r2.metric("🟡 Hoje", formatar(hoje_rec))
+        r3.metric("🔵 Próx. 7 dias", formatar(prox7_rec))
+        r4.metric("🟢 Este mês", formatar(mes_rec))
 
-        receber_cat = pend_receber.groupby("Categoria")["Valor categoria/centro de custo"].sum().reset_index()
-        receber_cat["Valor_fmt"] = receber_cat["Valor categoria/centro de custo"].apply(formatar)
+        st.markdown("### 📊 A Receber por Categoria")
 
-        fig_receber = px.bar(
-            receber_cat,
+        rec_cat = pend_receber.groupby("Categoria")["Valor categoria/centro de custo"].sum().reset_index()
+        rec_cat["Valor_fmt"] = rec_cat["Valor categoria/centro de custo"].apply(formatar)
+
+        fig_rec = px.bar(
+            rec_cat,
             x="Valor categoria/centro de custo",
             y="Categoria",
             orientation="h",
-            text="Valor_fmt",
-            title="A Receber por Categoria"
+            text="Valor_fmt"
         )
-        fig_receber.update_layout(xaxis_tickformat="R$,.2f")
-        st.plotly_chart(fig_receber, use_container_width=True)
+        fig_rec.update_layout(xaxis_tickformat="R$,.2f")
+        st.plotly_chart(fig_rec, use_container_width=True)
 
-        st.markdown("---")
-        st.subheader("📄 Detalhamento Completo")
-
-        st.dataframe(pend_pagar, use_container_width=True)
+        st.markdown("### 📄 Detalhamento A Receber")
         st.dataframe(pend_receber, use_container_width=True)
 
 # ======================================================================================
@@ -273,3 +292,4 @@ with aba3:
 with aba4:
     st.header("🛠 Área Operacional")
     st.write("Espaço reservado para recursos administrativos futuros.")
+
