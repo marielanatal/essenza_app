@@ -10,6 +10,8 @@ Funciona sem internet e guarda o progresso no próprio aparelho.
 - **Practicar**: foco em falar. A sessão diária pede que você diga cada frase em voz alta antes de ouvir a resposta; a **Conversa** faz um lado do diálogo e você responde falando; o **Eco** treina repetir junto (devagar e no ritmo normal); **Sons difíceis** cobre os sons que denunciam o sotaque brasileiro. Há também quiz, escuta, falsos amigos e escrita.
 - **Microfone**: quando o app é aberto pelo endereço próprio (instalado na tela inicial, em Chrome ou Safari), aparece o botão **Falar**, que escuta você e diz se entendeu a frase. Dentro do Claude o microfone não fica disponível, então você fala em voz alta e confere ouvindo.
 - **Frases**: guia de consulta com busca, para usar durante a viagem.
+- **Lola**: uma amiga de Madri que te recebe na tela inicial com uma mensagem diferente a cada dia (toque no balão para ouvir), comemora cada sessão com elogios em espanhol de verdade e confete, e dá uma curiosidade sobre a Espanha por dia.
+- **Níveis e conquistas**: XP por frases, falas em voz alta e missões; 7 níveis (de *Turista* a *¡Como en casa!*) e 9 conquistas. Sons e vibração podem ser desligados em Ajustes.
 
 O áudio usa a voz de espanhol do próprio celular. No Android, se a voz soar estranha, instale "Espanhol (Espanha)" em
 Configurações › Sistema › Idioma › Conversão de texto em voz. No iPhone, em Ajustes › Acessibilidade › Conteúdo Falado › Vozes.
