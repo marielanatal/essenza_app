@@ -7,7 +7,8 @@ Funciona sem internet e guarda o progresso no próprio aparelho.
 
 - **Hoy**: contagem regressiva para a viagem, a sessão do dia (frases novas + revisões), sequência de dias e a missão da semana.
 - **Plan**: 14 semanas temáticas (cafeteria, restaurante, transporte, hotel, direções, compras, saúde…), cada uma com explicação de gramática/pronúncia, um diálogo com áudio e uma missão prática.
-- **Practicar**: repetição espaçada, quiz, escuta, escrita e falsos amigos.
+- **Practicar**: foco em falar. A sessão diária pede que você diga cada frase em voz alta antes de ouvir a resposta; a **Conversa** faz um lado do diálogo e você responde falando; o **Eco** treina repetir junto (devagar e no ritmo normal); **Sons difíceis** cobre os sons que denunciam o sotaque brasileiro. Há também quiz, escuta, falsos amigos e escrita.
+- **Microfone**: quando o app é aberto pelo endereço próprio (instalado na tela inicial, em Chrome ou Safari), aparece o botão **Falar**, que escuta você e diz se entendeu a frase. Dentro do Claude o microfone não fica disponível, então você fala em voz alta e confere ouvindo.
 - **Frases**: guia de consulta com busca, para usar durante a viagem.
 
 O áudio usa a voz de espanhol do próprio celular. No Android, se a voz soar estranha, instale "Espanhol (Espanha)" em

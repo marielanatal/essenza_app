@@ -197,6 +197,11 @@ nav.tabs button.on{color:var(--cobalt);background:var(--cobalt-soft)}
 .actions.three{grid-template-columns:1fr 1fr 1fr}
 .opts{display:flex;flex-direction:column;gap:10px}
 .opt{border:1.5px solid var(--line);background:var(--surface);border-radius:14px;padding:14px;text-align:left;font-size:17px;min-height:54px}
+.opt svg{width:18px;height:18px;vertical-align:-3px;color:var(--cobalt);margin-right:8px}
+.actions.duo{grid-template-columns:1fr 1.4fr}
+.slowbtn{min-height:42px;border-radius:99px;padding:8px 14px;border:0;background:var(--cobalt-soft);color:var(--cobalt);font-weight:700;font-size:14px}
+.say.lg+.slowbtn{min-height:56px}
+.ctx{font-size:14px;color:var(--muted);text-align:left;width:100%;border-left:3px solid var(--line);padding-left:10px}
 .opt:disabled{color:var(--ink);opacity:1;cursor:default}
 .opt.right{border-color:var(--ok);background:var(--ok-soft)}
 .opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
@@ -272,7 +277,7 @@ nav.tabs button.on{color:var(--cobalt);background:var(--cobalt-soft)}
    cada card: [espanhol, português, dica opcional]
    ============================================================ */
 const WEEKS = [
-{ n:1, title:"Hola, ¿qué tal?", sub:"Saudações, apresentação e pronúncia",
+{ n:1, me:"B", title:"Hola, ¿qué tal?", sub:"Saudações, apresentação e pronúncia",
   tip:`<h3>Pronúncia: o que muda para quem fala português</h3>
   <ul>
    <li><b>j</b> e <b>g</b> antes de e/i soam como um "rr" forte, raspado na garganta: <i>jamón, gente</i>.</li>
@@ -583,7 +588,7 @@ const WEEKS = [
    ["Lo he pasado genial","Me diverti muito"],
    ["¡Que lo pases bien!","Divirta-se!"]
   ]},
-{ n:13, title:"Lo que he hecho", sub:"Contar o que fez e o que vai fazer",
+{ n:13, me:"B", title:"Lo que he hecho", sub:"Contar o que fez e o que vai fazer",
   tip:`<h3>Pretérito perfecto: o passado da Espanha</h3>
   <p>Na Espanha, para coisas de <b>hoje</b> ou recentes, usa-se <i>haber + particípio</i>:</p>
   <div class="tblwrap"><table><tr><td>yo</td><td>he</td></tr><tr><td>tú</td><td>has</td></tr><tr><td>él/ella</td><td>ha</td></tr><tr><td>nosotros</td><td>hemos</td></tr><tr><td>vosotros</td><td>habéis</td></tr><tr><td>ellos</td><td>han</td></tr></table></div>
@@ -666,6 +671,18 @@ const FALSOS = [
  ["todavía","ainda","Não é 'todavia, porém'.",14]
 ];
 
+/* Sons difíceis para quem fala português */
+const SOUNDS = [
+ {t:"J e G (antes de e, i)", d:"Som forte, raspado no fundo da garganta, como um 'rr' bem carregado. Nunca como o 'j' do português.", ex:["jamón","joven","gente","Jerez","Me gusta el jamón."]},
+ {t:"Z e C (antes de e, i)", d:"Na Espanha, a ponta da língua vai entre os dentes, como o 'th' do inglês 'think'.", ex:["gracias","cerveza","zapato","plaza","Cinco cervezas, por favor."]},
+ {t:"LL e Y", d:"Soam como um 'i' consoante, quase um 'dj' bem suave. Nunca como 'lh'.", ex:["calle","llave","me llamo","ayer","Me llamo Ana y vivo en la calle Mayor."]},
+ {t:"R e RR", d:"R entre vogais é leve, como em 'caro'. RR e R no começo da palavra vibram a ponta da língua; não é o 'r' de garganta do português.", ex:["pero","perro","caro","carro","Roma","El perro corre mucho."]},
+ {t:"Sem vogais nasais", d:"'bien' é 'bi-én', com o n bem marcado no final. Não diga 'biẽ' nem 'tambẽ'.", ex:["bien","también","son","tienen","También tienen pan."]},
+ {t:"E e O no final", d:"Pronuncie as vogais finais como estão escritas: 'noche' termina em 'e', não em 'i'; 'mucho' termina em 'o', não em 'u'.", ex:["noche","leche","poco","mucho","Esta noche tomo un café con leche."]},
+ {t:"B e V", d:"Soam iguais, como um 'b' suave: 'vino' soa como 'bino'.", ex:["vino","vale","Valencia","Barcelona","Vale, un vino de Valencia."]},
+ {t:"T e D sem chiado", d:"'t' e 'd' nunca viram 'tch' e 'dj': 'tarde' não é 'tardji', 'tiene' não é 'tchiene'.", ex:["tarde","tiene","día","noticias","Buenas tardes, ¿tienes tiempo?"]}
+];
+
 const TOTAL_WEEKS = WEEKS.length;
 const INTERVALS = [0,1,3,7,14,30,60];
 
@@ -737,9 +754,11 @@ function unlockedCards(){ const w=curWeek(); return CARDS.filter(c=>c.week<=w); 
 function seenCards(){ return CARDS.filter(c=>S.cards[c.id]); }
 function newCards(){ return unlockedCards().filter(c=>!S.cards[c.id]); }
 function dueCards(){ const t=todayN(); return CARDS.filter(c=>S.cards[c.id] && S.cards[c.id].d<=t).sort((a,b)=>S.cards[a.id].d-S.cards[b.id].d); }
-function logToday(){ const k=todayKey(); if(!S.log[k]) S.log[k]={n:0,r:0,q:0}; return S.log[k]; }
+function logToday(){ const k=todayKey(); if(!S.log[k]) S.log[k]={n:0,r:0,q:0,s:0}; if(!S.log[k].s) S.log[k].s=0; return S.log[k]; }
+const activity = l => l ? (l.n||0)+(l.r||0)+(l.q||0)+(l.s||0) : 0;
+function spokenTotal(){ return Object.values(S.log).reduce((a,l)=>a+(l.s||0),0); }
 function newLeftToday(){ const l=S.log[todayKey()]; return Math.max(0, S.daily - (l ? l.n : 0)); }
-function streak(){ let n=todayN(), s=0; const active=k=>{ const l=S.log[k]; return l && (l.n+l.r+l.q)>0; };
+function streak(){ let n=todayN(), s=0; const active=k=>activity(S.log[k])>0;
   if(!active(keyFromNum(n))) n--; while(active(keyFromNum(n))){ s++; n--; } return s; }
 function weekProgress(w){ const cs=CARDS.filter(c=>c.week===w); const seen=cs.filter(c=>S.cards[c.id]).length; return {seen,total:cs.length}; }
 function learnedCount(){ return CARDS.filter(c=>S.cards[c.id] && S.cards[c.id].b>=1).length; }
@@ -747,6 +766,7 @@ function masteredCount(){ return CARDS.filter(c=>S.cards[c.id] && S.cards[c.id].
 function grade(card, result){
   const t=todayN(); const st=S.cards[card.id] || {b:0,d:t};
   if(result==="bad"){ st.b=0; st.d=t; }
+  else if(result==="mid"){ st.b=Math.max(1,st.b); st.d=t+1; }
   else { st.b=Math.min(INTERVALS.length-1, st.b + (result==="easy"?2:1)); st.d=t+INTERVALS[st.b]; }
   S.cards[card.id]=st;
 }
@@ -760,8 +780,16 @@ function loadVoices(){ try{ voices = speechSynthesis.getVoices() || []; }catch(e
 if(canSpeak){ loadVoices(); try{ speechSynthesis.addEventListener("voiceschanged", loadVoices); }catch(e){} }
 function esVoice(){ return voices.find(v=>/^es[-_]ES/i.test(v.lang)) || voices.find(v=>/^es/i.test(v.lang)); }
 function cleanSpeech(t){ return t.replace(/\(.*?\)/g,"").replace(/…/g,"").replace(/\s\/\s/g,", ").trim(); }
-function utter(t, pitch){ const u=new SpeechSynthesisUtterance(cleanSpeech(t)); u.lang="es-ES"; const v=esVoice(); if(v) u.voice=v; u.rate=S.rate; if(pitch) u.pitch=pitch; return u; }
-function speak(t){ if(!canSpeak) return; try{ speechSynthesis.cancel(); speechSynthesis.speak(utter(t)); }catch(e){} }
+function utter(t, pitch, slow){ const u=new SpeechSynthesisUtterance(cleanSpeech(t)); u.lang="es-ES"; const v=esVoice(); if(v) u.voice=v; u.rate=slow ? Math.max(0.5,S.rate*0.7) : S.rate; if(pitch) u.pitch=pitch; return u; }
+function speak(t, slow){ if(!canSpeak) return; try{ speechSynthesis.cancel(); speechSynthesis.speak(utter(t, 0, slow)); }catch(e){} }
+
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let MIC = !!SR && !window.claude && window.isSecureContext;
+function hear(){ return new Promise((res,rej)=>{ let done=false; const r=new SR(); r.lang="es-ES"; r.interimResults=false; r.maxAlternatives=3;
+  r.onresult=e=>{ done=true; res(Array.from(e.results[0]).map(a=>a.transcript)); };
+  r.onerror=e=>{ done=true; rej(e.error); }; r.onend=()=>{ if(!done) res([]); };
+  try{ speechSynthesis.cancel(); r.start(); }catch(e){ rej("start"); } }); }
+function similarity(said, target){ const w=x=>norm(x).replace(/[¿?¡!.,;:…]/g," ").split(/\s+/).filter(Boolean); const T=w(cleanSpeech(target)); const A=new Set(w(said)); return T.length ? T.filter(x=>A.has(x)).length/T.length : 0; }
 function speakDialog(lines){ if(!canSpeak) return; try{ speechSynthesis.cancel(); const who=[...new Set(lines.map(l=>l[0]))]; lines.forEach(l=>speechSynthesis.speak(utter(l[1], who.indexOf(l[0])%2 ? 1.25 : 0.9))); }catch(e){} }
 
 /* ============================================================
@@ -776,8 +804,14 @@ const ICON = {
   quiz:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></svg>`,
   ear:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8.5a6 6 0 0 1 12 0c0 6-6 6-6 10a3 3 0 0 1-6 0"/><path d="M10 8.5a2 2 0 0 1 4 0"/></svg>`,
   pen:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>`,
+  mic:`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4"/></svg>`,
+  talk:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg>`,
+  mouth:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12c3-4 7-5 10-3 3-2 7-1 10 3-3 5-7 7-10 7s-7-2-10-7z"/><path d="M2 12h20"/></svg>`,
+  repeat:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>`,
   warn:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"/></svg>`
 };
+const slowBtn = t => canSpeak ? `<button class="slowbtn" data-act="slow" data-say="${h(t)}">Devagar</button>` : "";
+const sayRow = (t, lg) => `<div class="row" style="justify-content:center">${sayBtn(t,lg)}${slowBtn(t)}</div>`;
 const sayBtn = (t, lg) => canSpeak ? `<button class="say${lg?" lg":""}" data-act="say" data-say="${h(t)}" aria-label="Ouvir">${ICON.say}</button>` : "";
 function phraseRow(c){ return `<div class="phrase"><div class="txt"><div class="es">${c.kind==="fa"?'<span class="tag">falso amigo</span>':""}${h(c.es)}</div><div class="pt">${h(c.pt)}</div>${c.note?`<div class="note">${h(c.note)}</div>`:""}</div>${sayBtn(c.es)}</div>`; }
 let toastT;
@@ -803,15 +837,16 @@ function renderHoje(){
   const wp = weekProgress(w.n);
   const due = dueCards().length;
   const nw = Math.min(newLeftToday(), newCards().length);
-  const l = S.log[todayKey()] || {n:0,r:0,q:0};
+  const l = S.log[todayKey()] || {n:0,r:0,q:0,s:0};
   const todayDone = (l.n+l.r) > 0;
+  const convBtn = `<button class="btn saff wide two" data-act="conv">Praticar a conversa da semana <span class="ct">você responde em voz alta</span></button>`;
   const nothing = due===0 && nw===0;
   const pool = unlockedCards();
   const fdd = pool[(todayN()*7) % pool.length];
   const t = todayN();
   const dayNames = ["D","S","T","Q","Q","S","S"];
   let daysHtml = "";
-  for(let i=6;i>=0;i--){ const k=keyFromNum(t-i); const lg=S.log[k]; const on=lg && (lg.n+lg.r+lg.q)>0; const dow=new Date((t-i)*864e5).getUTCDay(); daysHtml += `<div class="day${on?" on":""}${i===0?" today":""}"><i></i>${dayNames[dow]}</div>`; }
+  for(let i=6;i>=0;i--){ const k=keyFromNum(t-i); const lg=S.log[k]; const on=activity(lg)>0; const dow=new Date((t-i)*864e5).getUTCDay(); daysHtml += `<div class="day${on?" on":""}${i===0?" today":""}"><i></i>${dayNames[dow]}</div>`; }
   const daysLeft = Math.max(0, numOf(S.trip)-t);
   const weeksLeftPlan = TOTAL_WEEKS - curWeek();
   const behind = daysLeft < weeksLeftPlan*7;
@@ -827,15 +862,15 @@ function renderHoje(){
         <div class="meter"><span style="width:${Math.round(100*wp.seen/wp.total)}%"></span></div>
       </div>
       ${nothing
-        ? `<div class="verdict ok">Tudo em dia por hoje. Que tal um quiz ou ouvir o diálogo da semana?</div>
-           <div class="row"><button class="btn soft" data-act="quiz" style="flex:1">Quiz rápido</button><button class="btn ghost" data-act="goweek" data-week="${w.n}" style="flex:1">Ver diálogo</button></div>`
-        : `<button class="btn wide two" data-act="session">${todayDone?"Continuar":"Começar"} sessão de hoje <span class="ct">${nw} novas · ${due} revisões</span></button>`}
+        ? `<div class="verdict ok">Sessão em dia. Agora treine a conversa da semana em voz alta.</div>
+           ${convBtn}`
+        : `<button class="btn wide two" data-act="session">${todayDone?"Continuar":"Começar"} sessão de hoje <span class="ct">${nw} novas · ${due} revisões</span></button>${convBtn}`}
     </div>
     ${behind ? `<div class="card small"><b>A viagem chega antes do fim do plano.</b> <span class="muted">Faltam ${daysLeft} dias e ${weeksLeftPlan} semanas de conteúdo. Você pode adiantar semanas na aba Plan.</span></div>`:""}
     <div class="stats">
       <div class="stat"><b>${streak()}</b><span>dias seguidos</span></div>
       <div class="stat"><b>${learnedCount()}</b><span>frases aprendidas</span></div>
-      <div class="stat"><b>${masteredCount()}</b><span>dominadas</span></div>
+      <div class="stat"><b>${spokenTotal()}</b><span>falas em voz alta</span></div>
     </div>
     <div class="card">
       <div class="spread"><span class="eyebrow">Últimos 7 dias</span><span class="small muted">meta: ${S.daily} novas/dia</span></div>
@@ -862,6 +897,7 @@ function renderPlano(){
       <div class="tip">${w.tip}</div>
       <div class="stack" style="gap:6px">
         <div class="spread"><span class="eyebrow">Diálogo</span>${canSpeak?`<button class="btn soft" style="min-height:38px;padding:8px 12px" data-act="dialog" data-week="${w.n}">${ICON.say.replace('<svg','<svg width="18" height="18"')} Ouvir tudo</button>`:""}</div>
+        <button class="btn saff wide" data-act="conv" data-week="${w.n}">Praticar esta conversa falando</button>
         <div class="dlg">${w.dialog.map(l=>`<button class="line" data-act="say" data-say="${h(l[1])}"><span class="who">${h(l[0])}</span><span><span class="es">${h(l[1])}</span><br><span class="pt">${h(l[2])}</span></span></button>`).join("")}</div>
       </div>
       <div class="mission"><input type="checkbox" id="m-${w.n}" data-act="mission" data-week="${w.n}" ${S.missions[w.n]?"checked":""}><label for="m-${w.n}"><b>Missão:</b> ${h(w.mission)}</label></div>
@@ -878,14 +914,23 @@ function renderTreino(){
   const due = dueCards().length, nw = Math.min(newLeftToday(), newCards().length);
   const seen = seenCards().length;
   $("#v-treino").innerHTML = `
-    <div><h2 style="font-size:24px">Practicar</h2><p class="muted small" style="margin-top:4px">A sessão diária usa repetição espaçada: o que você erra volta logo, o que acerta volta cada vez mais tarde.</p></div>
+    <div><h2 style="font-size:24px">Practicar</h2><p class="muted small" style="margin-top:4px">O foco é falar. Em todo treino, diga a frase em voz alta <b>antes</b> de ouvir a resposta, e depois repita imitando a voz.</p></div>
     <button class="btn wide two" data-act="session">Sessão do dia <span class="ct">${nw} novas · ${due} revisões</span></button>
+    <button class="btn saff wide two" data-act="conv">Conversa: ${h(WEEKS[curWeek()-1].title)} <span class="ct">o app faz uma parte, você responde falando</span></button>
+    <div class="eyebrow" style="margin-top:4px">Falar e ouvir</div>
     <div class="tiles">
-      <button class="tile" data-act="quiz"><span class="ic">${ICON.quiz}</span><b>Quiz</b><span>10 perguntas de múltipla escolha</span></button>
-      <button class="tile" data-act="listen" ${canSpeak?"":"disabled"}><span class="ic">${ICON.ear}</span><b>Escuta</b><span>${canSpeak?"Ouça e escolha o significado":"Seu navegador não tem voz"}</span></button>
-      <button class="tile" data-act="write"><span class="ic">${ICON.pen}</span><b>Escrever</b><span>Escreva a frase em espanhol</span></button>
+      <button class="tile" data-act="eco" ${canSpeak?"":"disabled"}><span class="ic">${ICON.repeat}</span><b>Eco</b><span>Ouça e repita junto, devagar e no ritmo normal</span></button>
+      <button class="tile" data-act="sons" ${canSpeak?"":"disabled"}><span class="ic">${ICON.mouth}</span><b>Sons difíceis</b><span>Os sons que denunciam o sotaque brasileiro</span></button>
+      <button class="tile" data-act="listen" ${canSpeak?"":"disabled"}><span class="ic">${ICON.ear}</span><b>Escuta</b><span>Ouça e escolha o significado</span></button>
+      <button class="tile" data-act="conv" data-pick="1"><span class="ic">${ICON.talk}</span><b>Outras conversas</b><span>Repita os diálogos das semanas anteriores</span></button>
+    </div>
+    <div class="eyebrow" style="margin-top:4px">Reforço</div>
+    <div class="tiles">
+      <button class="tile" data-act="quiz"><span class="ic">${ICON.quiz}</span><b>Quiz</b><span>10 perguntas rápidas</span></button>
       <button class="tile" data-act="falsos"><span class="ic">${ICON.warn}</span><b>Falsos amigos</b><span>As armadilhas do portunhol</span></button>
     </div>
+    <button class="btn ghost wide" data-act="write">${ICON.pen.replace('<svg','<svg width="18" height="18"')} Escrever (ortografia)</button>
+    ${canSpeak ? "" : `<p class="small muted">Este navegador não tem voz; os treinos de fala precisam dela.</p>`}
     <p class="small muted">${seen===0 ? "Os treinos usam as frases que você já viu. Comece pela sessão do dia." : `Treinos usando ${seen} frases já vistas.`}</p>`;
 }
 
@@ -925,7 +970,7 @@ function showTab(t){
    TREINOS (tela cheia)
    ============================================================ */
 let D = null; // treino atual
-function openDrill(d){ D = d; D.i = 0; D.score = 0; D.total = d.items.length; $("#drill").hidden = false; document.body.style.overflow="hidden"; drawDrill(); }
+function openDrill(d){ D = d; D.i = 0; D.score = 0; D.revealed = false; D.total = d.items.length; $("#drill").hidden = false; document.body.style.overflow="hidden"; drawDrill(); }
 function closeDrill(){ D = null; $("#drill").hidden = true; document.body.style.overflow=""; try{ speechSynthesis.cancel(); }catch(e){} renderAll(); }
 function drillTop(){ const pct = D.items.length ? Math.round(100*D.i/D.items.length) : 100;
   return `<div class="top"><button class="x" data-act="closedrill" aria-label="Fechar">${ICON.x}</button><div class="meter"><span style="width:${pct}%"></span></div><span class="count">${Math.min(D.i+1,D.items.length)}/${D.items.length}</span></div>`; }
@@ -934,8 +979,8 @@ function startSession(){
   const fresh = newCards().slice(0, newLeftToday());
   const due = shuffle(dueCards().slice(0,40));
   const items = [];
-  for(let i=0;i<fresh.length;i+=4){ const chunk=fresh.slice(i,i+4); chunk.forEach(c=>items.push({t:"learn",c})); shuffle(chunk).forEach(c=>items.push({t:"test",c,dir:Math.random()<.6?"pt":"es"})); }
-  due.forEach(c=>items.push({t:"test",c,dir:Math.random()<.6?"pt":"es"}));
+  for(let i=0;i<fresh.length;i+=4){ const chunk=fresh.slice(i,i+4); chunk.forEach(c=>items.push({t:"learn",c})); shuffle(chunk).forEach(c=>items.push({t:"test",c,dir:Math.random()<.8?"pt":"es"})); }
+  due.forEach(c=>items.push({t:"test",c,dir:Math.random()<.8?"pt":"es"}));
   if(!items.length){ toast("Nada pendente hoje. Faça um quiz!"); return; }
   openDrill({mode:"session", items, revealed:false, retries:{}});
 }
@@ -963,6 +1008,21 @@ function startWrite(){
   if(!pool.length){ toast("Veja algumas frases primeiro."); return; }
   openDrill({mode:"write", items:shuffle(pool).slice(0,8).map(c=>({t:"write",c,answer:null}))});
 }
+function startConv(week, role){
+  const w = WEEKS[(week||curWeek())-1]; const me = role || w.me || "A";
+  openDrill({mode:"conv", week:w.n, me, items:w.dialog.map((l,k)=>({t:l[0]===me?"mine":"theirs", line:l, prev:k?w.dialog[k-1]:null}))});
+}
+function pickConv(){
+  const cw = curWeek();
+  openDrill({mode:"pick", items:[{t:"pick"}]});
+  $("#drill").innerHTML = drillTop().replace(/<div class="meter">.*?<\/div><span class="count">.*?<\/span>/,'<h2 style="font-size:20px;flex:1">Escolha a conversa</h2>') +
+    `<div class="stage" style="justify-content:flex-start"><div class="opts">${WEEKS.filter(w=>w.n<=cw).map(w=>`<button class="opt" data-act="conv" data-week="${w.n}"><b>${String(w.n).padStart(2,"0")}</b> · ${h(w.title)}<br><span class="muted small">${h(w.dialog[0][1])}</span></button>`).join("")}</div></div>`;
+}
+function startEco(){ let pool=seenCards(); if(pool.length<6) pool=unlockedCards(); openDrill({mode:"eco", items:shuffle(pool).slice(0,10).map(c=>({t:"eco",c}))}); }
+function startSons(){ openDrill({mode:"sons", items:SOUNDS.map(x=>({t:"som",s:x}))}); }
+function heardHtml(it){ if(!it.heard) return ""; const sc=it.heard.score; const cls=sc>=.8?"ok":sc>=.5?"mid":"bad";
+  return `<div class="verdict ${cls}">${sc>=.8?"¡Muy bien!":sc>=.5?"Quase lá.":"Não ficou claro."} Entendi: “${h(it.heard.text)}”</div>`; }
+function micBtn(it){ return `<button class="btn saff" data-act="mic">${ICON.mic} ${it.listening?"Ouvindo…":"Falar"}</button>`; }
 function startFalsos(){
   const pool = CARDS.filter(c=>c.kind==="fa");
   const qs = shuffle(pool).slice(0,10).map(c=>{ const opts=[c.pt, ...shuffle(pool.filter(x=>x.id!==c.id)).slice(0,3).map(x=>x.pt)]; return {t:"mc",c,dir:"es",field:"pt",opts:shuffle(opts),picked:null}; });
@@ -975,15 +1035,35 @@ function drawDrill(){
   const it = D.items[D.i], c = it.c;
   let stage = "", actions = "";
   if(it.t==="learn"){
-    stage = `<div class="flash"><span class="kind">${c.kind==="fa"?"Falso amigo":"Frase nova"}</span><div class="big">${h(c.es)}</div>${sayBtn(c.es,true)}<hr><div class="ans" style="color:var(--muted)">${h(c.pt)}</div>${c.note?`<div class="note">${h(c.note)}</div>`:""}</div>`;
-    actions = `<div class="actions"><button class="btn wide" data-act="learned">Entendi, próxima</button></div>`;
+    if(!it.played){ it.played=true; speak(c.es); }
+    stage = `<div class="flash"><span class="kind">${c.kind==="fa"?"Falso amigo":"Frase nova"} · ouça e repita em voz alta</span><div class="big">${h(c.es)}</div>${sayRow(c.es,true)}<hr><div class="ans" style="color:var(--muted)">${h(c.pt)}</div>${c.note?`<div class="note">${h(c.note)}</div>`:""}</div>`;
+    actions = `<div class="actions"><button class="btn wide" data-act="learned">Repeti em voz alta, próxima</button></div>`;
   } else if(it.t==="test"){
-    const front = it.dir==="pt" ? c.pt : c.es;
-    const back = it.dir==="pt" ? c.es : c.pt;
-    stage = `<div class="flash"><span class="kind">${it.dir==="pt"?"Como se diz em espanhol?":"O que significa?"}</span><div class="big ${it.dir==="pt"?"pt":""}">${h(front)}</div>${it.dir==="es"?sayBtn(c.es,true):""}${D.revealed?`<hr><div class="ans">${h(back)}</div>${it.dir==="pt"?sayBtn(c.es):""}${c.note?`<div class="note">${h(c.note)}</div>`:""}`:""}</div>`;
+    const oral = it.dir==="pt";
+    if(!oral && !it.played){ it.played=true; speak(c.es); }
+    const front = oral ? c.pt : c.es;
+    const back = oral ? c.es : c.pt;
+    stage = `<div class="flash"><span class="kind">${oral?"Diga em voz alta, em espanhol":"Ouça: o que significa?"}</span><div class="big ${oral?"pt":""}">${h(front)}</div>${!oral?sayBtn(c.es,true):""}${heardHtml(it)}${D.revealed?`<hr><div class="ans">${h(back)}</div>${oral?sayRow(c.es):""}${c.note?`<div class="note">${h(c.note)}</div>`:""}`:""}</div>`;
     actions = D.revealed
-      ? `<div class="actions three"><button class="btn bad" data-act="grade" data-g="bad">Errei</button><button class="btn soft" data-act="grade" data-g="good">Acertei</button><button class="btn ok" data-act="grade" data-g="easy">Fácil</button></div>`
-      : `<div class="actions"><button class="btn wide" data-act="reveal">Mostrar resposta</button></div>`;
+      ? `<div class="actions three"><button class="btn bad" data-act="grade" data-g="bad">Não saiu</button><button class="btn soft" data-act="grade" data-g="mid">Quase</button><button class="btn ok" data-act="grade" data-g="good">${oral?"Falei bem":"Entendi"}</button></div>`
+      : `<div class="actions${MIC&&oral?" duo":""}">${MIC&&oral?micBtn(it):""}<button class="btn wide" data-act="reveal">${oral?"Já falei: ouvir a resposta":"Mostrar significado"}</button></div>`;
+  } else if(it.t==="theirs"){
+    if(!it.played){ it.played=true; speak(it.line[1]); }
+    const nextMine = D.items[D.i+1] && D.items[D.i+1].t==="mine";
+    stage = `<div class="flash"><span class="kind">${h(it.line[0])} fala</span><div class="big">${h(it.line[1])}</div>${sayRow(it.line[1],true)}<hr><div class="pt">${h(it.line[2])}</div></div>`;
+    actions = `<div class="actions"><button class="btn wide" data-act="next">${nextMine?"Sua vez de responder":"Continuar"}</button></div>`;
+  } else if(it.t==="mine"){
+    stage = `${it.prev?`<div class="ctx">${h(it.prev[0])}: “${h(it.prev[1])}”</div>`:""}<div class="flash"><span class="kind">Sua fala · diga em espanhol</span><div class="big pt">${h(it.line[2])}</div>${heardHtml(it)}${D.revealed?`<hr><div class="ans">${h(it.line[1])}</div>${sayRow(it.line[1])}<p class="small muted">Repita imitando a entonação.</p>`:""}</div>`;
+    actions = D.revealed ? `<div class="actions"><button class="btn wide" data-act="next">Próxima fala</button></div>`
+      : `<div class="actions${MIC?" duo":""}">${MIC?micBtn(it):""}<button class="btn wide" data-act="reveal">Já falei: ouvir o certo</button></div>`;
+  } else if(it.t==="eco"){
+    if(!it.played){ it.played=true; speak(c.es); }
+    stage = `<div class="flash"><span class="kind">Eco · ouça e repita junto</span><div class="big">${h(c.es)}</div>${sayRow(c.es,true)}<hr><div class="pt">${h(c.pt)}</div><p class="small muted">Repita 3 vezes: devagar, no ritmo normal e de olhos fechados.</p></div>`;
+    actions = `<div class="actions"><button class="btn wide" data-act="spoke">Repeti, próxima</button></div>`;
+  } else if(it.t==="som"){
+    const x = it.s;
+    stage = `<div class="flash" style="text-align:left;align-items:stretch"><span class="kind">Som difícil</span><div class="big" style="font-size:26px">${h(x.t)}</div><p>${h(x.d)}</p><div class="opts">${x.ex.map(e=>`<button class="opt" data-act="say" data-say="${h(e)}">${ICON.say}${h(e)}</button>`).join("")}</div><p class="small muted">Toque em cada uma, ouça e repita em voz alta.</p></div>`;
+    actions = `<div class="actions"><button class="btn wide" data-act="spoke">Repeti todas, próximo som</button></div>`;
   } else if(it.t==="mc"){
     const prompt = it.dir==="listen" ? `<span class="kind">Ouça e escolha</span>${sayBtn(c.es,true)}${it.picked!==null?`<div class="ans">${h(c.es)}</div>`:""}`
       : `<span class="kind">${it.dir==="es"?"O que significa?":"Como se diz em espanhol?"}</span><div class="big ${it.dir==="pt"?"pt":""}">${h(it.dir==="es"?c.es:c.pt)}</div>${it.dir==="es"?sayBtn(c.es):""}`;
@@ -1000,10 +1080,17 @@ function drawDrill(){
   const a = $("#ans"); if(a){ a.focus(); a.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); checkWrite(); } }); }
 }
 function drawDone(){
-  const isSession = D.mode==="session";
-  const msg = isSession ? "Sessão concluída!" : `${D.score} de ${D.total}`;
-  const sub = isSession ? `Volte amanhã para revisar. Sequência: ${streak()} ${streak()===1?"dia":"dias"}.` : (D.score>=D.total*0.8 ? "¡Muy bien! Você está mandando bem." : "Os erros voltam na sua próxima sessão de revisão.");
-  $("#drill").innerHTML = drillTop() + `<div class="stage"><div class="done-box"><div class="big">${isSession?"¡Olé!":h(msg)}</div><p style="font-size:18px;font-weight:700">${isSession?h(msg):""}</p><p class="muted">${h(sub)}</p></div></div><div class="actions"><button class="btn wide" data-act="closedrill">Voltar</button>${!isSession?`<button class="btn soft wide" data-act="again">Mais uma rodada</button>`:""}</div>`;
+  const M = {
+    session:["¡Olé!","Sessão concluída!",`Agora pratique a conversa da semana. Sequência: ${streak()} ${streak()===1?"dia":"dias"}.`],
+    conv:["¡Genial!","Conversa completa!","Agora troque de papel e faça a outra pessoa."],
+    eco:["¡Bien!","Eco concluído","Quanto mais você repete em voz alta, mais natural fica."],
+    sons:["¡Perfecto!","Sons revisados","Volte aqui sempre que algum som travar."]
+  }[D.mode];
+  const [big, msg, sub] = M || [`${D.score} de ${D.total}`, "", D.score>=D.total*0.8 ? "¡Muy bien! Você está mandando bem." : "Os erros voltam na sua próxima sessão de revisão."];
+  const btns = D.mode==="session" ? `<button class="btn saff wide" data-act="conv">Praticar a conversa da semana</button>`
+    : D.mode==="conv" ? `<button class="btn saff wide" data-act="convswap">Trocar de papel</button><button class="btn soft wide" data-act="again">De novo</button>`
+    : `<button class="btn soft wide" data-act="again">Mais uma rodada</button>`;
+  $("#drill").innerHTML = drillTop() + `<div class="stage"><div class="done-box"><div class="big">${h(big)}</div>${msg?`<p style="font-size:18px;font-weight:700">${h(msg)}</p>`:""}<p class="muted">${h(sub)}</p></div></div><div class="actions">${btns}<button class="btn ghost wide" data-act="closedrill">Voltar</button></div>`;
 }
 function checkWrite(){
   const it = D.items[D.i]; const v = ($("#ans")||{}).value || "";
@@ -1066,19 +1153,44 @@ document.addEventListener("click", e=>{
     case "listen": startQuiz("listen"); break;
     case "write": startWrite(); break;
     case "falsos": startFalsos(); break;
-    case "again": { const m=D.mode; closeDrill(); if(m==="write") startWrite(); else if(m==="falsos") startFalsos(); else startQuiz(m); break; }
+    case "again": { const m=D.mode, wk=D.week, me=D.me; closeDrill(); if(m==="write") startWrite(); else if(m==="falsos") startFalsos(); else if(m==="conv") startConv(wk,me); else if(m==="eco") startEco(); else if(m==="sons") startSons(); else startQuiz(m); break; }
+    case "conv": { if(el.dataset.pick){ pickConv(); break; } const wk = el.dataset.week ? +el.dataset.week : null; if(D) closeDrill(); startConv(wk); break; }
+    case "convswap": { const wk=D.week, me=D.me; const other=[...new Set(WEEKS[wk-1].dialog.map(l=>l[0]))].find(x=>x!==me); closeDrill(); startConv(wk, other); break; }
+    case "eco": startEco(); break;
+    case "sons": startSons(); break;
+    case "slow": speak(el.dataset.say, true); break;
+    case "spoke": logToday().s++; save(); D.i++; drawDrill(); break;
+    case "mic": {
+      const it=D.items[D.i]; if(it.listening) break;
+      const target = it.c ? it.c.es : it.line[1];
+      it.listening=true; drawDrill();
+      hear().then(alts=>{
+        it.listening=false;
+        if(!D || D.items[D.i]!==it) return;
+        if(!alts.length){ toast("Não ouvi nada. Tente de novo, mais perto do celular."); drawDrill(); return; }
+        it.heard={text:alts[0], score:Math.max(...alts.map(a=>similarity(a,target)))};
+        D.revealed=true; logToday().s++; save(); drawDrill(); speak(target);
+      }).catch(err=>{
+        it.listening=false;
+        if(err==="not-allowed"||err==="service-not-allowed"||err==="start"){ MIC=false; toast("Microfone indisponível. Fale em voz alta e confira ouvindo."); }
+        else toast("Não ouvi direito. Tente de novo.");
+        if(D) drawDrill();
+      });
+      break; }
     case "goweek": openWeek=+el.dataset.week; renderPlano(); showTab("plano"); break;
     case "toggleweek": { const n=+el.dataset.week; openWeek = openWeek===n ? -1 : n; renderPlano(); const nb=document.querySelector(`[data-act="toggleweek"][data-week="${n}"]`); if(nb) nb.scrollIntoView({block:"start",behavior:"smooth"}); break; }
     case "unlock": { const n=+el.dataset.week; S.unlocked=Math.max(S.unlocked||1,n); save(); renderAll(); toast(`Semana ${n} liberada no treino`); break; }
     case "chip": phraseFilter=el.dataset.k; renderFrases(); break;
     case "closedrill": closeDrill(); break;
     case "learned": { const c=D.items[D.i].c; if(!S.cards[c.id]){ S.cards[c.id]={b:0,d:todayN()}; logToday().n++; save(); } D.i++; drawDrill(); break; }
-    case "reveal": { D.revealed=true; const it=D.items[D.i]; drawDrill(); if(it.dir==="pt") speak(it.c.es); break; }
+    case "reveal": { const it=D.items[D.i]; const first=!D.revealed; D.revealed=true;
+      if(it.t==="mine"){ if(first && !it.heard){ logToday().s++; save(); } drawDrill(); speak(it.line[1]); }
+      else { drawDrill(); if(it.dir==="pt") speak(it.c.es); } break; }
     case "grade": {
       const it=D.items[D.i], g=el.dataset.g;
       const wasNew = !S.cards[it.c.id];
       grade(it.c, g);
-      const lg=logToday(); if(wasNew) lg.n++; else lg.r++;
+      const lg=logToday(); if(wasNew) lg.n++; else lg.r++; if(it.dir==="pt" && !it.heard) lg.s++;
       if(g==="bad"){ D.retries[it.c.id]=(D.retries[it.c.id]||0)+1; if(D.retries[it.c.id]<=2) D.items.push({t:"test",c:it.c,dir:it.dir==="pt"?"es":"pt"}); }
       save(); D.revealed=false; D.i++; drawDrill(); break; }
     case "pick": {
@@ -1086,7 +1198,7 @@ document.addEventListener("click", e=>{
       const right = it.opts[it.picked]===it.c[it.field];
       if(right) D.score++; else if(S.cards[it.c.id]) S.cards[it.c.id].d=todayN();
       logToday().q++; save(); drawDrill(); if(it.dir==="pt") speak(it.c.es); break; }
-    case "next": D.i++; drawDrill(); break;
+    case "next": D.revealed=false; D.i++; drawDrill(); break;
     case "check": checkWrite(); break;
     case "acc": { const a=$("#ans"); if(a){ const s=a.selectionStart??a.value.length, en=a.selectionEnd??a.value.length; a.value=a.value.slice(0,s)+el.dataset.a+a.value.slice(en); a.focus(); a.setSelectionRange(s+1,s+1); } break; }
     case "settings": openSettings(); break;
