@@ -11,6 +11,8 @@ Funciona sem internet e guarda o progresso no próprio aparelho.
 - **Microfone**: quando o app é aberto pelo endereço próprio (instalado na tela inicial, em Chrome ou Safari), aparece o botão **Falar**, que escuta você e diz se entendeu a frase. Dentro do Claude o microfone não fica disponível, então você fala em voz alta e confere ouvindo.
 - **Frases**: guia de consulta com busca, para usar durante a viagem.
 - **Lola**: uma amiga de Madri que te recebe na tela inicial com uma mensagem diferente a cada dia (toque no balão para ouvir), comemora cada sessão com elogios em espanhol de verdade e confete, e dá uma curiosidade sobre a Espanha por dia.
+- **Pasajeros**: várias pessoas no mesmo app, cada uma com seu progresso. Ranking de XP da semana, troféu para quem lidera no domingo e **Duelo** (quiz a dois passando o celular). Toque em "PASAJERO" no painel para trocar ou adicionar.
+- **Kit de sobrevivência**: as 24 frases que resolvem aeroporto, estação, café, comida e emergências, fixas no guia.
 - **Níveis e conquistas**: XP por frases, falas em voz alta e missões; 7 níveis (de *Turista* a *¡Como en casa!*) e 9 conquistas. Sons e vibração podem ser desligados em Ajustes.
 
 O áudio usa a voz de espanhol do próprio celular. No Android, se a voz soar estranha, instale "Espanhol (Espanha)" em
