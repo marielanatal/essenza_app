@@ -5,7 +5,7 @@ Funciona sem internet e guarda o progresso no próprio aparelho.
 
 ## O que tem
 
-- **Hoy**: contagem regressiva para a viagem, a sessão do dia (frases novas + revisões), sequência de dias e a missão da semana.
+- **Hoy**: a rotina da noite em 3 passos, um de cada vez: Sessão (frases novas + revisões, ≈ 5 min), Conversa falada (≈ 3 min) e Eco (≈ 2 min). Quando os três estão feitos, a tela diz isso. Progresso, nível e conquistas ficam num painel à parte. Na primeira abertura, a Lola explica o método.
 - **Plan**: 14 semanas temáticas (cafeteria, restaurante, transporte, hotel, direções, compras, saúde…), cada uma com explicação de gramática/pronúncia, um diálogo com áudio e uma missão prática.
 - **Practicar**: foco em falar. A sessão diária pede que você diga cada frase em voz alta antes de ouvir a resposta; a **Conversa** faz um lado do diálogo e você responde falando; o **Eco** treina repetir junto (devagar e no ritmo normal); **Sons difíceis** cobre os sons que denunciam o sotaque brasileiro. Há também quiz, escuta, falsos amigos e escrita.
 - **Microfone**: quando o app é aberto pelo endereço próprio (instalado na tela inicial, em Chrome ou Safari), aparece o botão **Falar**, que escuta você e diz se entendeu a frase. Dentro do Claude o microfone não fica disponível, então você fala em voz alta e confere ouvindo.
