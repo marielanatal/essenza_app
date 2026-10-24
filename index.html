@@ -2348,6 +2348,46 @@ const LEVELS = [[0,"Turista"],[60,"Fan de las tapas"],[160,"Habitual del bar"],[
 const LOLA = `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="36" r="21" fill="#f1c6a0"/><path d="M11 38c-1-18 9-28 21-28s22 10 21 28c-3-11-9-16-21-16S14 27 11 38z" fill="#2a1a12"/><path d="M11 38c0 6 2 10 4 12-1-6 0-10 1-13z M53 38c0 6-2 10-4 12 1-6 0-10-1-13z" fill="#2a1a12"/><circle cx="24.5" cy="37" r="2.4" fill="#2a1a12"/><circle cx="39.5" cy="37" r="2.4" fill="#2a1a12"/><path d="M23 45c5 5 13 5 18 0" stroke="#b0302a" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="21" cy="42" r="2.5" fill="#f3a08c" opacity=".6"/><circle cx="43" cy="42" r="2.5" fill="#f3a08c" opacity=".6"/><circle cx="50" cy="22" r="5.5" fill="#d9372b"/><circle cx="50" cy="22" r="2" fill="#f6c453"/></svg>`;
 
 
+/* Fotos reais: a imagem principal do artigo da Wikipédia em espanhol, carregada no aparelho (não aqui no Claude). */
+const WP_WEEK = {1:"Puerta_del_Sol",2:"Aeropuerto_Adolfo_Suárez_Madrid-Barajas",3:"Café_con_leche",4:"Tortilla_de_patatas",5:"Gran_Vía_(Madrid)",6:"Mercado_de_San_Miguel",7:"Hotel_Ritz_(Madrid)",8:"Calle_de_Preciados",9:"Metro_de_Madrid",10:"Parque_del_Retiro",11:"Farmacia",12:"Tapa_(gastronomía)",13:"Toledo",14:"Plaza_de_Cibeles"};
+const WP_CITY = {madrid:"Madrid", barcelona:"Barcelona", sevilla:"Sevilla"};
+const WP_PLACE = {
+ "Museo del Prado":"Museo_del_Prado","Museo Reina Sofía":"Museo_Nacional_Centro_de_Arte_Reina_Sofía","Palacio Real":"Palacio_Real_de_Madrid","Plaza Mayor e Mercado de San Miguel":"Plaza_Mayor_de_Madrid","Parque del Retiro e Palacio de Cristal":"Palacio_de_Cristal_del_Retiro","Templo de Debod ao pôr do sol":"Templo_de_Debod","Tapas em La Latina":"La_Latina_(Madrid)","Gran Vía, Sol e Chueca a pé":"Gran_Vía_(Madrid)","Tour do Estádio Bernabéu":"Estadio_Santiago_Bernabéu","Museo Sorolla":"Museo_Sorolla","Museo Thyssen":"Museo_Thyssen-Bornemisza","El Rastro (domingo)":"El_Rastro","Flamenco no Corral de la Morería":"Corral_de_la_Morería","Chocolate con churros em San Ginés":"Chocolatería_San_Ginés",
+ "Toledo":"Toledo","Segovia":"Acueducto_de_Segovia","El Escorial":"Monasterio_de_El_Escorial","Ávila":"Ávila",
+ "Sagrada Família":"Templo_Expiatorio_de_la_Sagrada_Familia","Park Güell":"Parque_Güell","Casa Batlló":"Casa_Batlló","La Pedrera (Casa Milà)":"Casa_Milà","Barri Gòtic e Catedral":"Catedral_de_Barcelona","Mercado de La Boqueria":"Mercado_de_La_Boquería","El Born e Museu Picasso":"Museo_Picasso_(Barcelona)","Barceloneta e orla":"La_Barceloneta","Montjuïc: teleférico, MNAC e vista":"Montjuïc","Bunkers del Carmel":"Turó_de_la_Rovira","Spotify Camp Nou: tour e museu":"Camp_Nou","Jantar em Gràcia":"Gracia_(Barcelona)","Flamenco no Tablao Cordobés":"Flamenco","Palau de la Música Catalana":"Palacio_de_la_Música_Catalana",
+ "Montserrat":"Montserrat_(montaña)","Girona":"Gerona","Sitges":"Sitges","Figueres (Museu Dalí)":"Teatro-Museo_Dalí","Tarragona":"Tarragona",
+ "Real Alcázar":"Real_Alcázar_de_Sevilla","Catedral e Giralda":"Catedral_de_Sevilla","Plaza de España e Parque de María Luisa":"Plaza_de_España_(Sevilla)","Barrio de Santa Cruz a pé":"Barrio_de_Santa_Cruz_(Sevilla)","Triana: mercado e cerâmica":"Triana_(Sevilla)","Setas de Sevilla (mirante)":"Metropol_Parasol","Flamenco na Casa de la Memoria":"Flamenco","Tapas em Alameda e El Arenal":"Tapa_(gastronomía)","Torre del Oro e passeio pelo Guadalquivir":"Torre_del_Oro","Casa de Pilatos":"Casa_de_Pilatos","Hospital de los Venerables":"Hospital_de_los_Venerables","Metropol e Calle Sierpes (compras)":"Calle_Sierpes",
+ "Córdoba":"Mezquita-catedral_de_Córdoba","Cádiz":"Cádiz","Jerez de la Frontera":"Jerez_de_la_Frontera","Granada e Alhambra (pernoite)":"Alhambra","Itálica (ruínas romanas)":"Itálica"
+};
+const PHOTOS_ON = !window.claude;      // dentro do Claude a rede externa é bloqueada
+let WPCACHE = {}; try{ WPCACHE = JSON.parse(localStorage.getItem("rumbo-wp")||"{}"); }catch(e){}
+function wpSave(){ try{ localStorage.setItem("rumbo-wp", JSON.stringify(WPCACHE)); }catch(e){} }
+function photoEl(title, cls, label){
+  if(!title) return "";
+  return `<figure class="photo${cls?" "+cls:""}" data-wp="${h(title)}" data-label="${h(label||"")}"><div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div></figure>`;
+}
+async function wpSummary(title){
+  if(WPCACHE[title] && WPCACHE[title].t > Date.now()-30*864e5) return WPCACHE[title];
+  const res = await fetch("https://es.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(title), {headers:{"Accept":"application/json"}});
+  if(!res.ok) throw new Error(res.status);
+  const j = await res.json();
+  const src = j.thumbnail && j.thumbnail.source ? j.thumbnail.source.replace(/\/\d+px-/, "/800px-") : null;
+  const out = {t:Date.now(), src, title:j.title, url:(j.content_urls && j.content_urls.desktop && j.content_urls.desktop.page) || ("https://es.wikipedia.org/wiki/"+encodeURIComponent(title))};
+  WPCACHE[title]=out; wpSave(); return out;
+}
+function loadPhotos(){
+  if(!PHOTOS_ON) return;
+  document.querySelectorAll(".photo[data-wp]:not([data-done])").forEach(async fig=>{
+    fig.dataset.done="1"; const title=fig.dataset.wp;
+    try{
+      const info = await wpSummary(title);
+      if(!info.src) return;
+      const img=new Image(); img.alt=fig.dataset.label||info.title; img.decoding="async";
+      img.onload=()=>{ fig.appendChild(img); const cap=document.createElement("figcaption"); cap.innerHTML = `<b>${h(fig.dataset.label||"")}</b><a href="${h(info.url)}" target="_blank" rel="noopener">Foto: Wikipedia ↗</a>`; fig.appendChild(cap); };
+      img.src=info.src;
+    }catch(e){ /* sem rede ou artigo não encontrado: fica o fundo neutro */ }
+  });
+}
 /* Para ver e ouvir: links da missão de cada semana (buscas no YouTube e sites oficiais; funcionam sempre) */
 const yt = q => "https://www.youtube.com/results?search_query="+encodeURIComponent(q);
 const WEEK_LINKS = {
