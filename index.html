@@ -2969,7 +2969,7 @@ function fmtShort(n){ const k=keyFromNum(n).split("-"); const m=["jan","fev","ma
    ESTADO (localStorage + sincronização opcional)
    ============================================================ */
 const LS_KEY = "rumbo-espana-v1";
-function defaults(){ return {v:1,start:todayKey(),trip:"2027-02-01",dest:"ESPAÑA",daily:5,rate:0.9,unlocked:1,name:"",sound:true,cards:{},missions:{},log:{},badges:{},updatedAt:0}; }
+function defaults(){ return {v:1,start:todayKey(),trip:"2027-02-01",dest:"ESPAÑA",daily:12,minutes:15,planWeeks:0,rate:0.9,unlocked:1,name:"",sound:true,cards:{},missions:{},log:{},badges:{},updatedAt:0}; }
 function normalize(s){ const d=defaults(); s = (s && typeof s==="object") ? s : {}; return Object.assign(d, s, {cards:s.cards||{}, missions:s.missions||{}, log:s.log||{}, badges:s.badges||{}}); }
 /* Perfis (pasajeros): cada pessoa tem seu progresso; o ranking compara a semana */
 const PROF_KEY = "rumbo-profiles";
@@ -3122,9 +3122,24 @@ document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState=
 /* ============================================================
    LÓGICA DE ESTUDO
    ============================================================ */
-function weekByDate(){ return Math.min(TOTAL_WEEKS, Math.max(1, Math.floor((todayN()-numOf(S.start))/7)+1)); }
+/* Cronograma: 14 temas distribuídos entre o início do estudo e a viagem (ou nas semanas definidas) */
+function planWeeks(){ if(S.planWeeks) return Math.max(2, Math.min(52, S.planWeeks)); const w=Math.round((numOf(S.trip)-numOf(S.start))/7); return Math.max(2, Math.min(52, w||14)); }
+function planDays(){ return planWeeks()*7; }
+function weekStart(n){ return numOf(S.start)+Math.floor((n-1)*planDays()/TOTAL_WEEKS); }         // dia em que o tema n começa
+function weekEnd(n){ return n>=TOTAL_WEEKS ? numOf(S.start)+planDays()-1 : weekStart(n+1)-1; }    // último dia do tema n
+function weekByDate(){ const t=todayN(); let u=1; for(let n=1;n<=TOTAL_WEEKS;n++){ if(weekStart(n)<=t) u=n; } return u; }
 function curWeek(){ return Math.min(TOTAL_WEEKS, Math.max(weekByDate(), S.unlocked||1)); }
-function weekStart(n){ return numOf(S.start)+(n-1)*7; }
+function calWeek(){ return Math.max(1, Math.floor((todayN()-numOf(S.start))/7)+1); }
+const MIN_OPTS=[5,10,15,20,30];
+function dailyFor(minutes){ return ({5:4,10:8,15:12,20:16,30:24})[minutes] || Math.max(3, Math.round(minutes*0.8)); }
+/* Viabilidade: dá para ver as frases do plano antes da viagem com a meta atual? */
+function feasibility(){
+  const left = CARDS.filter(c=>c.tier===1 && !S.cards[c.id]).length;
+  const days = Math.max(1, numOf(S.trip)-todayN());
+  const need = Math.ceil(left/Math.max(1, Math.round(days*6/7)));   // conta ~6 dias de estudo por semana
+  const reach = Math.min(TOTAL_WEEKS, Math.max(1, Math.floor((S.daily*Math.round(days*6/7))/Math.max(1,left)*(TOTAL_WEEKS-curWeek()+1))+curWeek()-1));
+  return {left, days, need, ok: S.daily>=need, reach};
+}
 function unlockedCards(){ const w=curWeek(); return CARDS.filter(c=>c.week<=w); }
 function seenCards(){ return CARDS.filter(c=>S.cards[c.id]); }
 function newCards(){ const l=S.log[todayKey()]; const extraOn = l && (l.x||0)>0; const u=unlockedCards().filter(c=>!S.cards[c.id]); return [...u.filter(c=>c.tier===1), ...(extraOn ? u.filter(c=>c.tier===2) : [])]; }
@@ -3134,12 +3149,17 @@ function logToday(){ const k=todayKey(); if(!S.log[k]) S.log[k]={n:0,r:0,q:0,s:0
 const activity = l => l ? (l.n||0)+(l.r||0)+(l.q||0)+(l.s||0)+(l.c||0)+(l.e||0) : 0;
 function todaySteps(){
   const l=S.log[todayKey()]||{}; const nw=Math.min(newLeftToday(), newCards().length), due=dueCards().length;
-  return [
+  const m=S.minutes||15;
+  const all=[
     {id:"session", t:"Sessão", d: (nw===0&&due===0) ? "Frases de hoje em dia" : (due===0 && (l.n||0)>=S.daily) ? `Meta feita · extra: ${nw} novas à espera` : `${nw} novas · ${due} revisões · ≈ ${sessionMinutes(nw,due)} min`, done: due===0 && (nw===0 || (l.n||0)>=S.daily), started:(l.n||0)+(l.r||0)>0, act:"session", go:"Começar"},
     {id:"conv", t:"Conversa falada", d:`${WEEKS[curWeek()-1].title} · ≈ 3 min`, done:(l.c||0)>0, act:"conv", go:"Conversar"},
     MIC ? {id:"eco", t:"Pronúncia no microfone", d:"5 palavras e 7 frases · ≈ 3 min", done:(l.e||0)>0, act:"pron", go:"Falar"}
-        : {id:"eco", t:"Eco: repetir imitando", d:"10 frases · ≈ 2 min", done:(l.e||0)>0, act:"eco", go:"Repetir"}
+        : {id:"eco", t:"Eco: repetir imitando", d:"10 frases · ≈ 2 min", done:(l.e||0)>0, act:"eco", go:"Repetir"},
+    {id:"quiz", t:"Quiz", d:"10 perguntas, com 'o que responder?' · ≈ 3 min", done:(l.q||0)>=10, act:"quiz", go:"Jogar"},
+    {id:"extra", t:"Frases extra", d:`+${S.daily} além da meta · ≈ ${sessionMinutes(S.daily,0)} min`, done:(l.x||0)>0 && (l.n||0)>=S.daily*2, act:"extra", go:"Mais"}
   ];
+  const n = m<=5 ? 1 : m<=10 ? 2 : m<=15 ? 3 : m<=20 ? 4 : 5;
+  return all.slice(0,n);
 }
 function spokenTotal(){ return Object.values(S.log).reduce((a,l)=>a+(l.s||0),0); }
 function sessionMinutes(nw, due){ return Math.max(1, Math.round((nw*2.2 + due*0.6)/2)); }
@@ -3358,7 +3378,7 @@ function renderBoard(){
   const [y,m,d] = S.trip.split("-");
   $("#b-date").textContent = `${+d} ${["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"][+m-1]} ${y}`;
   const dest=(S.dest||"Espanha"); $("#b-dest").textContent = dest.toUpperCase()==="ESPAÑA" ? "Espanha" : dest.charAt(0).toUpperCase()+dest.slice(1).toLowerCase();
-  $("#b-week").textContent = `semana ${curWeek()} de ${TOTAL_WEEKS}`;
+  $("#b-week").textContent = `semana ${Math.min(calWeek(),planWeeks())} de ${planWeeks()} · tema ${curWeek()}`;
   $("#b-pax").innerHTML = `<i></i>${h((me().name||"").slice(0,14))}`;
 }
 
@@ -3371,8 +3391,8 @@ function renderHoje(){
   const nothing = steps[0].done;
   const t = todayN();
   const daysLeft = Math.max(0, numOf(S.trip)-t);
-  const weeksLeftPlan = TOTAL_WEEKS - curWeek();
-  const behind = daysLeft < weeksLeftPlan*7;
+  const fz = feasibility();
+  const behind = !fz.ok && daysLeft>0 && fz.left>0;
   const lola = lolaSays({nothing, daysLeft, allDone, cur: cur && cur.id});
   const lv = level();
   const lvPct = lv.hi ? Math.round(100*(lv.x-lv.lo)/(lv.hi-lv.lo)) : 100;
@@ -3387,20 +3407,20 @@ function renderHoje(){
   }).join("");
   $("#v-hoje").innerHTML = `
     <div class="lola"><div class="av">${LOLA}</div><button class="bubble" data-act="say" data-say="${h(lola.es)}"><div class="name">Lola · toque numa palavra</div><div class="es">${W(lola.es)}</div><div class="pt">${h(lola.pt)}</div></button></div>
-    <div class="todayhead"><h2>Hoje</h2><div class="wk">Semana ${w.n} · <a href="#" data-act="goweek" data-week="${w.n}">${h(w.title)}</a></div></div>
+    <div class="todayhead"><h2>Hoje</h2><div class="wk">Tema ${w.n} de ${TOTAL_WEEKS} · <a href="#" data-act="goweek" data-week="${w.n}">${h(w.title)}</a></div></div>
     ${PHOTOS_ON ? photoEl(WP_WEEK[w.n], "banner", w.title) : ""}
     ${allDone && (backupAge()===null ? learnedCount()>=10 : backupAge()>=7) ? `<button class="card tint-s" style="text-align:left;width:100%" data-act="backup"><p class="small"><b>Faça um backup (leva 10 segundos).</b> ${IS_IOS?"No iPhone, apagar o app apaga o progresso. ":""}Toque aqui para gerar o link e guarde nas Notas ou no WhatsApp.</p></button>`:""}
     ${allDone ? `<div class="alldone"><div class="av" style="width:64px;height:64px;background:rgba(255,255,255,.2)">${LOLA}</div><div><div class="big">Feito por hoje. ¡Hasta mañana!</div><p>Rotina completa em ${streak()} ${streak()===1?"dia seguido":"dias seguidos"}.</p></div></div>
     <div class="card stack" style="gap:10px"><div class="eyebrow">Quer mais? Extras de hoje</div>
       <div class="row" style="gap:8px">
-        ${newTier(1) ? `<button class="btn soft" style="flex:1 1 46%" data-act="extra">+${S.daily} frases novas <span class="ct">≈ ${sessionMinutes(S.daily,0)} min</span></button>` : newTier(2) ? `<button class="btn soft" style="flex:1 1 46%" data-act="extra">+${Math.min(S.daily,newTier(2))} frases extra <span class="ct">da semana ${curWeek()} · ≈ ${sessionMinutes(Math.min(S.daily,newTier(2)),0)} min</span></button>` : `<button class="btn soft" style="flex:1 1 46%" data-act="unlocknext">Liberar próxima semana</button>`}
+        ${newTier(1) ? `<button class="btn soft" style="flex:1 1 46%" data-act="extra">+${S.daily} frases novas <span class="ct">≈ ${sessionMinutes(S.daily,0)} min</span></button>` : newTier(2) ? `<button class="btn soft" style="flex:1 1 46%" data-act="extra">+${Math.min(S.daily,newTier(2))} frases extra <span class="ct">da semana ${curWeek()} · ≈ ${sessionMinutes(Math.min(S.daily,newTier(2)),0)} min</span></button>` : `<button class="btn soft" style="flex:1 1 46%" data-act="unlocknext">Liberar próximo tema</button>`}
         <button class="btn soft" style="flex:1 1 46%" data-act="conv" data-pick="1">Outra conversa</button>
         <button class="btn soft" style="flex:1 1 46%" data-act="${MIC?"pron":"eco"}">${MIC?"Pronúncia de novo":"Eco de novo"}</button>
         <button class="btn soft" style="flex:1 1 46%" data-act="quiz">Quiz rápido</button>
       </div>
       <p class="small muted">${newTier(1) ? `Ainda há ${newTier(1)} frases do plano liberadas até a semana ${curWeek()}, mais ${newTier(2)} extras.` : newTier(2) ? `Você já viu as frases do plano até a semana ${curWeek()}. Restam ${newTier(2)} frases extra desta semana.` : `Você já viu tudo até a semana ${curWeek()}. Pode adiantar a próxima.`} O extra não quebra a rotina: amanhã volta ao normal.</p></div>` : ""}
-    <div class="steps">${stepsHtml}<div class="stepfoot"><span>${doneN} de 3 · uns 10 minutos no total</span><span>Fale em voz alta de verdade</span></div></div>
-    ${behind ? `<div class="card tint-s small"><b>A viagem chega antes do fim do plano.</b> Faltam ${daysLeft} dias e ${weeksLeftPlan} semanas de conteúdo. Você pode adiantar semanas na aba Plan.</div>`:""}
+    <div class="steps">${stepsHtml}<div class="stepfoot"><span>${doneN} de ${steps.length} · uns ${S.minutes||15} min no total</span><button class="btn soft" style="min-height:30px;padding:4px 10px;font-size:12px" data-act="settings">mudar tempo</button></div></div>
+    ${behind ? `<button class="card tint-s small" style="text-align:left;width:100%" data-act="settings"><b>No ritmo atual você não vê tudo antes da viagem.</b> Faltam ${fz.left} frases do plano em ${daysLeft} dias: precisaria de ${fz.need} novas por dia (hoje: ${S.daily}). Toque para ajustar os minutos por dia.</button>`:""}
     <button class="prog" data-act="progreso" aria-label="Ver progresso e conquistas">
       <div><div class="nums"><div><b>${streak()>=3?'🔥 ':""}${streak()}</b><span>dias seguidos</span></div><div><b>${learnedCount()}</b><span>frases</span></div><div><b>${spokenTotal()}</b><span>falas</span></div></div>
       <div class="lv">Nível ${lv.i+1} · ${h(lv.title)}${lv.hi?` · faltam ${lv.hi-lv.x} XP`:""}<div class="meter"><span style="width:${lvPct}%"></span></div></div></div>
@@ -3432,16 +3452,31 @@ function openProgreso(){
   </div>`;
   el.hidden=false;
 }
+function obPlanText(){
+  const t=$("#ob-trip"), st=$("#ob-start"), mn=$("#ob-min");
+  const trip = t && /^\d{4}-\d{2}-\d{2}$/.test(t.value) ? t.value : S.trip, start = st && /^\d{4}-\d{2}-\d{2}$/.test(st.value) ? st.value : S.start, m = mn ? +mn.value : (S.minutes||15);
+  const weeks=Math.max(2, Math.min(52, Math.round((numOf(trip)-numOf(start))/7)||14)); const daily=dailyFor(m);
+  const perWeek=TOTAL_WEEKS/weeks; const ritmo = perWeek>1.5 ? `${Math.round(perWeek*10)/10} temas por semana` : perWeek<0.75 ? `cada tema dura ${Math.round(10/perWeek)/10} semanas` : "um tema por semana";
+  const total=CARDS.filter(c=>c.tier===1).length; const studyDays=Math.round(weeks*6); const covered=Math.min(total, daily*studyDays);
+  const ok = covered>=total;
+  return `<b>Seu plano:</b> ${TOTAL_WEEKS} temas em ${weeks} semanas (${ritmo}), ${daily} frases novas por dia. ${ok ? "Dá para ver tudo antes da viagem." : `Com ${m} min/dia você cobre uns ${Math.round(100*covered/total)}% das frases antes da viagem; os temas mais úteis vêm primeiro. Mais minutos = mais cobertura.`}`;
+}
 function openOnboarding(){
   const el=$("#sheet"); setTimeout(loadPhotos, 50);
   el.innerHTML = `<div class="sheet onb" role="dialog" aria-label="Como funciona">
     ${PHOTOS_ON ? photoEl("Puerta_de_Alcalá", "banner", "Madrid") : ""}
-    <div class="lola"><div class="av">${LOLA}</div><div class="bubble"><div class="name">Lola</div><div class="es">¡Hola! Soy Lola, tu amiga de Madrid.</div><div class="pt">Vou te preparar para a Espanha em 14 semanas, uns 10 minutos por noite.</div></div></div>
-    <div class="pt-step"><span class="n">1</span><div><b>Toda noite, 3 passos</b><span>Sessão (frases novas e revisões), Conversa falada e Eco. Estão na tela inicial, um de cada vez. Faça na ordem e pronto.</span></div></div>
+    <div class="lola"><div class="av">${LOLA}</div><div class="bubble"><div class="name">Lola</div><div class="es">¡Hola! Soy Lola, tu amiga de Madrid.</div><div class="pt">Vou te preparar para a Espanha no seu ritmo: você diz quando viaja e quanto tempo tem por dia, e eu monto o plano.</div></div></div>
+    <div class="pt-step"><span class="n">1</span><div><b>Toda noite, uma rotina curta</b><span>Sessão (frases novas e revisões), Conversa falada, Pronúncia… o tamanho depende dos seus minutos. Fica na tela inicial, um passo de cada vez.</span></div></div>
     <div class="pt-step"><span class="n">2</span><div><b>Fale em voz alta, sempre</b><span>O app mostra em português, você fala em espanhol e depois confere ouvindo. Falar de verdade é o que faz a diferença na viagem.</span></div></div>
     <div class="pt-step"><span class="n">3</span><div><b>Toque numa palavra para traduzir</b><span>Qualquer palavra em espanhol no app abre o dicionário. E a aba Viaje monta o roteiro das cidades.</span></div></div>
     <div class="field"><label for="ob-name">Como posso te chamar?</label><input id="ob-name" maxlength="20" placeholder="Seu nome" value="${h(S.name && S.name!=="Jogador 1" ? S.name : "")}"></div>
-    <button class="btn wide" data-act="obdone">¡Vamos!</button>
+    <div class="route" style="background:var(--paper);border-radius:16px;padding:12px">
+      <label><span class="eyebrow">Quando é a viagem?</span><input type="date" id="ob-trip" value="${h(S.trip)}"></label>
+      <label><span class="eyebrow">Começo a estudar em</span><input type="date" id="ob-start" value="${h(S.start)}"></label>
+      <label class="full"><span class="eyebrow">Quanto tempo por dia?</span><select id="ob-min">${MIN_OPTS.map(n=>`<option value="${n}" ${(S.minutes||15)===n?"selected":""}>${n} minutos · ${n<=5?"só o essencial":n<=10?"sessão + conversa":n<=15?"sessão, conversa e pronúncia":n<=20?"rotina completa + quiz":"rotina completa + extras"}</option>`).join("")}</select></label>
+      <p class="small full" id="ob-plan" style="margin:0">${obPlanText()}</p>
+    </div>
+    <button class="btn wide" data-act="obdone">Montar meu plano</button>
     <button class="btn ghost wide" data-act="obrestore">Já usava o app? Restaurar meu progresso</button>
   </div>`;
   el.hidden=false; loadPhotos();
@@ -3455,7 +3490,7 @@ function renderPlano(){
   if(openWeek===null) openWeek = cw;
   const items = WEEKS.map(w=>{
     const wp = weekProgress(w.n);
-    const status = w.n<cw ? (wp.seen===wp.total ? "done" : "past") : w.n===cw ? "now" : "soon";
+    const status = w.n<cw ? (wp.seen===wp.total ? "done" : "past") : (w.n===cw || (weekStart(w.n)<=todayN() && weekEnd(w.n)>=todayN())) ? "now" : "soon";
     const pill = status==="done" ? `<span class="pill ok">concluída</span>` : status==="now" ? `<span class="pill now">agora</span>` : status==="past" ? `<span class="pill soon">${wp.seen}/${wp.total}</span>` : `<span class="pill soon">em breve</span>`;
     const open = openWeek===w.n;
     const body = !open ? "" : `<div class="wbody">
@@ -3476,12 +3511,16 @@ function renderPlano(){
       <div><div class="eyebrow" style="margin-bottom:6px">Para ver e ouvir nesta semana</div>${linksHtml(w.n)}</div>
       <div><div class="eyebrow">Frases (${CARDS.filter(c=>c.week===w.n&&c.tier===1).length})</div><div class="list">${CARDS.filter(c=>c.week===w.n&&c.tier===1).map(phraseRow).join("")}</div></div>
       ${CARDS.some(c=>c.week===w.n&&c.tier===2) ? `<details class="sec"><summary>Frases extra (${CARDS.filter(c=>c.week===w.n&&c.tier===2).length}) <span class="small muted" style="font-weight:400">entram nos extras do dia</span></summary><div class="in"><div class="list">${CARDS.filter(c=>c.week===w.n&&c.tier===2).map(phraseRow).join("")}</div></div></details>` : ""}
-      ${w.n>cw ? `<button class="btn ghost wide" data-act="unlock" data-week="${w.n}">Adiantar: liberar esta semana no treino</button>` : `<button class="btn soft wide" data-act="quiz" data-week="${w.n}">Quiz desta semana</button>`}
+      ${w.n>cw ? `<button class="btn ghost wide" data-act="unlock" data-week="${w.n}">Adiantar: liberar este tema no treino</button>` : `<button class="btn soft wide" data-act="quiz" data-week="${w.n}">Quiz desta semana</button>`}
     </div>`;
-    return `<div class="week ${status}"><button class="head" data-act="toggleweek" data-week="${w.n}" aria-expanded="${open}"><span class="wnum">${wicon(w.n)}</span><span><span class="wtitle">${W(w.title)}</span><br><span class="wdates">${fmtShort(weekStart(w.n))} – ${fmtShort(weekStart(w.n)+6)} · ${h(w.sub)}</span></span>${pill}</button>${body}</div>`;
+    return `<div class="week ${status}"><button class="head" data-act="toggleweek" data-week="${w.n}" aria-expanded="${open}"><span class="wnum">${wicon(w.n)}</span><span><span class="wtitle">${W(w.title)}</span><br><span class="wdates">${fmtShort(weekStart(w.n))} – ${fmtShort(weekEnd(w.n))} · ${h(w.sub)}</span></span>${pill}</button>${body}</div>`;
   }).join("");
   const res = `<div class="card stack" style="gap:4px;margin-top:8px"><div class="eyebrow">Para ouvir espanhol da Espanha todo dia</div><p class="small muted">Ouvir 10 minutos por dia, mesmo sem entender tudo, acostuma o ouvido ao ritmo e ao sotaque. Escolha um e deixe no caminho do trabalho.</p>${RESOURCES.map(([k,t,d,u])=>`<div class="res"><span class="ic ${k}">${KIND_IC[k]}</span><div><a href="${h(u)}" target="_blank" rel="noopener">${h(t)}</a><p>${h(d)}</p></div></div>`).join("")}</div>`;
-  $("#v-plano").innerHTML = `<div><h2 style="font-size:24px">Plano de ${TOTAL_WEEKS} semanas</h2><p class="muted small" style="margin-top:4px">Uma semana por tema, 5 a 10 minutos por noite. As primeiras semanas são o que você mais vai usar: pedir ajuda, aeroporto e estação, café, comida e direções. Toque numa semana para ver a explicação, o diálogo e as frases.</p></div>${items}${res}`;
+  const pw=planWeeks(); const perWeek = TOTAL_WEEKS/pw; const ritmoTxt = perWeek>1.5 ? `${Math.round(perWeek*10)/10} temas por semana` : perWeek>1.05 ? "pouco mais de um tema por semana" : perWeek<0.75 ? `cada tema dura ${Math.round(10/perWeek)/10} semanas` : "um tema por semana";
+  const fz=feasibility();
+  $("#v-plano").innerHTML = `<div><h2 style="font-size:24px">Seu plano de estudo</h2><p class="muted small" style="margin-top:4px">${TOTAL_WEEKS} temas em <b>${pw} semanas</b> (${fmtShort(numOf(S.start))} a ${fmtShort(numOf(S.start)+pw*7-1)}): ${ritmoTxt}. <b>${S.minutes||15} min por dia</b>, ${S.daily} frases novas por dia. As primeiras semanas são o que você mais vai usar: pedir ajuda, aeroporto, café, comida e direções.</p></div>
+    <button class="card ${fz.ok?"tint-g":"tint-s"} small" style="text-align:left;width:100%" data-act="settings">${fz.left===0 ? "<b>Você já viu todas as frases do plano.</b> Agora é revisar e praticar as conversas." : fz.ok ? `<b>No ritmo certo:</b> faltam ${fz.left} frases e ${fz.days} dias até a viagem; sua meta de ${S.daily}/dia dá conta.` : `<b>Ritmo curto:</b> faltam ${fz.left} frases em ${fz.days} dias; precisaria de ${fz.need} por dia (hoje ${S.daily}).`} <span style="color:var(--cobalt);font-weight:700">Ajustar plano ›</span></button>
+    ${items}${res}`;
 }
 
 /* RENDER: Practicar */
@@ -3992,8 +4031,14 @@ function openSettings(){
     <div class="field"><label for="s-name">Seu nome (passageiro ativo)</label><input id="s-name" maxlength="20" value="${h(S.name||"")}" placeholder="Seu nome ou apelido"></div>
     <div class="field"><label for="s-trip">Data da viagem</label><input type="date" id="s-trip" value="${h(S.trip)}"></div>
     <div class="field"><label for="s-dest">Destino no painel</label><input id="s-dest" maxlength="14" value="${h(S.dest||"ESPAÑA")}"><span class="hint">Ex.: MADRID, BARCELONA, SEVILLA.</span></div>
-    <div class="field"><label for="s-start">Início do plano (semana 1)</label><input type="date" id="s-start" value="${h(S.start)}"><span class="hint">As semanas avançam sozinhas a cada 7 dias a partir desta data.</span></div>
-    <div class="field"><label for="s-daily">Frases novas por dia</label><select id="s-daily">${[3,5,8,10,15].map(n=>`<option value="${n}" ${S.daily===n?"selected":""}>${n}${n===5?" (≈ 5 min por noite)":""}</option>`).join("")}</select></div>
+    <div class="card tint-c stack" style="gap:10px">
+      <b>Plano de estudo</b>
+      <div class="field"><label for="s-start">Começo do estudo</label><input type="date" id="s-start" value="${h(S.start)}"></div>
+      <div class="field"><label for="s-weeks">Duração do plano</label><select id="s-weeks"><option value="0" ${!S.planWeeks?"selected":""}>Até a viagem (${(()=>{const w=Math.round((numOf(S.trip)-numOf(S.start))/7); return Math.max(2,Math.min(52,w||14));})()} semanas)</option>${[4,6,8,10,12,14,16,20,24,30,40,52].map(n=>`<option value="${n}" ${S.planWeeks===n?"selected":""}>${n} semanas</option>`).join("")}</select><span class="hint">Os ${TOTAL_WEEKS} temas se distribuem nessas semanas. Menos semanas = mais temas por semana.</span></div>
+      <div class="field"><label for="s-minutes">Minutos por dia</label><select id="s-minutes">${MIN_OPTS.map(n=>`<option value="${n}" ${(S.minutes||15)===n?"selected":""}>${n} min · ${dailyFor(n)} frases novas · ${n<=5?"só a sessão":n<=10?"sessão + conversa":n<=15?"sessão, conversa e pronúncia":n<=20?"+ quiz":"+ quiz e frases extra"}</option>`).join("")}</select></div>
+      <div class="field"><label for="s-daily">Frases novas por dia (ajuste fino)</label><select id="s-daily">${[3,4,5,6,8,10,12,15,16,20,24].map(n=>`<option value="${n}" ${S.daily===n?"selected":""}>${n}</option>`).join("")}</select></div>
+      <p class="hint" id="s-feas">${(()=>{ const f=feasibility(); return f.left===0 ? "Todas as frases do plano já vistas." : f.ok ? `No ritmo: faltam ${f.left} frases e ${f.days} dias; ${S.daily}/dia dá conta.` : `Atenção: faltam ${f.left} frases em ${f.days} dias; precisaria de ${f.need}/dia.`; })()}</p>
+    </div>
     <div class="field"><label for="s-rate">Velocidade da voz: <span id="s-rate-v">${S.rate.toFixed(2)}</span>×</label><input type="range" id="s-rate" min="0.6" max="1.1" step="0.05" value="${S.rate}">${canSpeak?`<button class="btn soft" data-act="say" data-say="Hola, ¿qué tal? Me llamo Lucía y vivo en Madrid.">Testar voz</button>`:`<span class="hint">Este navegador não oferece voz.</span>`}<span class="hint">${canSpeak ? (esVoice() ? "Voz em uso: "+h(esVoice().name) : "Nenhuma voz de espanhol instalada; o aparelho usará a voz padrão. No Android, instale 'Espanhol (Espanha)' em Configurações › Idioma › Conversão de texto em voz.") : ""}</span></div>
     <div class="field"><label>Microfone (botão Falar)</label>
       ${window.claude ? `<span class="hint">Dentro do Claude o microfone não está disponível. Use o app instalado pelo endereço do GitHub.</span>` :
@@ -4015,13 +4060,16 @@ function openSettings(){
   el.hidden = false;
   $("#s-rate").addEventListener("input", e=>{ $("#s-rate-v").textContent = (+e.target.value).toFixed(2); });
   const sp=$("#s-photos"); if(sp) sp.addEventListener("change", ()=>{ try{ localStorage.setItem("rumbo-photos", sp.checked?"on":"off"); }catch(e){} toast(sp.checked?"Fotos ligadas. Recarregando…":"Fotos desligadas. Recarregando…"); setTimeout(()=>location.reload(), 600); });
-  ["s-trip","s-start","s-daily","s-rate","s-dest","s-name","s-sound"].forEach(id=>$("#"+id).addEventListener("change", applySettings));
+  const sm=$("#s-minutes"); if(sm) sm.addEventListener("change", ()=>{ S.minutes=+sm.value; S.daily=dailyFor(S.minutes); const sd=$("#s-daily"); if(sd) sd.value=String(S.daily); applySettings(); });
+  ["s-trip","s-start","s-daily","s-weeks","s-rate","s-dest","s-name","s-sound"].forEach(id=>{ const el=$("#"+id); if(el) el.addEventListener("change", applySettings); });
 }
 function applySettings(){
   const trip=$("#s-trip").value, start=$("#s-start").value;
   if(/^\d{4}-\d{2}-\d{2}$/.test(trip)) S.trip=trip;
   if(/^\d{4}-\d{2}-\d{2}$/.test(start)) S.start=start;
   S.daily = +$("#s-daily").value || 8;
+  { const sw=$("#s-weeks"); if(sw) S.planWeeks = +sw.value || 0; }
+  { const f=feasibility(); const fe=$("#s-feas"); if(fe) fe.textContent = f.left===0 ? "Todas as frases do plano já vistas." : f.ok ? `No ritmo: faltam ${f.left} frases e ${f.days} dias; ${S.daily}/dia dá conta.` : `Atenção: faltam ${f.left} frases em ${f.days} dias; precisaria de ${f.need}/dia.`; }
   S.rate = +$("#s-rate").value || 0.9;
   S.dest = ($("#s-dest").value || "ESPAÑA").slice(0,14);
   S.name = ($("#s-name").value || "").trim().slice(0,20) || me().name;
@@ -4059,7 +4107,8 @@ document.addEventListener("click", e=>{
     case "falsos": startFalsos(); break;
     case "pasajeros": openPasajeros(); break;
     case "progreso": openProgreso(); break;
-    case "obdone": { const n=(($("#ob-name")||{}).value||"").trim().slice(0,20); if(n){ S.name=n; me().name=n; } PR.onboarded=true; saveProfiles(); save(); $("#sheet").hidden=true; renderAll(); toast(n?`¡Encantada, ${n}!`:"¡Vamos!"); break; }
+    case "obdone": { const n=(($("#ob-name")||{}).value||"").trim().slice(0,20); if(n){ S.name=n; me().name=n; }
+      { const t=$("#ob-trip"), st=$("#ob-start"), mn=$("#ob-min"); if(t && /^\d{4}-\d{2}-\d{2}$/.test(t.value)) S.trip=t.value; if(st && /^\d{4}-\d{2}-\d{2}$/.test(st.value)) S.start=st.value; if(mn){ S.minutes=+mn.value; S.daily=dailyFor(S.minutes); } S.planWeeks=0; } PR.onboarded=true; saveProfiles(); save(); $("#sheet").hidden=true; renderAll(); toast(n?`¡Encantada, ${n}!`:"¡Vamos!"); break; }
     case "vdest": { toggleMiddle(el.dataset.id); saveProfiles(); renderViaje(); break; }
     case "vgo": { e.preventDefault(); if(el.disabled) break; vgo(el.dataset.s, el.dataset.city||null); break; }
     case "vauto": { if(autoDays()){ saveProfiles(); renderViaje(); toast("Dias distribuídos. Ajuste com − e + se quiser."); } else toast("Precisa de pelo menos 1 dia por cidade."); break; }
@@ -4135,11 +4184,11 @@ document.addEventListener("click", e=>{
       break; }
     case "checkupdate": { toast("Verificando…"); fetch("index.html",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=t.match(/APP_VERSION = "([^"]+)"/); if(m && m[1]!==APP_VERSION){ toast(`Versão ${m[1]} disponível. Atualizando…`); if(navigator.serviceWorker && navigator.serviceWorker.getRegistration) navigator.serviceWorker.getRegistration().then(reg=>reg&&reg.update()); setTimeout(()=>location.reload(), 1200); } else toast("Você já está na versão mais recente."); }).catch(()=>toast("Sem conexão para verificar.")); break; }
     case "extra": { const lg=logToday(); lg.x=(lg.x||0)+S.daily; save(); renderAll(); startSession(); break; }
-    case "unlocknext": { if(curWeek()<TOTAL_WEEKS){ S.unlocked=Math.max(S.unlocked||1, curWeek()+1); const lg=logToday(); lg.x=(lg.x||0)+S.daily; save(); renderAll(); toast(`Semana ${curWeek()} liberada. ¡A por ella!`); startSession(); } else toast("Você já liberou todas as semanas. ¡Enhorabuena!"); break; }
+    case "unlocknext": { if(curWeek()<TOTAL_WEEKS){ S.unlocked=Math.max(S.unlocked||1, curWeek()+1); const lg=logToday(); lg.x=(lg.x||0)+S.daily; save(); renderAll(); toast(`Tema ${curWeek()} liberado. ¡A por él!`); startSession(); } else toast("Você já liberou todas as semanas. ¡Enhorabuena!"); break; }
     case "pronretry": { const it=D.items[D.i]; it.heard=null; drawDrill(); break; }
     case "goweek": e.preventDefault(); openWeek=+el.dataset.week; renderPlano(); showTab("plano"); break;
     case "toggleweek": { const n=+el.dataset.week; openWeek = openWeek===n ? -1 : n; renderPlano(); const nb=document.querySelector(`[data-act="toggleweek"][data-week="${n}"]`); if(nb) nb.scrollIntoView({block:"start",behavior:"smooth"}); break; }
-    case "unlock": { const n=+el.dataset.week; S.unlocked=Math.max(S.unlocked||1,n); save(); renderAll(); toast(`Semana ${n} liberada no treino`); break; }
+    case "unlock": { const n=+el.dataset.week; S.unlocked=Math.max(S.unlocked||1,n); save(); renderAll(); toast(`Tema ${n} liberado no treino`); break; }
     case "chip": phraseFilter=el.dataset.k; renderFrases(); break;
     case "closedrill": closeDrill(); break;
     case "learned": { const c=D.items[D.i].c; if(!S.cards[c.id]){ S.cards[c.id]={b:0,d:todayN()}; logToday().n++; save(); } D.i++; drawDrill(); break; }
@@ -4175,6 +4224,7 @@ document.addEventListener("click", e=>{
 });
 document.addEventListener("change", e=>{
   const el = e.target;
+  if(el.id==="ob-trip"||el.id==="ob-start"||el.id==="ob-min"){ const pp=$("#ob-plan"); if(pp) pp.innerHTML=obPlanText(); return; }
   if(el.dataset && el.dataset.act==="varr"){ setArrival(el.value); saveProfiles(); renderViaje(); return; }
   if(el.dataset && el.dataset.act==="vdep"){ setDeparture(el.value); saveProfiles(); renderViaje(); return; }
   if(el.dataset && el.dataset.act==="vtrip"){ if(/^\d{4}-\d{2}-\d{2}$/.test(el.value)){ S.trip=el.value; save(); renderAll(); renderViaje(); } return; }
@@ -4195,7 +4245,7 @@ setTimeout(()=>{ if(!PR.onboarded && $("#sheet").hidden) openOnboarding(); }, 40
   } else toast("Esse link de backup não é válido."); return; }
   const d=parseInvite(location.hash); if(d && receiveScore(d)){ try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} renderAll(); setTimeout(()=>{ toast(`Placar de ${d.name} recebido. Agora mande o seu!`); if(PR.onboarded) openPasajeros(); }, 600); } })();
 /* Atualização automática: quando sai versão nova, o app baixa e recarrega sozinho (fora de um treino). */
-const APP_VERSION = "2026.10.24-1308";
+const APP_VERSION = "2026.10.24-1324";
 let pendingReload = false;
 function maybeReload(){ if(!pendingReload) return; if(D || !$("#drill").hidden){ return; } pendingReload=false; toast("Atualizando o app…"); setTimeout(()=>location.reload(), 600); }
 if("serviceWorker" in navigator && !window.claude && location.protocol==="https:"){
