@@ -3380,11 +3380,38 @@ const KIND_IC={video:"▶",podcast:"♪",site:"↗"};
 function linksHtml(n){ const ls=WEEK_LINKS[n]||[]; if(!ls.length) return ""; return `<div class="links">${ls.map(([k,t,u])=>`<a class="lnk" href="${h(u)}" target="_blank" rel="noopener"><span class="ic ${k}">${KIND_IC[k]}</span><span><span class="k">${KIND_PT[k]}</span><b>${h(t)}</b></span><span class="go">abrir</span></a>`).join("")}</div>`; }
 function bkTag(k){ const b=BOOK[k]||BOOK.h; return `<span class="bk ${b[1]}"><i></i>${b[0]}</span>`; }
 function itemHtml(m){ return `<div class="item"><div class="hd"><a href="${h(m.link)}" target="_blank" rel="noopener">${h(m.t)}</a><div class="meta2">${bkTag(m.pay?m.book:"g")}<span class="meta">${h(m.area||m.how||"")}${m.price?` · ${h(m.price)}`:""}</span></div></div><div class="tip">${m.tip}</div></div>`; }
+let viajeQ = "";
+function viajeSearch(q){
+  const n = norm(q.trim()); if(n.length<2) return [];
+  const hit = (...xs) => xs.some(x => x && norm(String(x).replace(/<[^>]+>/g,"")).includes(n));
+  const out=[];
+  Object.entries(DEST).forEach(([id,d])=>{
+    const cityHit = hit(d.name, d.region);
+    d.must.forEach(m=>{ if(cityHit || hit(m.t, m.area, m.tip, m.price)) out.push({city:d.name, id, kind:"Imperdível", m}); });
+    d.daytrips.forEach(m=>{ if(cityHit || hit(m.t, m.how, m.tip)) out.push({city:d.name, id, kind:"Bate e volta", m}); });
+    d.curios.forEach((c,i)=>{ if(hit(c)) out.push({city:d.name, id, kind:"Curiosidade", text:c}); });
+    d.transit.forEach(g=>g.o.forEach(o=>{ if(hit(o[0], o[3], g.t)) out.push({city:d.name, id, kind:"Transporte", m:{t:o[0], how:g.t+" · "+o[1], link:o[2], tip:o[3], book:"h", pay:0}}); }));
+  });
+  return out.slice(0,40);
+}
 function renderViaje(){
   const sel = V.dests.filter(id=>DEST[id]);
+  const results = viajeSearch(viajeQ);
+  const searchBox = `<input class="search" id="vq" type="search" placeholder="Buscar lugar, passeio ou transporte (ex.: Alcázar, Toledo, táxi)" value="${h(viajeQ)}" autocomplete="off">`;
+  if(viajeQ.trim().length>=2){
+    $("#v-viaje").innerHTML = `<div><h2 style="font-size:24px">Tu viaje</h2></div>${searchBox}
+      <p class="small muted">${results.length ? `${results.length} ${results.length===1?"resultado":"resultados"} para “${h(viajeQ)}”` : `Nada encontrado para “${h(viajeQ)}”. Por enquanto só tenho Madrid, Barcelona e Sevilla; me diga a cidade e eu adiciono.`}</p>
+      ${results.map(r=> r.text
+        ? `<div class="card tint-c stack" style="gap:4px"><div class="eyebrow">${h(r.city)} · ${r.kind}</div><p class="fact">${r.text}</p></div>`
+        : `<div class="card" style="padding:4px 16px"><div class="eyebrow" style="padding-top:10px">${h(r.city)} · ${r.kind}</div>${itemHtml(r.m)}</div>`).join("")}
+      ${results.length ? `<button class="btn ghost wide" data-act="vclear">Limpar busca</button>` : ""}`;
+    const q=$("#vq"); if(q){ q.focus(); q.setSelectionRange(q.value.length,q.value.length); }
+    return;
+  }
   const totalDays = sel.reduce((a,id)=>a+(V.days[id]||0),0);
   const setup = `
     <div class="hero-art"><div><h2 style="font-size:24px">Tu viaje</h2><p class="muted small" style="margin-top:4px">Marque os destinos, diga quantos dias e o que você curte. Eu monto o roteiro, com os links de compra e o que precisa reservar antes.</p></div>${illus("viaje")}</div>
+    ${searchBox}
     <div class="row" style="gap:8px">${Object.keys(DEST).map(id=>`<button class="dchip${V.dests.includes(id)?" on":""}" data-act="vdest" data-id="${id}"><span class="em">${DEST[id].emoji}</span><span><b>${h(DEST[id].name)}</b><span>${h(DEST[id].region)}</span></span></button>`).join("")}</div>
     ${sel.length?`<div class="card stack" style="gap:12px">
       <div class="row" style="gap:8px">
@@ -3737,6 +3764,7 @@ document.addEventListener("click", e=>{
     case "vint": { const k=el.dataset.k; V.interests = V.interests.includes(k) ? V.interests.filter(x=>x!==k) : [...V.interests,k]; saveProfiles(); renderViaje(); break; }
     case "vritmo": V.ritmo=el.dataset.k; saveProfiles(); renderViaje(); break;
     case "vmove": moveDest(el.dataset.id, +el.dataset.d); saveProfiles(); renderViaje(); break;
+    case "vclear": viajeQ=""; renderViaje(); break;
     case "vopen": { const id=el.dataset.id; V.open = V.open===id ? null : id; saveProfiles(); renderViaje(); const nb=document.querySelector(`[data-act="vopen"][data-id="${id}"]`); if(nb) nb.scrollIntoView({block:"start",behavior:"smooth"}); break; }
     case "useprofile": switchProfile(el.dataset.id); $("#sheet").hidden=true; toast(`Agora é ${me().name}. ¡Vamos!`); break;
     case "delprofile": { if(el.dataset.armed){ removeProfile(el.dataset.id); openPasajeros(); toast("Removido."); } else { el.dataset.armed="1"; el.style.background="var(--bad-soft)"; el.style.color="var(--bad)"; toast("Toque de novo para remover"); setTimeout(()=>{ delete el.dataset.armed; el.style.background=""; el.style.color=""; }, 2500); } break; }
@@ -3828,7 +3856,7 @@ document.addEventListener("change", e=>{
   if(el.dataset && el.dataset.act==="vdep"){ setDeparture(el.value); saveProfiles(); renderViaje(); return; }
   if(el.dataset && el.dataset.act==="vtrip"){ if(/^\d{4}-\d{2}-\d{2}$/.test(el.value)){ S.trip=el.value; save(); renderAll(); renderViaje(); } return; } if(el.dataset && el.dataset.act==="mission"){ S.missions[el.dataset.week] = el.checked; save(); if(el.checked){ const pm=rnd(PRAISE); toast(`Missão cumprida. ${pm[0]} +25 XP`); confetti(); tone("done"); } renderAll(); }
 });
-document.addEventListener("input", e=>{ if(e.target.id==="q"){ phraseQuery=e.target.value; renderPhraseList(); } });
+document.addEventListener("input", e=>{ if(e.target.id==="q"){ phraseQuery=e.target.value; renderPhraseList(); } if(e.target.id==="vq"){ const was=viajeQ.trim().length>=2; viajeQ=e.target.value; const is=viajeQ.trim().length>=2; if(was||is) renderViaje(); } });
 $("#sheet").addEventListener("click", e=>{ if(e.target.id==="sheet") $("#sheet").hidden=true; });
 
 /* início */
