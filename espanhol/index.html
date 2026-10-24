@@ -2400,12 +2400,13 @@ async function wpSummary(title){
     const hit=sr && sr.query && sr.query.search && sr.query.search[0]; if(!hit) throw new Error("no article");
     t=hit.title; ml=await wpJson("https://es.wikipedia.org/api/rest_v1/page/media-list/"+enc(t));
   }
-  const pics=(ml.items||[]).filter(i=>i.type==="image" && i.showInGallery!==false && /\.jpe?g$/i.test(i.title||"") && !WP_BAD.test(i.title||""));
+  let pics=(ml.items||[]).filter(i=>i.type==="image" && i.showInGallery!==false && /\.jpe?g$/i.test(i.title||"") && !WP_BAD.test(i.title||""));
+  if(!pics.length) pics=(ml.items||[]).filter(i=>i.type==="image" && /\.(png|webp)$/i.test(i.title||"") && !WP_BAD.test(i.title||""));
   const srcs=[];
   const abs=u=>u.startsWith("//")?"https:"+u:u;
   pics.slice(0,3).forEach(it=>{
     const file=(it.title||"").replace(/^[^:]+:/,"");
-    if(file) srcs.push("https://commons.wikimedia.org/wiki/Special:FilePath/"+encodeURIComponent(file)+"?width=800");
+    if(file){ srcs.push("https://commons.wikimedia.org/wiki/Special:FilePath/"+encodeURIComponent(file)+"?width=800"); srcs.push("https://es.wikipedia.org/wiki/Special:FilePath/"+encodeURIComponent(file)+"?width=800"); }
     const s0=(it.srcset && it.srcset[0] && it.srcset[0].src) || (it.original && it.original.source) || "";
     if(s0){ const a=abs(s0); srcs.push(a.replace(/\/\d+px-/, "/800px-").replace(/([?&])width=\d+/, "$1width=800"), a); }
   });
@@ -3936,7 +3937,7 @@ document.addEventListener("click", e=>{
         for(const [city,title] of Object.entries(WP_CITY)){
           try{ delete WPCACHE[title]; const info=await wpSummary(title); let okU=null; const bad=[];
             for(const u of (info.srcs||[])){ const ok=await new Promise(res=>{ const im=new Image(); im.referrerPolicy="no-referrer"; im.onload=()=>res(true); im.onerror=()=>res(false); im.src=u; }); if(ok){ okU=u; break; } bad.push(u.split("/")[2]); }
-            lines.push(`4) ${city} (${info.title}): ${okU ? "OK via "+okU.split("/")[2] : "ERRO em "+(bad.join(", ")||"nenhum endereço")}`);
+            lines.push(`4) ${city} (${info.title}): ${okU ? "OK via "+okU.split("/")[2] : "ERRO em "+(bad.join(", ")||"nenhum endereço")} · ${(info.srcs||[]).length} endereços`);
           }catch(e){ lines.push(`4) ${city}: ERRO ${e&&e.message||e}`); }
         }
         lines.push(`Erros desta sessão: ${PHOTO_ERR.length ? PHOTO_ERR.slice(0,4).join(" · ") : "nenhum"}`);
