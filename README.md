@@ -30,4 +30,6 @@ O app é a pasta `espanhol/` (um `index.html` + ícones + `sw.js` para funcionar
 
 Depois disso ele abre como um app e funciona offline.
 
-Em Ajustes, dá para mudar a data da viagem, o número de frases novas por dia, a velocidade da voz e copiar/restaurar um backup do progresso.
+Em Ajustes, dá para mudar a data da viagem, o número de frases novas por dia e a velocidade da voz.
+
+**Backup.** O progresso fica salvo no aparelho. No iPhone, cada app adicionado à Tela de Início tem um armazenamento próprio: apagar o app apaga o progresso. Por isso há **Salvar backup agora** (Ajustes e, uma vez por semana, na tela inicial): gera um link que você guarda nas Notas ou manda para você mesma; abrir o link em qualquer aparelho restaura tudo. O app lembra disso toda semana.
