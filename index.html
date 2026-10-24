@@ -26,6 +26,7 @@
   --saffron:#d9920f; --saffron-soft:#fbefd4; --on-saffron:#1d1608;
   --ok:#1d7448; --ok-soft:#dcf2e5; --bad:#b0302a; --bad-soft:#f8e0de;
   --board:#1b2f80; --board-fg:#f6c453; --board-dim:#8c93a8; --board-cell:#222a42;
+  --hero-a:#1b2f80; --hero-b:#3b57c4; --hero-band:transparent;
   --f-display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
   --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
   --f-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
@@ -62,7 +63,7 @@ p{margin:0}
 .small{font-size:14px}
 
 /* Painel de partidas */
-.board{background:linear-gradient(140deg,#1b2f80 0%,#2443a6 55%,#3b57c4 100%);color:#fff;margin:0 calc(-1 * max(16px,env(safe-area-inset-right,0px))) 0 calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding:10px max(16px,env(safe-area-inset-right,0px)) 18px max(16px,env(safe-area-inset-left,0px));border-radius:0 0 28px 28px;position:relative;overflow:hidden}
+.board{background:linear-gradient(140deg,var(--hero-a) 0%,var(--hero-b) 100%);color:#fff;border-bottom:6px solid var(--hero-band);margin:0 calc(-1 * max(16px,env(safe-area-inset-right,0px))) 0 calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding:10px max(16px,env(safe-area-inset-right,0px)) 18px max(16px,env(safe-area-inset-left,0px));border-radius:0 0 28px 28px;position:relative;overflow:hidden}
 .board::after{content:"";position:absolute;right:-40px;top:-50px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.07);pointer-events:none}
 .board-top{display:flex;justify-content:space-between;align-items:center;gap:8px;position:relative}
 .brand{display:inline-flex;align-items:center;gap:8px;flex:none}
@@ -2748,6 +2749,21 @@ function buildPlan(id, days, interests, ritmo){
   return out;
 }
 
+/* Tema visual do país: cabeçalho e pano de fundo. Cada pacote de país traz o seu. */
+const THEMES = {
+  es: {name:"Espanha", heroA:"#8f0d19", heroB:"#d1202b", band:"#f6c453", paper:"#faf5ee", paperDark:"#15100f", surfaceDark:"#201818", lineDark:"#332727"}
+};
+function applyTheme(key){
+  const t=THEMES[key]||THEMES.es; const st=document.documentElement.style;
+  st.setProperty("--hero-a",t.heroA); st.setProperty("--hero-b",t.heroB); st.setProperty("--hero-band",t.band); st.setProperty("--board",t.heroA);
+  const dark = document.documentElement.dataset.theme==="dark" || (document.documentElement.dataset.theme!=="light" && matchMedia("(prefers-color-scheme: dark)").matches);
+  st.setProperty("--paper", dark ? t.paperDark : t.paper);
+  if(dark){ st.setProperty("--surface", t.surfaceDark); st.setProperty("--line", t.lineDark); } else { st.removeProperty("--surface"); st.removeProperty("--line"); }
+  const m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute("content", t.heroA);
+}
+applyTheme("es");
+try{ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ()=>applyTheme("es")); }catch(e){}
+
 const TOTAL_WEEKS = WEEKS.length;
 const INTERVALS = [0,1,3,7,14,30,60];
 
@@ -4245,7 +4261,7 @@ setTimeout(()=>{ if(!PR.onboarded && $("#sheet").hidden) openOnboarding(); }, 40
   } else toast("Esse link de backup não é válido."); return; }
   const d=parseInvite(location.hash); if(d && receiveScore(d)){ try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} renderAll(); setTimeout(()=>{ toast(`Placar de ${d.name} recebido. Agora mande o seu!`); if(PR.onboarded) openPasajeros(); }, 600); } })();
 /* Atualização automática: quando sai versão nova, o app baixa e recarrega sozinho (fora de um treino). */
-const APP_VERSION = "2026.10.24-1324";
+const APP_VERSION = "2026.10.24-1328";
 let pendingReload = false;
 function maybeReload(){ if(!pendingReload) return; if(D || !$("#drill").hidden){ return; } pendingReload=false; toast("Atualizando o app…"); setTimeout(()=>location.reload(), 600); }
 if("serviceWorker" in navigator && !window.claude && location.protocol==="https:"){
