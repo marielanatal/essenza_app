@@ -2361,15 +2361,14 @@ async function wpSummary(title){
     t=hit.title; ml=await wpJson("https://es.wikipedia.org/api/rest_v1/page/media-list/"+enc(t));
   }
   const pics=(ml.items||[]).filter(i=>i.type==="image" && i.showInGallery!==false && /\.jpe?g$/i.test(i.title||"") && !WP_BAD.test(i.title||""));
-  const it=pics[0];
   const srcs=[];
   const abs=u=>u.startsWith("//")?"https:"+u:u;
-  if(it){
+  pics.slice(0,3).forEach(it=>{
     const file=(it.title||"").replace(/^[^:]+:/,"");
     if(file) srcs.push("https://commons.wikimedia.org/wiki/Special:FilePath/"+encodeURIComponent(file)+"?width=800");
     const s0=(it.srcset && it.srcset[0] && it.srcset[0].src) || (it.original && it.original.source) || "";
     if(s0){ const a=abs(s0); srcs.push(a.replace(/\/\d+px-/, "/800px-").replace(/([?&])width=\d+/, "$1width=800"), a); }
-  }
+  });
   if(!srcs.length){
     const pi=await wpJson("https://es.wikipedia.org/w/api.php?action=query&prop=pageimages&piprop=thumbnail&pithumbsize=800&titles="+encodeURIComponent(t.replace(/_/g," "))+"&format=json&origin=*");
     const pg=pi && pi.query && pi.query.pages && Object.values(pi.query.pages)[0];
@@ -3843,7 +3842,12 @@ document.addEventListener("click", e=>{
         try{ const r=await fetch("https://es.wikipedia.org/api/rest_v1/page/media-list/Puerta_de_Alcal%C3%A1",{headers:{"Accept":"application/json"}}); lines.push(`1) REST media-list: HTTP ${r.status}`); const j=await r.json(); lines.push(`   ${(j.items||[]).length} itens; primeiro: ${(j.items&&j.items[0]&&j.items[0].title)||"—"}`); }catch(e){ lines.push(`1) REST media-list: ERRO ${e&&e.message||e}`); }
         try{ const r=await fetch("https://es.wikipedia.org/w/api.php?action=query&prop=pageimages&piprop=thumbnail&pithumbsize=400&titles=Puerta%20de%20Alcal%C3%A1&format=json&origin=*"); lines.push(`2) API pageimages: HTTP ${r.status}`); const j=await r.json(); const pg=Object.values((j.query||{}).pages||{})[0]; lines.push(`   thumb: ${(pg&&pg.thumbnail&&pg.thumbnail.source)||"—"}`); }catch(e){ lines.push(`2) API pageimages: ERRO ${e&&e.message||e}`); }
         try{ await new Promise((res,rej)=>{ const im=new Image(); im.onload=()=>res(); im.onerror=()=>rej(new Error("imagem não carregou")); im.src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/120px-PNG_transparency_demonstration_1.png"; }); lines.push("3) Imagem do upload.wikimedia.org: OK"); }catch(e){ lines.push("3) Imagem do upload.wikimedia.org: ERRO"); }
-        try{ delete WPCACHE["Puerta_de_Alcalá"]; const info=await wpSummary("Puerta_de_Alcalá"); for(const u of (info.srcs||[])){ const ok=await new Promise(res=>{ const im=new Image(); im.referrerPolicy="no-referrer"; im.onload=()=>res(true); im.onerror=()=>res(false); im.src=u; }); lines.push(`4) ${u.split("/")[2]}${/FilePath/.test(u)?" (FilePath)":""}: ${ok?"OK":"ERRO"}`); } }catch(e){ lines.push(`4) endereços: ERRO ${e&&e.message||e}`); }
+        for(const [city,title] of Object.entries(WP_CITY)){
+          try{ delete WPCACHE[title]; const info=await wpSummary(title); let okU=null; const bad=[];
+            for(const u of (info.srcs||[])){ const ok=await new Promise(res=>{ const im=new Image(); im.referrerPolicy="no-referrer"; im.onload=()=>res(true); im.onerror=()=>res(false); im.src=u; }); if(ok){ okU=u; break; } bad.push(u.split("/")[2]); }
+            lines.push(`4) ${city} (${info.title}): ${okU ? "OK via "+okU.split("/")[2] : "ERRO em "+(bad.join(", ")||"nenhum endereço")}`);
+          }catch(e){ lines.push(`4) ${city}: ERRO ${e&&e.message||e}`); }
+        }
         lines.push(`Erros desta sessão: ${PHOTO_ERR.length ? PHOTO_ERR.slice(0,4).join(" · ") : "nenhum"}`);
         lines.push(`Versão ${APP_VERSION} · ${Date.now()-t0} ms`);
         out.innerHTML=lines.map(h).join("<br>"); out.className="verdict "+(lines.some(l=>/ERRO/.test(l))?"bad":"ok"); })();
@@ -3909,7 +3913,7 @@ setTimeout(()=>{ if(!PR.onboarded && $("#sheet").hidden) openOnboarding(); }, 40
   } else toast("Esse link de backup não é válido."); return; }
   const d=parseInvite(location.hash); if(d && receiveScore(d)){ try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} renderAll(); setTimeout(()=>{ toast(`Placar de ${d.name} recebido. Agora mande o seu!`); if(PR.onboarded) openPasajeros(); }, 600); } })();
 /* Atualização automática: quando sai versão nova, o app baixa e recarrega sozinho (fora de um treino). */
-const APP_VERSION = "2026.10.24-1233";
+const APP_VERSION = "2026.10.24-1239";
 let pendingReload = false;
 function maybeReload(){ if(!pendingReload) return; if(D || !$("#drill").hidden){ return; } pendingReload=false; toast("Atualizando o app…"); setTimeout(()=>location.reload(), 600); }
 if("serviceWorker" in navigator && !window.claude && location.protocol==="https:"){
