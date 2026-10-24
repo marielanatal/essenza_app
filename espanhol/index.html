@@ -3477,7 +3477,7 @@ function showTab(t){
    ============================================================ */
 let D = null; // treino atual
 function openDrill(d){ D = d; D.i = 0; D.score = 0; D.revealed = false; D.total = d.items.length; $("#drill").hidden = false; document.body.style.overflow="hidden"; drawDrill(); }
-function closeDrill(){ hideDict(); D = null; $("#drill").hidden = true; document.body.style.overflow=""; try{ speechSynthesis.cancel(); }catch(e){} renderAll(); }
+function closeDrill(){ hideDict(); D = null; setTimeout(maybeReload, 300); $("#drill").hidden = true; document.body.style.overflow=""; try{ speechSynthesis.cancel(); }catch(e){} renderAll(); }
 function drillTop(){ const pct = D.items.length ? Math.round(100*D.i/D.items.length) : 100;
   return `<div class="top"><button class="x" data-act="closedrill" aria-label="Fechar">${ICON.x}</button><div class="meter"><span style="width:${pct}%"></span></div><span class="count">${Math.min(D.i+1,D.items.length)}/${D.items.length}</span></div>`; }
 
@@ -3705,7 +3705,7 @@ function openSettings(){
       ${window.claude ? `<span class="hint">Dentro do Claude o microfone não está disponível. Use o app instalado pelo endereço do GitHub.</span>` :
         `<button class="btn soft" data-act="mictest">${ICON.mic} Testar microfone</button><div id="mic-test-out" class="hint">${SR ? (IS_IOS && STANDALONE ? "Você está no app instalado do iPhone. Se o teste falhar, abra o endereço no Safari: lá o microfone funciona." : "Toque para testar. Vou pedir permissão ao celular na primeira vez.") : "Este navegador não tem reconhecimento de voz. Use Chrome (Android) ou Safari (iPhone)."}</div>`}</div>
     <div class="field"><label class="row" style="gap:10px"><input type="checkbox" id="s-sound" style="width:22px;height:22px;accent-color:var(--cobalt)" ${S.sound?"checked":""}> Sons e vibração nos acertos</label></div>
-    <p class="hint" id="s-sync">${remote?"Progresso sincronizado na sua conta Claude.":"Progresso salvo neste aparelho."}</p>
+    <p class="hint" id="s-sync">${remote?"Progresso sincronizado na sua conta Claude.":"Progresso salvo neste aparelho."} · Versão ${APP_VERSION}${window.claude?"":` · <button class="btn soft" style="min-height:30px;padding:4px 10px;font-size:13px" data-act="checkupdate">Buscar atualização</button>`}</p>
     <div class="card tint-s stack" style="gap:8px">
       <b>Backup do progresso</b>
       <p class="small">${IS_IOS ? "No iPhone, apagar o app da tela inicial apaga também o progresso. " : ""}Salve um link de backup nas Notas ou mande para você mesma no WhatsApp. Para recuperar, basta abrir o link.${backupAge()!==null?` Último backup: ${backupAge()===0?"hoje":backupAge()===1?"ontem":"há "+backupAge()+" dias"}.`:" Você ainda não fez nenhum."}</p>
@@ -3814,6 +3814,7 @@ document.addEventListener("click", e=>{
       break; }
     case "mictest": micTest(); break;
     case "pron": startPron(); break;
+    case "checkupdate": { toast("Verificando…"); fetch("index.html",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=t.match(/APP_VERSION = "([^"]+)"/); if(m && m[1]!==APP_VERSION){ toast(`Versão ${m[1]} disponível. Atualizando…`); if(navigator.serviceWorker && navigator.serviceWorker.getRegistration) navigator.serviceWorker.getRegistration().then(reg=>reg&&reg.update()); setTimeout(()=>location.reload(), 1200); } else toast("Você já está na versão mais recente."); }).catch(()=>toast("Sem conexão para verificar.")); break; }
     case "extra": { const lg=logToday(); lg.x=(lg.x||0)+S.daily; save(); renderAll(); startSession(); break; }
     case "unlocknext": { if(curWeek()<TOTAL_WEEKS){ S.unlocked=Math.max(S.unlocked||1, curWeek()+1); const lg=logToday(); lg.x=(lg.x||0)+S.daily; save(); renderAll(); toast(`Semana ${curWeek()} liberada. ¡A por ella!`); startSession(); } else toast("Você já liberou todas as semanas. ¡Enhorabuena!"); break; }
     case "pronretry": { const it=D.items[D.i]; it.heard=null; drawDrill(); break; }
@@ -3873,7 +3874,20 @@ setTimeout(()=>{ if(!PR.onboarded && $("#sheet").hidden) openOnboarding(); }, 40
     el.hidden=false; $("#bk-yes").onclick=()=>{ if(restoreBackup(bk)){ el.hidden=true; toast(`Pronto, ${me().name}. Tudo de volta!`); confetti(); } else toast("Não consegui restaurar esse backup."); };
   } else toast("Esse link de backup não é válido."); return; }
   const d=parseInvite(location.hash); if(d && receiveScore(d)){ try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} renderAll(); setTimeout(()=>{ toast(`Placar de ${d.name} recebido. Agora mande o seu!`); if(PR.onboarded) openPasajeros(); }, 600); } })();
-if("serviceWorker" in navigator && !window.claude && location.protocol==="https:"){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
+/* Atualização automática: quando sai versão nova, o app baixa e recarrega sozinho (fora de um treino). */
+const APP_VERSION = "__APP_VERSION__";
+let pendingReload = false;
+function maybeReload(){ if(!pendingReload) return; if(D || !$("#drill").hidden){ return; } pendingReload=false; toast("Atualizando o app…"); setTimeout(()=>location.reload(), 600); }
+if("serviceWorker" in navigator && !window.claude && location.protocol==="https:"){
+  let hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register("sw.js", {updateViaCache:"none"}).then(reg=>{
+    const check = () => { try{ reg.update(); }catch(e){} };
+    document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState==="visible") check(); });
+    window.addEventListener("focus", check);
+    setInterval(check, 30*60*1000);
+  }).catch(()=>{});
+  navigator.serviceWorker.addEventListener("controllerchange", ()=>{ if(!hadController){ hadController=true; return; } pendingReload=true; maybeReload(); });
+}
 </script>
 <!-- APP END -->
 </body>
