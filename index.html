@@ -3379,7 +3379,7 @@ const KIND_PT={video:"vídeo",podcast:"podcast",site:"site"};
 const KIND_IC={video:"▶",podcast:"♪",site:"↗"};
 function linksHtml(n){ const ls=WEEK_LINKS[n]||[]; if(!ls.length) return ""; return `<div class="links">${ls.map(([k,t,u])=>`<a class="lnk" href="${h(u)}" target="_blank" rel="noopener"><span class="ic ${k}">${KIND_IC[k]}</span><span><span class="k">${KIND_PT[k]}</span><b>${h(t)}</b></span><span class="go">abrir</span></a>`).join("")}</div>`; }
 function bkTag(k){ const b=BOOK[k]||BOOK.h; return `<span class="bk ${b[1]}"><i></i>${b[0]}</span>`; }
-function itemHtml(m){ return `<div class="item"><div class="hd"><a href="${h(m.link)}" target="_blank" rel="noopener">${h(m.t)}</a><div class="meta2">${bkTag(m.pay?m.book:"g")}<span class="meta">${h(m.area||m.how||"")}${m.price?` · ${h(m.price)}`:""}</span></div></div><div class="tip">${m.tip}</div></div>`; }
+function itemHtml(m){ return `<div class="item"><div class="hd"><a href="${h(m.link)}" target="_blank" rel="noopener">${h(m.t)}</a><div class="meta2">${bkTag(m.pay===0 ? "g" : (m.book||"h"))}<span class="meta">${h(m.area||m.how||"")}${m.price?` · ${h(m.price)}`:""}</span></div></div><div class="tip">${m.tip}</div></div>`; }
 let viajeQ = "";
 function viajeSearch(q){
   const n = norm(q.trim()); if(n.length<2) return [];
