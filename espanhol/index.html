@@ -2340,7 +2340,8 @@ const WP_PLACE = {
  "Real Alcázar":"Real_Alcázar_de_Sevilla","Catedral e Giralda":"Catedral_de_Sevilla","Plaza de España e Parque de María Luisa":"Plaza_de_España_(Sevilla)","Barrio de Santa Cruz a pé":"Barrio_de_Santa_Cruz_(Sevilla)","Triana: mercado e cerâmica":"Triana_(Sevilla)","Setas de Sevilla (mirante)":"Metropol_Parasol","Flamenco na Casa de la Memoria":"Flamenco","Tapas em Alameda e El Arenal":"Tapa_(gastronomía)","Torre del Oro e passeio pelo Guadalquivir":"Torre_del_Oro","Casa de Pilatos":"Casa_de_Pilatos","Hospital de los Venerables":"Hospital_de_los_Venerables","Metropol e Calle Sierpes (compras)":"Calle_Sierpes",
  "Córdoba":"Mezquita-catedral_de_Córdoba","Cádiz":"Cádiz","Jerez de la Frontera":"Jerez_de_la_Frontera","Granada e Alhambra (pernoite)":"Alhambra","Itálica (ruínas romanas)":"Itálica"
 };
-const PHOTOS_ON = !window.claude;      // dentro do Claude a rede externa é bloqueada
+const PHOTO_ERR = [];
+const PHOTOS_ON = !window.claude && (localStorage.getItem("rumbo-photos")!=="off");      // dentro do Claude a rede externa é bloqueada
 let WPCACHE = {}; try{ WPCACHE = JSON.parse(localStorage.getItem("rumbo-wp2")||"{}"); localStorage.removeItem("rumbo-wp"); }catch(e){}
 function wpSave(){ try{ localStorage.setItem("rumbo-wp2", JSON.stringify(WPCACHE)); }catch(e){} }
 function photoEl(title, cls, label){
@@ -2348,7 +2349,7 @@ function photoEl(title, cls, label){
   return `<figure class="photo${cls?" "+cls:""}" data-wp="${h(title)}" data-label="${h(label||"")}"><div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div></figure>`;
 }
 const WP_BAD=/escudo|bandera|flag|coat|mapa|map_|_map|locat|situaci|logo|plano|diagram|icon|se[ñn]al|wikidata|commons-logo|placa/i;
-async function wpJson(url){ const res=await fetch(url,{headers:{"Accept":"application/json"}}); if(!res.ok) throw new Error(res.status); return res.json(); }
+async function wpJson(url){ let res; try{ res=await fetch(url,{headers:{"Accept":"application/json"}}); }catch(e){ throw new Error("rede: "+(e&&e.message||e)); } if(!res.ok) throw new Error("HTTP "+res.status); return res.json(); }
 async function wpSummary(title){
   if(WPCACHE[title] && WPCACHE[title].t > Date.now()-30*864e5) return WPCACHE[title];
   const enc=t=>encodeURIComponent(t.replace(/ /g,"_"));
@@ -2360,8 +2361,14 @@ async function wpSummary(title){
     t=hit.title; ml=await wpJson("https://es.wikipedia.org/api/rest_v1/page/media-list/"+enc(t));
   }
   const pics=(ml.items||[]).filter(i=>i.type==="image" && i.showInGallery!==false && /\.jpe?g$/i.test(i.title||"") && !WP_BAD.test(i.title||""));
-  const it=pics[0]; if(!it) throw new Error("no photo");
-  let src=(it.srcset && it.srcset[0] && it.srcset[0].src) || (it.original && it.original.source) || ""; if(!src) throw new Error("no src");
+  const it=pics[0];
+  let src = it ? ((it.srcset && it.srcset[0] && it.srcset[0].src) || (it.original && it.original.source) || "") : "";
+  if(!src){
+    // segundo caminho: imagem de página pela API clássica
+    const pi=await wpJson("https://es.wikipedia.org/w/api.php?action=query&prop=pageimages&piprop=thumbnail&pithumbsize=800&titles="+encodeURIComponent(t.replace(/_/g," "))+"&format=json&origin=*");
+    const pg=pi && pi.query && pi.query.pages && Object.values(pi.query.pages)[0];
+    src=(pg && pg.thumbnail && pg.thumbnail.source) || ""; if(!src) throw new Error("no photo");
+  }
   if(src.startsWith("//")) src="https:"+src; src=src.replace(/\/\d+px-/, "/800px-");
   const out={t:Date.now(), src, title:t.replace(/_/g," "), url:"https://es.wikipedia.org/wiki/"+enc(t)};
   WPCACHE[title]=out; wpSave(); return out;
@@ -2376,7 +2383,7 @@ function loadPhotos(){
       const img=new Image(); img.alt=fig.dataset.label||info.title; img.decoding="async";
       img.onload=()=>{ fig.appendChild(img); const cap=document.createElement("figcaption"); cap.innerHTML = `<b>${h(fig.dataset.label||"")}</b><a href="${h(info.url)}" target="_blank" rel="noopener">Foto: Wikipedia ↗</a>`; fig.appendChild(cap); };
       img.src=info.src;
-    }catch(e){ /* sem rede ou artigo não encontrado: fica o fundo neutro */ }
+    }catch(e){ fig.hidden=true; PHOTO_ERR.push(`${title}: ${e && e.message || e}`); }
   });
 }
 /* Para ver e ouvir: links da missão de cada semana (buscas no YouTube e sites oficiais; funcionam sempre) */
@@ -3704,6 +3711,9 @@ function openSettings(){
     <div class="field"><label>Microfone (botão Falar)</label>
       ${window.claude ? `<span class="hint">Dentro do Claude o microfone não está disponível. Use o app instalado pelo endereço do GitHub.</span>` :
         `<button class="btn soft" data-act="mictest">${ICON.mic} Testar microfone</button><div id="mic-test-out" class="hint">${SR ? (IS_IOS && STANDALONE ? "Você está no app instalado do iPhone. Se o teste falhar, abra o endereço no Safari: lá o microfone funciona." : "Toque para testar. Vou pedir permissão ao celular na primeira vez.") : "Este navegador não tem reconhecimento de voz. Use Chrome (Android) ou Safari (iPhone)."}</div>`}</div>
+    ${window.claude ? "" : `<div class="field"><label>Fotos dos lugares</label>
+      <label class="row" style="gap:10px"><input type="checkbox" id="s-photos" style="width:22px;height:22px;accent-color:var(--cobalt)" ${PHOTOS_ON?"checked":""}> Mostrar fotos (vêm da Wikipédia, precisam de internet na 1ª vez)</label>
+      <button class="btn soft" data-act="phototest">Testar fotos</button><div id="photo-test-out" class="hint">Se as fotos não aparecerem, toque aqui e me mande um print do resultado.</div></div>`}
     <div class="field"><label class="row" style="gap:10px"><input type="checkbox" id="s-sound" style="width:22px;height:22px;accent-color:var(--cobalt)" ${S.sound?"checked":""}> Sons e vibração nos acertos</label></div>
     <p class="hint" id="s-sync">${remote?"Progresso sincronizado na sua conta Claude.":"Progresso salvo neste aparelho."} · Versão ${APP_VERSION}${window.claude?"":` · <button class="btn soft" style="min-height:30px;padding:4px 10px;font-size:13px" data-act="checkupdate">Buscar atualização</button>`}</p>
     <div class="card tint-s stack" style="gap:8px">
@@ -3717,6 +3727,7 @@ function openSettings(){
   </div>`;
   el.hidden = false;
   $("#s-rate").addEventListener("input", e=>{ $("#s-rate-v").textContent = (+e.target.value).toFixed(2); });
+  const sp=$("#s-photos"); if(sp) sp.addEventListener("change", ()=>{ try{ localStorage.setItem("rumbo-photos", sp.checked?"on":"off"); }catch(e){} toast(sp.checked?"Fotos ligadas. Recarregando…":"Fotos desligadas. Recarregando…"); setTimeout(()=>location.reload(), 600); });
   ["s-trip","s-start","s-daily","s-rate","s-dest","s-name","s-sound"].forEach(id=>$("#"+id).addEventListener("change", applySettings));
 }
 function applySettings(){
@@ -3814,6 +3825,16 @@ document.addEventListener("click", e=>{
       break; }
     case "mictest": micTest(); break;
     case "pron": startPron(); break;
+    case "phototest": {
+      const out=$("#photo-test-out"); out.textContent="Testando…"; out.className="verdict mid";
+      (async()=>{ const lines=[]; const t0=Date.now();
+        try{ const r=await fetch("https://es.wikipedia.org/api/rest_v1/page/media-list/Puerta_de_Alcal%C3%A1",{headers:{"Accept":"application/json"}}); lines.push(`1) REST media-list: HTTP ${r.status}`); const j=await r.json(); lines.push(`   ${(j.items||[]).length} itens; primeiro: ${(j.items&&j.items[0]&&j.items[0].title)||"—"}`); }catch(e){ lines.push(`1) REST media-list: ERRO ${e&&e.message||e}`); }
+        try{ const r=await fetch("https://es.wikipedia.org/w/api.php?action=query&prop=pageimages&piprop=thumbnail&pithumbsize=400&titles=Puerta%20de%20Alcal%C3%A1&format=json&origin=*"); lines.push(`2) API pageimages: HTTP ${r.status}`); const j=await r.json(); const pg=Object.values((j.query||{}).pages||{})[0]; lines.push(`   thumb: ${(pg&&pg.thumbnail&&pg.thumbnail.source)||"—"}`); }catch(e){ lines.push(`2) API pageimages: ERRO ${e&&e.message||e}`); }
+        try{ await new Promise((res,rej)=>{ const im=new Image(); im.onload=()=>res(); im.onerror=()=>rej(new Error("imagem não carregou")); im.src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/120px-PNG_transparency_demonstration_1.png"; }); lines.push("3) Imagem do upload.wikimedia.org: OK"); }catch(e){ lines.push("3) Imagem do upload.wikimedia.org: ERRO"); }
+        lines.push(`Erros desta sessão: ${PHOTO_ERR.length ? PHOTO_ERR.slice(0,4).join(" · ") : "nenhum"}`);
+        lines.push(`Versão ${APP_VERSION} · ${Date.now()-t0} ms`);
+        out.innerHTML=lines.map(h).join("<br>"); out.className="verdict "+(lines.some(l=>/ERRO/.test(l))?"bad":"ok"); })();
+      break; }
     case "checkupdate": { toast("Verificando…"); fetch("index.html",{cache:"no-store"}).then(r=>r.text()).then(t=>{ const m=t.match(/APP_VERSION = "([^"]+)"/); if(m && m[1]!==APP_VERSION){ toast(`Versão ${m[1]} disponível. Atualizando…`); if(navigator.serviceWorker && navigator.serviceWorker.getRegistration) navigator.serviceWorker.getRegistration().then(reg=>reg&&reg.update()); setTimeout(()=>location.reload(), 1200); } else toast("Você já está na versão mais recente."); }).catch(()=>toast("Sem conexão para verificar.")); break; }
     case "extra": { const lg=logToday(); lg.x=(lg.x||0)+S.daily; save(); renderAll(); startSession(); break; }
     case "unlocknext": { if(curWeek()<TOTAL_WEEKS){ S.unlocked=Math.max(S.unlocked||1, curWeek()+1); const lg=logToday(); lg.x=(lg.x||0)+S.daily; save(); renderAll(); toast(`Semana ${curWeek()} liberada. ¡A por ella!`); startSession(); } else toast("Você já liberou todas as semanas. ¡Enhorabuena!"); break; }
