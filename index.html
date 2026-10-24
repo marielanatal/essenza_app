@@ -3005,6 +3005,16 @@ if(!PR.uid) PR.uid = "u"+Math.random().toString(36).slice(2,10);
 const APP_URL = "https://marielanatal.github.io/essenza_app/";
 if(!PR.viaje) PR.viaje={dests:["madrid","sevilla","barcelona"], days:{madrid:3,sevilla:2,barcelona:3}, interests:["historia","comida"], ritmo:"normal", open:null};
 const V = PR.viaje;
+if(!V.custom) V.custom={};
+function registerCustom(id, name){ DEST[id]={custom:true, name, emoji:"📍", region:"cidade adicionada por você", stay:{min:1, ideal:1, text:"Ainda não tenho guia desta cidade. Peça para o app ganhar um pacote dela: curiosidades, imperdíveis, bate-voltas e transporte."}, curios:[], must:[], daytrips:[], transit:[], days:[]}; }
+Object.entries(V.custom).forEach(([id,c])=>registerCustom(id, c.name));
+function addCustomCity(name){
+  name=(name||"").trim().slice(0,24); if(!name) return null;
+  const existing=Object.keys(DEST).find(k=>norm(DEST[k].name)===norm(name)); if(existing) return existing;
+  const id="c_"+norm(name).replace(/[^a-z0-9]+/g,"_").slice(0,20)+"_"+Date.now().toString(36).slice(-3);
+  V.custom[id]={name}; registerCustom(id,name); return id;
+}
+function removeCustomCity(id){ if(!V.custom[id]) return; delete V.custom[id]; delete DEST[id]; V.dests=V.dests.filter(x=>x!==id); if(V.dep===id) V.dep=V.dests[V.dests.length-1]; if(V.city===id) V.city=V.dests[0]; }
 if(!V.dep) V.dep=V.dests[V.dests.length-1]; if(!V.city) V.city=V.dests[0]; V.screen = V.screen || "home";
 function me(){ return PR.list.find(x=>x.id===PR.active) || PR.list[0]; }
 let S = loadState(stateKey(PR.active)) || defaults();
@@ -3736,7 +3746,7 @@ function renderViaje(){
       <button class="menu" data-act="vgo" data-s="rota"><span class="ic" style="background:var(--ok-soft)">✈️</span><span><b>Sua rota</b><span>${h(routeText)}</span><span style="color:var(--cobalt);font-weight:700;margin-top:4px">Editar chegada, volta, cidades e dias</span></span><span class="chev">›</span></button>
       <div class="sec-h"><span class="n">🏙️</span><h3>Cidades</h3></div>
       <p class="small muted" style="padding:0 4px;margin-top:-6px">O que cada lugar tem: curiosidades, imperdíveis com ingressos, bate-voltas e transporte. Toque numa cidade.</p>
-      ${sel.map((id,i)=>{ const d=DEST[id]; const cd=CD[id]; return `<button class="citycard" data-act="vgo" data-s="cidade" data-city="${id}">${PHOTOS_ON?photoEl(WP_CITY[id],"",d.name):`<span class="emoji">${d.emoji}</span>`}<span><b>${h(d.name)}</b><span>${V.days[id]||1} ${V.days[id]===1?"dia":"dias"} · ${fmtDay(cd[0])}${cd[1]>cd[0]?" a "+fmtDay(cd[1]):""}</span><span>${d.must.length} imperdíveis · ${d.daytrips.length} bate-voltas</span></span><span class="chev">›</span></button>`; }).join("")}
+      ${sel.map((id,i)=>{ const d=DEST[id]; const cd=CD[id]; return `<button class="citycard" data-act="vgo" data-s="cidade" data-city="${id}">${PHOTOS_ON?photoEl(WP_CITY[id]||d.name,"",d.name):`<span class="emoji">${d.emoji}</span>`}<span><b>${h(d.name)}</b><span>${V.days[id]||1} ${V.days[id]===1?"dia":"dias"} · ${fmtDay(cd[0])}${cd[1]>cd[0]?" a "+fmtDay(cd[1]):""}</span><span>${d.must.length} imperdíveis · ${d.daytrips.length} bate-voltas</span></span><span class="chev">›</span></button>`; }).join("")}
       <div class="sec-h"><span class="n">📅</span><h3>Roteiro dia a dia</h3></div>
       <p class="small muted" style="padding:0 4px;margin-top:-6px">O que fazer em cada dia, com manhã, tarde e noite, trechos de trem e o que reservar antes.</p>
       <button class="menu" data-act="vgo" data-s="roteiro"><span class="ic" style="background:var(--cobalt-soft)">📅</span><span><b>Ver o roteiro</b><span>${totalDays} dias · ${sel.length} ${sel.length===1?"cidade":"cidades"} · interesses: ${V.interests.length?V.interests.map(k=>(INTERESES.find(x=>x[0]===k)||[])[1]).filter(Boolean).join(", "):"todos"}</span></span><span class="chev">›</span></button>
@@ -3754,7 +3764,12 @@ function renderViaje(){
         <label><span class="eyebrow">Dia da volta</span><input type="date" id="v-ret" data-act="vret" value="${h(V.ret||"")}" min="${h(S.trip)}"></label>
       </div>
       ${(()=>{ const av=availableDays(); if(av===null) return `<p class="small muted">Informe o dia da volta e eu confiro se os dias das cidades cabem na viagem.</p>`; if(av<1) return `<p class="small" style="color:var(--bad)">A volta precisa ser depois da chegada.</p>`; const diff=av-totalDays; return diff===0 ? `<p class="small" style="color:var(--ok)"><b>Fecha certinho:</b> ${av} dias entre a chegada e a volta, e as cidades somam ${totalDays}.</p>` : `<div class="card tint-s small" style="padding:12px"><b>${av} dias</b> entre a chegada (${fmtShort(numOf(S.trip))}) e a volta (${fmtShort(numOf(V.ret))}), mas as cidades somam <b>${totalDays}</b> (${diff>0?`sobram ${diff}`:`faltam ${-diff}`}). <button class="btn soft" style="min-height:34px;padding:6px 12px;margin-top:6px" data-act="vauto">Distribuir os ${av} dias automaticamente</button></div>`; })()}
-      ${middles.length ? `<div><div class="eyebrow" style="margin-bottom:6px">Cidades no meio do caminho</div><div class="row" style="gap:8px">${middles.map(id=>`<button class="ichip${V.dests.includes(id)?" on":""}" data-act="vdest" data-id="${id}">${V.dests.includes(id)?"✓ ":"+ "}${h(DEST[id].name)}</button>`).join("")}</div></div>` : ""}
+      <div class="card tint-c stack" style="gap:8px;padding:14px">
+        <div><b>Cidades no meio do caminho</b><p class="small muted">Toque para incluir ou tirar. Chegada e volta ficam fixas nas pontas.</p></div>
+        <div class="row" style="gap:8px">${middles.length ? middles.map(id=>`<button class="ichip${V.dests.includes(id)?" on":""}" data-act="vdest" data-id="${id}">${V.dests.includes(id)?"✓ ":"+ "}${h(DEST[id].name)}${DEST[id].custom?` <span class="x" style="display:inline-grid;width:18px;height:18px;border-radius:50%;font-size:11px;margin-left:4px;vertical-align:middle" data-act="vdelcustom" data-id="${id}" aria-label="remover">✕</span>`:""}</button>`).join("") : `<span class="small muted">Todas as cidades já estão na rota.</span>`}</div>
+        <div class="row" style="gap:6px"><input id="v-newcity" maxlength="24" placeholder="Outra cidade (ex.: Toledo, Granada)" style="flex:1;min-width:0;border:0;background:var(--surface);border-radius:10px;padding:10px 12px;font-size:15px"><button class="btn" data-act="vaddcity">Adicionar</button></div>
+        <p class="small muted">Cidades adicionadas entram na rota com dias e datas. Guia completo (imperdíveis, transporte) só para Madrid, Barcelona e Sevilla por enquanto; peça e eu acrescento.</p>
+      </div>
       <div><div class="eyebrow" style="margin-bottom:4px">Dias em cada cidade</div>
       ${sel.map((id,i)=>{ const cd=CD[id]; const role = id===arr ? "a" : (id===dep && dep!==arr ? "d" : ""); const canMove = role==="";
         return `<div class="cityrow"><span class="pos ${role}">${role==="a"?"✈":role==="d"?"↩":i+1}</span><div style="min-width:0"><b>${h(DEST[id].name)}</b><span class="sub">${fmtDay(cd[0])}${cd[1]>cd[0]?` → ${fmtDay(cd[1])}`:""}${role==="a"?" · chegada":role==="d"?" · volta":""}${canMove?` <button class="x" style="width:24px;height:22px;border-radius:6px;display:inline-grid;vertical-align:middle;margin-left:4px" data-act="vmove" data-id="${id}" data-d="-1" ${i<=1?"disabled":""} aria-label="subir">↑</button><button class="x" style="width:24px;height:22px;border-radius:6px;display:inline-grid;vertical-align:middle" data-act="vmove" data-id="${id}" data-d="1" ${(i>=sel.length-2 && dep!==arr)||(i>=sel.length-1)?"disabled":""} aria-label="descer">↓</button>`:""}</span></div><div class="stepper"><button data-act="vdays" data-id="${id}" data-d="-1" aria-label="menos um dia">−</button><b>${V.days[id]||1}</b><button data-act="vdays" data-id="${id}" data-d="1" aria-label="mais um dia">+</button></div></div>`; }).join("")}
@@ -3765,7 +3780,13 @@ function renderViaje(){
   else if(V.screen==="cidade"){
     const id=V.city, d=DEST[id], i=sel.indexOf(id), cd=CD[id];
     const prev=sel[i-1], next=sel[i+1];
-    html = back(`${d.emoji} ${h(d.name)}`) + `
+    if(d.custom){ html = back(`${d.emoji} ${h(d.name)}`) + `${PHOTOS_ON ? photoEl(d.name, "banner", d.name) : ""}
+      <p class="small muted" style="padding:0 4px">${V.days[id]||1} ${V.days[id]===1?"dia":"dias"}, ${fmtDay(cd[0])}${cd[1]>cd[0]?` a ${fmtDay(cd[1])}`:""} · <a href="#" data-act="vgo" data-s="rota" style="color:var(--cobalt);font-weight:700;text-decoration:none">mudar dias</a></p>
+      <div class="verd"><b>Sem guia ainda.</b> ${h(d.stay.text)}</div>
+      <div class="card stack" style="gap:8px"><b>Enquanto isso</b><a class="btn soft wide" href="https://www.google.com/maps/search/${encodeURIComponent(d.name+" España")}" target="_blank" rel="noopener">Abrir ${h(d.name)} no Google Maps ↗</a><a class="btn ghost wide" href="https://es.wikipedia.org/wiki/${encodeURIComponent(d.name.replace(/ /g,"_"))}" target="_blank" rel="noopener">Ler sobre ${h(d.name)} na Wikipédia ↗</a><a class="btn ghost wide" href="https://www.renfe.com" target="_blank" rel="noopener">Trens para ${h(d.name)} (Renfe) ↗</a></div>
+      <div class="citynav"><button data-act="vgo" data-s="cidade" data-city="${prev||""}" ${prev?"":"disabled"}>${prev?"← "+h(DEST[prev].name):"← início"}</button><button data-act="vgo" data-s="cidade" data-city="${next||""}" ${next?"":"disabled"}>${next?h(DEST[next].name)+" →":"fim →"}</button></div>
+      <button class="btn ghost wide" data-act="vgo" data-s="home">← Voltar para Viaje</button>`; }
+    else html = back(`${d.emoji} ${h(d.name)}`) + `
       ${PHOTOS_ON ? photoEl(WP_CITY[id], "banner", d.name) : ""}
       <p class="small muted" style="padding:0 4px">${h(d.region)} · ${V.days[id]||1} ${V.days[id]===1?"dia":"dias"}, ${fmtDay(cd[0])}${cd[1]>cd[0]?` a ${fmtDay(cd[1])}`:""} · <a href="#" data-act="vgo" data-s="rota" style="color:var(--cobalt);font-weight:700;text-decoration:none">mudar dias</a></p>
       <div class="verd"><b>Quantos dias vale?</b> ${h(d.stay.text)}</div>
@@ -3786,6 +3807,7 @@ function renderViaje(){
     sel.forEach((id,i)=>{
       if(i===0){ const ap=DEST[id].transit.find(t=>/Aeroporto/i.test(t.t)); if(ap) parts.push(`<div class="leg"><b>${h(fmtDay(CD[id][0]))} · Chegada em ${h(DEST[id].name)}</b><span>Do aeroporto ao centro: ${ap.o.map(o=>`${h(o[0])} (${h(o[1])})`).join(" · ")}</span><span class="muted">Detalhes em Cidades › ${h(DEST[id].name)} › Transporte.</span></div>`); }
       if(i>0){ const lg=legFor(sel[i-1],id); if(lg) parts.push(`<div class="leg"><b>${h(fmtDay(CD[id][0]))} · ${h(DEST[sel[i-1]].name)} → ${h(DEST[id].name)}</b><span>${h(lg.how)}</span><span>${lg.links.map(l=>`<a href="${h(l[1])}" target="_blank" rel="noopener">${h(l[0])} ↗</a>`).join("")}</span><span class="muted">${h(lg.tip)}</span></div>`); }
+      if(DEST[id].custom){ for(let k=0;k<(V.days[id]||1);k++) parts.push(`<div class="dayc"><h3>${h(fmtDay(CD[id][0]+k))} · ${h(DEST[id].name)}, dia ${k+1}</h3><p class="small muted">Dia livre: ainda não tenho o guia de ${h(DEST[id].name)}. Use a busca da aba Viaje ou o Google Maps, e me peça o pacote desta cidade.</p></div>`); }
       buildPlan(id, V.days[id]||1, V.interests, V.ritmo).forEach((day,k)=>{
         day.title = `${fmtDay(CD[id][0]+k)} · ${day.title}`;
         if(day.kind==="city") parts.push(`<div class="dayc"><h3>${h(day.title)}</h3>${day.blocks.map(b=>`<div class="blk"><span class="sl ${b.slot}">${b.slot==="m"?"Manhã":b.slot==="t"?"Tarde":"Noite"}</span><div><a href="${h(b.m.link)}" target="_blank" rel="noopener">${h(b.m.t)}</a> ${bkTag(b.m.pay?b.m.book:"g")}<div class="meta">${h(b.m.area)}${b.m.price?` · ${h(b.m.price)}`:""}</div></div></div>`).join("")}<button class="btn ghost" style="min-height:38px;padding:6px 12px;align-self:flex-start" data-act="vgo" data-s="cidade" data-city="${id}">Ver tudo sobre ${h(DEST[id].name)} ›</button></div>`);
@@ -4125,8 +4147,10 @@ document.addEventListener("click", e=>{
     case "progreso": openProgreso(); break;
     case "obdone": { const n=(($("#ob-name")||{}).value||"").trim().slice(0,20); if(n){ S.name=n; me().name=n; }
       { const t=$("#ob-trip"), st=$("#ob-start"), mn=$("#ob-min"); if(t && /^\d{4}-\d{2}-\d{2}$/.test(t.value)) S.trip=t.value; if(st && /^\d{4}-\d{2}-\d{2}$/.test(st.value)) S.start=st.value; if(mn){ S.minutes=+mn.value; S.daily=dailyFor(S.minutes); } S.planWeeks=0; } PR.onboarded=true; saveProfiles(); save(); $("#sheet").hidden=true; renderAll(); toast(n?`¡Encantada, ${n}!`:"¡Vamos!"); break; }
-    case "vdest": { toggleMiddle(el.dataset.id); saveProfiles(); renderViaje(); break; }
+    case "vdest": { if(e.target.closest('[data-act="vdelcustom"]')) break; toggleMiddle(el.dataset.id); saveProfiles(); renderViaje(); break; }
     case "vgo": { e.preventDefault(); if(el.disabled) break; vgo(el.dataset.s, el.dataset.city||null); break; }
+    case "vaddcity": { const inp=$("#v-newcity"); const id=addCustomCity(inp&&inp.value); if(!id){ toast("Digite o nome da cidade."); break; } if(!V.dests.includes(id)) toggleMiddle(id); saveProfiles(); renderViaje(); toast(`${DEST[id].name} entrou na rota.`); setTimeout(()=>{ const i=$("#v-newcity"); if(i) i.scrollIntoView({block:"center"}); },50); break; }
+    case "vdelcustom": { e.stopPropagation(); removeCustomCity(el.dataset.id); saveProfiles(); renderViaje(); break; }
     case "vauto": { if(autoDays()){ saveProfiles(); renderViaje(); toast("Dias distribuídos. Ajuste com − e + se quiser."); } else toast("Precisa de pelo menos 1 dia por cidade."); break; }
     case "vdays": { const id=el.dataset.id; V.days[id]=Math.min(7,Math.max(1,(V.days[id]||1)+(+el.dataset.d))); saveProfiles(); renderViaje(); break; }
     case "vint": { const k=el.dataset.k; V.interests = V.interests.includes(k) ? V.interests.filter(x=>x!==k) : [...V.interests,k]; saveProfiles(); renderViaje(); break; }
@@ -4261,7 +4285,7 @@ setTimeout(()=>{ if(!PR.onboarded && $("#sheet").hidden) openOnboarding(); }, 40
   } else toast("Esse link de backup não é válido."); return; }
   const d=parseInvite(location.hash); if(d && receiveScore(d)){ try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} renderAll(); setTimeout(()=>{ toast(`Placar de ${d.name} recebido. Agora mande o seu!`); if(PR.onboarded) openPasajeros(); }, 600); } })();
 /* Atualização automática: quando sai versão nova, o app baixa e recarrega sozinho (fora de um treino). */
-const APP_VERSION = "2026.10.24-1328";
+const APP_VERSION = "2026.10.24-1330";
 let pendingReload = false;
 function maybeReload(){ if(!pendingReload) return; if(D || !$("#drill").hidden){ return; } pendingReload=false; toast("Atualizando o app…"); setTimeout(()=>location.reload(), 600); }
 if("serviceWorker" in navigator && !window.claude && location.protocol==="https:"){
