@@ -62,16 +62,17 @@ p{margin:0}
 .small{font-size:14px}
 
 /* Painel de partidas */
-.board{background:var(--board);color:var(--board-fg);margin:0 calc(-1 * max(16px,env(safe-area-inset-right,0px))) 0 calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding:18px max(16px,env(safe-area-inset-right,0px)) 20px max(16px,env(safe-area-inset-left,0px));font-family:var(--f-mono);
+.board{background:var(--board);color:var(--board-fg);margin:0 calc(-1 * max(16px,env(safe-area-inset-right,0px))) 0 calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding:10px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));font-family:var(--f-mono);
   background-image:
    conic-gradient(from 45deg at 50% 50%, transparent 0 25%, rgba(255,255,255,.025) 0 50%, transparent 0 75%, rgba(255,255,255,.025) 0);
   background-size:28px 28px}
 .board-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .board-top .lbl{font-size:12px;letter-spacing:.18em;color:var(--board-dim)}
 .brand{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.18em;color:var(--board-dim);flex:none}
-.brand svg{width:30px;height:30px}
+.brand svg{width:28px;height:28px}
 .board-top{gap:8px}
-.pax{background:transparent;border:1px solid var(--board-cell);color:var(--board-fg);border-radius:10px;height:40px;padding:0 12px;font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46%;margin-left:auto}
+.pax{background:var(--board-cell);border:0;color:var(--board-fg);border-radius:99px;height:32px;padding:0 12px;font-family:var(--f-body);font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46%;margin-left:auto;display:inline-flex;align-items:center;gap:6px}
+.pax i{width:8px;height:8px;border-radius:50%;background:#62d29d;display:inline-block;flex:none}
 .prow{display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center;padding:10px 0}
 .prow+.prow{border-top:1px solid var(--line)}
 .prow .av{width:40px;height:40px}
@@ -81,16 +82,15 @@ p{margin:0}
 .prow .xp small{display:block;font-weight:500;color:var(--muted);font-size:11px}
 .trophy{color:var(--saffron)}
 .crown{font-size:12px;font-weight:700;color:var(--saffron);letter-spacing:.06em}
-.gear{background:transparent;border:1px solid var(--board-cell);color:var(--board-fg);border-radius:10px;width:40px;height:40px;display:grid;place-items:center}
+.gear{background:transparent;border:0;color:var(--board-dim);border-radius:10px;width:36px;height:36px;display:grid;place-items:center}
 .gear svg{width:20px;height:20px}
-.board-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;margin-top:14px}
-.dest{font-size:13px;color:var(--board-dim);letter-spacing:.08em}
-.dest b{display:block;color:var(--board-fg);font-size:22px;letter-spacing:.12em;font-weight:700;margin-top:2px}
-.flaps{display:flex;gap:4px}
-.flap{background:var(--board-cell);border-radius:6px;min-width:34px;padding:6px 6px;text-align:center;font-size:30px;font-weight:700;line-height:1;position:relative}
+.board-row{display:flex;gap:12px;align-items:center;margin-top:10px}
+.dest{font-size:11px;color:var(--board-dim);letter-spacing:.08em;line-height:1.3;min-width:0}
+.dest .dl{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dest b{display:block;color:var(--board-fg);font-size:17px;letter-spacing:.12em;font-weight:700}
+.flaps{display:flex;gap:3px;flex:none}
+.flap{background:var(--board-cell);border-radius:5px;min-width:26px;padding:5px 4px;text-align:center;font-size:24px;font-weight:700;line-height:1;position:relative}
 .flap::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--board)}
-.flap-lbl{font-size:11px;letter-spacing:.16em;color:var(--board-dim);text-align:right;margin-top:6px}
-.board-sub{margin-top:12px;font-size:12px;color:var(--board-dim);letter-spacing:.06em;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .sync{display:inline-flex;align-items:center;gap:6px}
 .sync i{width:7px;height:7px;border-radius:50%;background:var(--board-dim);display:inline-block}
 .sync.on i{background:#62d29d}
@@ -408,20 +408,17 @@ nav.tabs button.on{color:var(--cobalt);background:var(--cobalt-soft)}
 <div class="wrap">
   <header class="board" aria-label="Contagem regressiva">
     <div class="board-top">
-      <span class="brand" aria-label="Rumbo a España"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="6" y="12" width="52" height="40" rx="7" fill="#222a42"/><text x="32" y="43" text-anchor="middle" font-family="DejaVu Sans, Arial, sans-serif" font-weight="700" font-size="34" fill="#f6c453">ñ</text><rect x="6" y="31.3" width="52" height="1.4" fill="#151b2e"/><circle cx="47" cy="20" r="3.2" fill="#d9372b"/></svg><span>RUMBO</span></span>
-      <button class="pax" data-act="pasajeros" id="b-pax">PASAJERO · —</button>
+      <span class="brand" aria-label="Rumbo a España"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="2" y="10" width="60" height="44" rx="10" fill="#c60b1e"/><rect x="2" y="21" width="60" height="22" fill="#ffc400"/><path d="M14 18h36a6 6 0 0 1 6 6v14a6 6 0 0 1-6 6H30l-9 7v-7h-7a6 6 0 0 1-6-6V24a6 6 0 0 1 6-6z" fill="#fff"/><text x="32" y="38" text-anchor="middle" font-family="DejaVu Sans, Arial, sans-serif" font-weight="700" font-size="15" fill="#151b2e">¡Hola!</text></svg><span>RUMBO</span></span>
+      <button class="pax" data-act="pasajeros" id="b-pax">—</button>
       <button class="gear" data-act="settings" aria-label="Ajustes">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
       </button>
     </div>
     <div class="board-row">
-      <div class="dest">DESTINO<b id="b-dest">ESPAÑA</b><span id="b-date">01 FEB 2027</span></div>
-      <div>
-        <div class="flaps" id="b-flaps"><span class="flap">1</span><span class="flap">0</span><span class="flap">1</span></div>
-        <div class="flap-lbl">DÍAS</div>
-      </div>
+      <div class="flaps" id="b-flaps"><span class="flap">1</span><span class="flap">0</span><span class="flap">1</span></div>
+      <div class="dest"><span class="dl">días para</span><b id="b-dest">ESPAÑA</b><span class="dl"><span id="b-date">01 FEB 2027</span> · <span id="b-week">SEMANA 1 / 14</span></span></div>
+      <span class="sync" id="b-sync" hidden><i></i><span></span></span>
     </div>
-    <div class="board-sub"><span id="b-week">SEMANA 1 / 14</span><span class="sync" id="b-sync"><i></i><span>salvo neste aparelho</span></span></div>
   </header>
 
   <main>
@@ -2583,6 +2580,8 @@ if(!PR){
   saveProfiles();
 }
 if(!PR.duels) PR.duels={};
+if(!PR.uid) PR.uid = "u"+Math.random().toString(36).slice(2,10);
+const APP_URL = "https://marielanatal.github.io/essenza_app/";
 if(!PR.viaje) PR.viaje={dests:["madrid","sevilla","barcelona"], days:{madrid:3,sevilla:2,barcelona:3}, interests:["historia","comida"], ritmo:"normal", open:null};
 const V = PR.viaje;
 function me(){ return PR.list.find(x=>x.id===PR.active) || PR.list[0]; }
@@ -2607,16 +2606,48 @@ function addProfile(name){
 function weekBounds(offset){ const t=todayN(); const dow=new Date(t*864e5).getUTCDay(); const mon=t-((dow+6)%7)+offset*7; return [mon, mon+6]; }
 function xpOfLog(log, from, to){ let x=0; Object.entries(log||{}).forEach(([k,l])=>{ const n=numOf(k); if(n>=from && n<=to) x+=(l.n||0)*3+(l.r||0)*2+(l.q||0)+(l.s||0)*2; }); return x; }
 function stateOf(id){ return id===PR.active ? S : (loadState(stateKey(id)) || defaults()); }
-function ranking(offset){ const [a,b]=weekBounds(offset||0); return PR.list.map(pf=>({...pf, xp:xpOfLog(stateOf(pf.id).log,a,b)})).sort((x,y)=>y.xp-x.xp); }
+function weekXp(pf, offset){ const [a,b]=weekBounds(offset||0); return pf.remote ? ((pf.weeks||{})[a]||0) : xpOfLog(stateOf(pf.id).log,a,b); }
+function ranking(offset){ return PR.list.map(pf=>({...pf, xp:weekXp(pf,offset||0)})).sort((x,y)=>y.xp-x.xp); }
+const locals = () => PR.list.filter(x=>!x.remote);
 function trophies(){
   const t={}; PR.list.forEach(pf=>t[pf.id]=0);
-  const states=PR.list.map(pf=>stateOf(pf.id));
-  const first=Math.min(...states.map(st=>numOf(st.start)), todayN());
+  const states=locals().map(pf=>stateOf(pf.id));
+  const remoteFirst=PR.list.filter(x=>x.remote).flatMap(x=>Object.keys(x.weeks||{}).map(Number));
+  const first=Math.min(...states.map(st=>numOf(st.start)), ...remoteFirst, todayN());
   const weeks=Math.min(60, Math.ceil((weekBounds(0)[0]-first)/7));
   for(let i=1;i<=weeks;i++){ const rk=ranking(-i); if(rk[0].xp>0 && (rk.length<2 || rk[0].xp>rk[1].xp)) t[rk[0].id]++; }
   return t;
 }
 function save(){ S.updatedAt = Date.now(); persistLocal(); scheduleRemote(); }
+/* Placar por link: cada pessoa compartilha o seu; quem abre o link vê o ranking atualizado */
+function b64e(o){ return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }
+function b64d(t){ t=t.replace(/-/g,"+").replace(/_/g,"/"); while(t.length%4) t+="="; return JSON.parse(decodeURIComponent(escape(atob(t)))); }
+function myScore(){ const weeks={}; for(let i=0;i<12;i++){ const [a]=weekBounds(-i); const x=xpOfLog(S.log,a,a+6); if(x) weeks[a]=x; } return {v:1,id:PR.uid,name:me().name,weeks,streak:streak(),xp:xp(),t:Date.now()}; }
+function myLink(){ return APP_URL+"#inv="+b64e(myScore()); }
+function receiveScore(d){
+  if(!d || d.v!==1 || !d.id || !d.name) return false;
+  if(d.id===PR.uid) { toast("Esse é o seu próprio placar."); return false; }
+  let pf=PR.list.find(x=>x.id===d.id);
+  if(!pf){ pf={id:d.id, remote:true}; PR.list.push(pf); }
+  Object.assign(pf,{name:String(d.name).slice(0,20), weeks:d.weeks||{}, streak:d.streak||0, xp:d.xp||0, updated:d.t||Date.now()});
+  saveProfiles(); return true;
+}
+function parseInvite(text){ const m=String(text||"").match(/inv=([A-Za-z0-9_-]+)/); if(!m) return null; try{ return b64d(m[1]); }catch(e){ return null; } }
+async function sharePlacar(){
+  const url=myLink(); const text=`Meu placar no Rumbo a España: ${weekXp(me(),0)} XP esta semana. Abre no seu app para atualizar o ranking: `;
+  try{ if(navigator.share){ await navigator.share({title:"Rumbo a España", text, url}); return; } }catch(e){ if(e && e.name==="AbortError") return; }
+  try{ await navigator.clipboard.writeText(text+url); toast("Link copiado. Cole no WhatsApp."); }
+  catch(e){ const ta=$("#s-inv"); if(ta){ ta.value=url; ta.select(); } toast("Copie o link do campo abaixo."); }
+}
+function removeProfile(id){
+  const pf=PR.list.find(x=>x.id===id); if(!pf) return;
+  if(!pf.remote && locals().length<=1){ toast("Precisa ficar ao menos um perfil neste celular."); return; }
+  if(id===PR.active){ const other=locals().find(x=>x.id!==id); if(other) switchProfile(other.id); }
+  PR.list=PR.list.filter(x=>x.id!==id); delete PR.duels[id]; saveProfiles();
+  if(!pf.remote){ try{ localStorage.removeItem(stateKey(id)); }catch(e){} }
+  renderAll();
+}
+function agoText(ts){ const d=Math.floor((Date.now()-ts)/864e5); return d<=0?"hoje":d===1?"ontem":`há ${d} dias`; }
 
 let remote = null, remoteTimer = null, writing = false, again = false;
 function scheduleRemote(){ if(!remote) return; clearTimeout(remoteTimer); remoteTimer = setTimeout(flushRemote, 1500); }
@@ -2629,7 +2660,7 @@ async function flushRemote(){
   writing = false;
   if(again){ again=false; flushRemote(); }
 }
-function setSync(on){ const el=document.getElementById("b-sync"); el.classList.toggle("on",on); el.lastElementChild.textContent = on ? "sincronizado na conta" : "salvo neste aparelho"; }
+function setSync(on){ const el=document.getElementById("b-sync"); el.classList.toggle("on",on); el.lastElementChild.textContent = on ? "sincronizado na conta" : "salvo neste aparelho"; const g=document.getElementById("s-sync"); if(g) g.textContent = on ? "Progresso sincronizado na sua conta Claude." : "Progresso salvo neste aparelho."; }
 async function connectRemote(){
   try{
     if(!window.claude || typeof window.claude.use!=="function") return;
@@ -2715,12 +2746,11 @@ function confetti(){
 function rankCard(){
   const rk=ranking(0), tr=trophies(), [a,b]=weekBounds(0);
   const lead = rk[0].xp>0 && (rk.length<2 || rk[0].xp>rk[1].xp) ? rk[0] : null;
-  const dw=Object.entries(PR.duels).reduce((s,[,n])=>s+n,0);
   return `<div class="card stack" style="gap:8px">
     <div class="spread"><span class="eyebrow">Ranking da semana</span><span class="small muted">${fmtShort(a)} – ${fmtShort(b)}</span></div>
-    ${rk.map((pf,i)=>`<div class="prow"><div class="av" style="background:${i===0&&lead?"var(--saffron-soft)":"var(--paper)"}">${faceOf(pf.id)}</div><div><b>${h(pf.name)}</b>${pf.id===PR.active?' <span class="small muted">(você)</span>':""}<div class="sub">${tr[pf.id]?`<span class="trophy">🏆</span> ${tr[pf.id]} ${tr[pf.id]===1?"semana":"semanas"}`:"ainda sem troféu"}${PR.duels[pf.id]?` · ${PR.duels[pf.id]} ${PR.duels[pf.id]===1?"duelo":"duelos"}`:""}</div></div><div class="xp">${pf.xp} XP${lead&&lead.id===pf.id?`<small class="crown">LÍDER</small>`:""}</div></div>`).join("")}
-    <p class="small muted">Quem tiver mais XP no domingo à noite leva o troféu da semana.${dw?"":" Duelos ganhos também contam no placar."}</p>
-    <div class="row"><button class="btn saff" style="flex:1" data-act="duel">Duelo agora</button><button class="btn ghost" style="flex:1" data-act="pasajeros">Trocar passageiro</button></div>
+    ${rk.map((pf,i)=>`<div class="prow"><div class="av" style="background:${i===0&&lead?"var(--saffron-soft)":"var(--paper)"}">${faceOf(pf.id)}</div><div><b>${h(pf.name)}</b>${pf.id===PR.active?' <span class="small muted">(você)</span>':""}<div class="sub">${tr[pf.id]?`<span class="trophy">🏆</span> ${tr[pf.id]} ${tr[pf.id]===1?"semana":"semanas"}`:"ainda sem troféu"}${PR.duels[pf.id]?` · ${PR.duels[pf.id]} ${PR.duels[pf.id]===1?"duelo":"duelos"}`:""}${pf.remote?` · placar ${agoText(pf.updated)}`:""}</div></div><div class="xp">${pf.xp} XP${lead&&lead.id===pf.id?`<small class="crown">LÍDER</small>`:""}</div></div>`).join("")}
+    <p class="small muted">Quem tiver mais XP no domingo à noite leva o troféu da semana.${PR.list.some(x=>x.remote)?" Troquem os placares por link para atualizar.":""}</p>
+    <div class="row"><button class="btn saff" style="flex:1" data-act="share">Compartilhar placar</button>${locals().length>1?`<button class="btn ghost" style="flex:1" data-act="duel">Duelo</button>`:`<button class="btn ghost" style="flex:1" data-act="pasajeros">Pasajeros</button>`}</div>
   </div>`;
 }
 const FACES=["#f1c6a0","#c68642","#8d5524","#e0ac69"];
@@ -2729,12 +2759,22 @@ function LOLAFACE(i){ const skin=FACES[i%FACES.length]; return `<svg viewBox="0 
 function openPasajeros(){
   const rk=ranking(0), tr=trophies();
   const el=$("#sheet");
+  const row = (pf) => `<div class="prow"><div class="av">${faceOf(pf.id)}</div><div style="min-width:0"><b>${h(pf.name)}</b>${pf.id===PR.active?' <span class="small muted">(você)</span>':""}<div class="sub">${pf.remote ? `${pf.xp} XP total · placar ${agoText(pf.updated)}` : `${h(level_of(stateOf(pf.id)))} · ${pf.remote?"":"neste celular"}`}${tr[pf.id]?` · <span class="trophy">🏆</span> ${tr[pf.id]}`:""}</div></div>
+    <div class="row" style="gap:6px;flex-wrap:nowrap">${pf.id===PR.active?`<span class="pill now">${pf.xp} XP</span>`:`${!pf.remote?`<button class="btn soft" style="min-height:36px;padding:6px 12px" data-act="useprofile" data-id="${pf.id}">Usar</button>`:`<span class="pill soon">${pf.xp} XP</span>`}<button class="x" style="width:36px;height:36px;border-radius:10px" data-act="delprofile" data-id="${pf.id}" aria-label="Remover ${h(pf.name)}">${ICON.x}</button>`}</div></div>`;
   el.innerHTML = `<div class="sheet" role="dialog" aria-label="Passageiros">
     <div class="spread"><h2 style="font-size:22px">Pasajeros</h2><button class="x" data-act="closesheet" aria-label="Fechar">${ICON.x}</button></div>
-    <p class="small muted">Cada passageiro tem seu próprio progresso. Toque em <b>Usar</b> para trocar. Quem faz mais XP na semana leva o troféu.</p>
-    <div>${rk.map((pf,i)=>`<div class="prow"><div class="av">${faceOf(pf.id)}</div><div><b>${h(pf.name)}</b><div class="sub">${h(level_of(stateOf(pf.id)))} · ${pf.xp} XP esta semana${tr[pf.id]?` · <span class="trophy">🏆</span> ${tr[pf.id]}`:""}</div></div>${pf.id===PR.active?`<span class="pill now">ativo</span>`:`<button class="btn soft" style="min-height:40px;padding:8px 14px" data-act="useprofile" data-id="${pf.id}">Usar</button>`}</div>`).join("")}</div>
-    <div class="field"><label for="s-newp">Adicionar passageiro</label><div class="row"><input id="s-newp" maxlength="20" placeholder="Nome" style="flex:1;border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:10px 12px;font-size:16px"><button class="btn" data-act="addprofile">Adicionar</button></div></div>
-    ${PR.list.length>1?`<button class="btn saff wide" data-act="duel">Duelo: quiz passando o celular</button>`:""}
+    <div>${rk.map(row).join("")}</div>
+    <div class="card tint-s stack" style="gap:8px">
+      <b>Competir com alguém no celular dela</b>
+      <p class="small">O app não tem servidor, então o placar viaja por link: você manda o seu, a pessoa manda o dela. Quem abre o link vê o ranking atualizado. Combinem de trocar no domingo à noite, quando fecha a semana.</p>
+      <button class="btn saff wide" data-act="share">Compartilhar meu placar</button>
+      <div class="row" style="gap:6px"><input id="s-inv" placeholder="Cole aqui o link que recebeu" style="flex:1;min-width:0;border:0;background:var(--surface);border-radius:10px;padding:10px 12px;font-size:14px"><button class="btn soft" data-act="recvinv">Adicionar</button></div>
+    </div>
+    <details class="sec"><summary>Mais um perfil neste mesmo celular</summary><div class="in">
+      <p class="small muted">Para quem divide o aparelho. Cada perfil tem seu próprio progresso; toque em Usar para trocar.</p>
+      <div class="row" style="gap:6px"><input id="s-newp" maxlength="20" placeholder="Nome" style="flex:1;min-width:0;border:0;background:var(--paper);border-radius:10px;padding:10px 12px;font-size:16px"><button class="btn" data-act="addprofile">Adicionar</button></div>
+      ${locals().length>1?`<button class="btn soft wide" data-act="duel">Duelo: quiz passando o celular</button>`:""}
+    </div></details>
   </div>`;
   el.hidden=false;
 }
@@ -2866,7 +2906,7 @@ function renderBoard(){
   $("#b-date").textContent = `${d} ${MES[+m-1]} ${y}`;
   $("#b-dest").textContent = (S.dest||"ESPAÑA").toUpperCase();
   $("#b-week").textContent = `SEMANA ${curWeek()} / ${TOTAL_WEEKS}`;
-  $("#b-pax").textContent = `PASAJERO · ${(me().name||"").toUpperCase().slice(0,12)}`;
+  $("#b-pax").innerHTML = `<i></i>${h((me().name||"").slice(0,14))}`;
 }
 
 /* RENDER: Hoy */
@@ -2903,7 +2943,7 @@ function renderHoje(){
       <div class="lv">Nível ${lv.i+1} · ${h(lv.title)}${lv.hi?` · faltam ${lv.hi-lv.x} XP`:""}<div class="meter"><span style="width:${lvPct}%"></span></div></div></div>
       <span class="chev">›</span>
     </button>
-    ${PR.list.length>1 ? rankCard() : ""}
+    ${PR.list.length>1 ? rankCard() : `<button class="card tint-g" style="text-align:left;width:100%;cursor:pointer" data-act="pasajeros"><p class="small"><b>Quer competir com alguém?</b> Toque no seu nome, no topo, e compartilhe seu placar.</p></button>`}
     <div class="mini">
       ${fdd ? `<div class="card stack" style="gap:6px"><div class="eyebrow">Frase do dia</div><div class="es">${W(fdd.es)}</div><div class="pt small">${h(fdd.pt)}</div>${sayBtn(fdd.es)}</div>`:""}
       <div class="card tint-c stack" style="gap:6px"><div class="eyebrow">¿Sabías que…?</div><p class="fact small">${daily(FACTS)}</p></div>
@@ -2978,7 +3018,7 @@ function renderTreino(){
       <button class="tile t-s" data-act="sons" ${canSpeak?"":"disabled"}><span class="ic">${ICON.mouth}</span><b>Sons difíceis</b><span>Os sons que denunciam o sotaque brasileiro</span></button>
       <button class="tile t-g" data-act="listen" ${canSpeak?"":"disabled"}><span class="ic">${ICON.ear}</span><b>Escuta</b><span>Ouça e escolha o significado</span></button>
       <button class="tile t-r" data-act="conv" data-pick="1"><span class="ic">${ICON.talk}</span><b>Outras conversas</b><span>Repita os diálogos das semanas anteriores</span></button>
-      <button class="tile t-s" data-act="duel"><span class="ic">${ICON.trophy}</span><b>Duelo</b><span>${PR.list.length>1?"Quiz a dois passando o celular":"Adicione um 2º passageiro para duelar"}</span></button>
+      <button class="tile t-s" data-act="duel"><span class="ic">${ICON.trophy}</span><b>Duelo</b><span>${locals().length>1?"Quiz a dois passando o celular":"Para duas pessoas no mesmo celular"}</span></button>
     </div>
     <div class="eyebrow" style="margin-top:4px">Reforço</div>
     <div class="tiles">
@@ -3138,8 +3178,8 @@ function mcItem(c, dir, pool){
   return {t:"mc", c, dir, field, opts:shuffle(opts), picked:null};
 }
 function startDuel(){
-  if(PR.list.length<2){ openPasajeros(); return; }
-  const others = PR.list.filter(x=>x.id!==PR.active);
+  if(locals().length<2){ toast("O duelo é para duas pessoas no mesmo celular. Adicione um perfil em Pasajeros."); openPasajeros(); return; }
+  const others = locals().filter(x=>x.id!==PR.active);
   const players = [me(), others[Math.floor(Math.random()*others.length)]];
   let pool = unlockedCards(); if(pool.length<8) pool = CARDS.filter(c=>c.week<=2);
   const qs = shuffle(pool).slice(0,10);
@@ -3264,6 +3304,7 @@ function openSettings(){
       ${window.claude ? `<span class="hint">Dentro do Claude o microfone não está disponível. Use o app instalado pelo endereço do GitHub.</span>` :
         `<button class="btn soft" data-act="mictest">${ICON.mic} Testar microfone</button><div id="mic-test-out" class="hint">${SR ? (IS_IOS && STANDALONE ? "Você está no app instalado do iPhone. Se o teste falhar, abra o endereço no Safari: lá o microfone funciona." : "Toque para testar. Vou pedir permissão ao celular na primeira vez.") : "Este navegador não tem reconhecimento de voz. Use Chrome (Android) ou Safari (iPhone)."}</div>`}</div>
     <div class="field"><label class="row" style="gap:10px"><input type="checkbox" id="s-sound" style="width:22px;height:22px;accent-color:var(--cobalt)" ${S.sound?"checked":""}> Sons e vibração nos acertos</label></div>
+    <p class="hint" id="s-sync">${remote?"Progresso sincronizado na sua conta Claude.":"Progresso salvo neste aparelho."}</p>
     <div class="field"><label for="s-io">Backup do progresso</label><textarea id="s-io" placeholder="Cole aqui um backup para restaurar"></textarea>
       <div class="row"><button class="btn soft" data-act="export" style="flex:1">Copiar backup</button><button class="btn ghost" data-act="import" style="flex:1">Restaurar</button></div>
       <span class="hint">Use para levar seu progresso para outro aparelho.</span></div>
@@ -3322,6 +3363,9 @@ document.addEventListener("click", e=>{
     case "vritmo": V.ritmo=el.dataset.k; saveProfiles(); renderViaje(); break;
     case "vopen": { const id=el.dataset.id; V.open = V.open===id ? null : id; saveProfiles(); renderViaje(); const nb=document.querySelector(`[data-act="vopen"][data-id="${id}"]`); if(nb) nb.scrollIntoView({block:"start",behavior:"smooth"}); break; }
     case "useprofile": switchProfile(el.dataset.id); $("#sheet").hidden=true; toast(`Agora é ${me().name}. ¡Vamos!`); break;
+    case "delprofile": { if(el.dataset.armed){ removeProfile(el.dataset.id); openPasajeros(); toast("Removido."); } else { el.dataset.armed="1"; el.style.background="var(--bad-soft)"; el.style.color="var(--bad)"; toast("Toque de novo para remover"); setTimeout(()=>{ delete el.dataset.armed; el.style.background=""; el.style.color=""; }, 2500); } break; }
+    case "share": sharePlacar(); break;
+    case "recvinv": { const d=parseInvite(($("#s-inv")||{}).value); if(!d){ toast("Não reconheci esse link. Cole o link inteiro."); break; } if(receiveScore(d)){ renderAll(); openPasajeros(); toast(`Placar de ${d.name} atualizado.`); } break; }
     case "addprofile": { const id=addProfile(($("#s-newp")||{}).value); if(!id){ toast("Digite um nome"); break; } openPasajeros(); toast("Passageiro adicionado. Toque em Usar para trocar."); break; }
     case "duel": startDuel(); break;
     case "again": { const m=D.mode, wk=D.week, me=D.me; closeDrill(); if(m==="write") startWrite(); else if(m==="falsos") startFalsos(); else if(m==="conv") startConv(wk,me); else if(m==="duel") startDuel(); else if(m==="eco") startEco(); else if(m==="sons") startSons(); else startQuiz(m); break; }
@@ -3400,6 +3444,7 @@ if(!S.updatedAt){ persistLocal(); }
 renderAll();
 connectRemote();
 if(!PR.onboarded) setTimeout(openOnboarding, 400);
+(function(){ const d=parseInvite(location.hash); if(d && receiveScore(d)){ try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} renderAll(); setTimeout(()=>{ toast(`Placar de ${d.name} recebido. Agora mande o seu!`); if(PR.onboarded) openPasajeros(); }, 600); } })();
 if("serviceWorker" in navigator && !window.claude && location.protocol==="https:"){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
 </script>
 <!-- APP END -->
