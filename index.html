@@ -244,6 +244,28 @@ button.card{border:0;font:inherit;color:inherit}
 .group h3{font-size:15px;color:var(--muted);font-family:var(--f-body);font-weight:700;letter-spacing:.04em;margin:6px 0 2px}
 .tag{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--bad);margin-right:6px}
 
+.illus{display:block;width:100%;height:auto;max-width:100%}
+.hero-art{display:grid;grid-template-columns:1fr 128px;gap:10px;align-items:center}
+.hero-art .illus{width:128px;filter:drop-shadow(0 6px 12px rgba(0,0,0,.18))}
+.plan-art{margin:-6px 0 4px;background:var(--paper);border-radius:16px;padding:6px 20px}
+.plan-art .illus{max-height:110px;margin:0 auto}
+.postcard{border-radius:18px;overflow:hidden;background:var(--paper)}
+.postcard .illus{display:block}
+.links{display:flex;flex-direction:column;gap:6px}
+.lnk{display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;background:var(--surface);border-radius:12px;padding:8px 10px;text-decoration:none;color:var(--ink)}
+.lnk .ic{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:13px;font-weight:800}
+.lnk .ic.video{background:${"#d9372b"}} .lnk .ic.podcast{background:var(--cobalt)} .lnk .ic.site{background:var(--ok)}
+.lnk b{font-size:14px;display:block;line-height:1.25}
+.lnk span.k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.lnk .go{color:var(--cobalt);font-weight:700}
+.res{display:grid;grid-template-columns:36px 1fr;gap:10px;align-items:start;padding:10px 0}
+.res+.res{border-top:1px solid var(--line)}
+.res .ic{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:800}
+.res .ic.video{background:${"#d9372b"}} .res .ic.podcast{background:var(--cobalt)} .res .ic.site{background:var(--ok)}
+.res a{font-family:var(--f-display);font-weight:600;color:var(--ink);text-decoration:none}
+.res a::after{content:" ↗";color:var(--cobalt);font-size:12px}
+.res p{font-size:14px;color:var(--muted)}
+
 /* Rotina de hoje */
 .steps{display:flex;flex-direction:column;gap:0;background:var(--surface);border-radius:26px;padding:6px 0;overflow:hidden}
 .step{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;padding:14px 16px;position:relative}
@@ -2254,6 +2276,78 @@ const LEVELS = [[0,"Turista"],[60,"Fan de las tapas"],[160,"Habitual del bar"],[
 
 const LOLA = `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="36" r="21" fill="#f1c6a0"/><path d="M11 38c-1-18 9-28 21-28s22 10 21 28c-3-11-9-16-21-16S14 27 11 38z" fill="#2a1a12"/><path d="M11 38c0 6 2 10 4 12-1-6 0-10 1-13z M53 38c0 6-2 10-4 12 1-6 0-10-1-13z" fill="#2a1a12"/><circle cx="24.5" cy="37" r="2.4" fill="#2a1a12"/><circle cx="39.5" cy="37" r="2.4" fill="#2a1a12"/><path d="M23 45c5 5 13 5 18 0" stroke="#b0302a" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="21" cy="42" r="2.5" fill="#f3a08c" opacity=".6"/><circle cx="43" cy="42" r="2.5" fill="#f3a08c" opacity=".6"/><circle cx="50" cy="22" r="5.5" fill="#d9372b"/><circle cx="50" cy="22" r="2" fill="#f6c453"/></svg>`;
 
+/* ============================================================
+   ILUSTRAÇÕES (SVG flat, cores do tema). viewBox 200x120.
+   Paleta: var(--cobalt) azul · var(--saffron) amarelo · #d9372b vermelho
+           var(--paper)/var(--surface) claros · var(--ink) traço
+   ============================================================ */
+const RED = "#d9372b", RED2 = "#b0302a", SKIN = "#f1c6a0", GREEN = "#2a9a63";
+const ILLUS = {
+ // 1 Hola: dois balões conversando, sol
+ 1:`<circle cx="170" cy="26" r="14" fill="var(--saffron)"/><path d="M20 30h78a12 12 0 0 1 12 12v22a12 12 0 0 1-12 12H48l-16 12V76H20A12 12 0 0 1 8 64V42a12 12 0 0 1 12-12z" fill="var(--cobalt)"/><text x="64" y="60" text-anchor="middle" font-family="Bricolage Grotesque,Arial,sans-serif" font-weight="800" font-size="20" fill="#fff">¡Hola!</text><path d="M104 54h80a10 10 0 0 1 10 10v24a10 10 0 0 1-10 10h-10v12l-16-12h-54a10 10 0 0 1-10-10V64a10 10 0 0 1 10-10z" fill="var(--saffron)"/><text x="144" y="81" text-anchor="middle" font-family="Bricolage Grotesque,Arial,sans-serif" font-weight="800" font-size="16" fill="#1d1608">¿Qué tal?</text>`,
+ // 2 Aeroporto: avião decolando, pista, mala
+ 2:`<path d="M0 108h200" stroke="var(--line)" stroke-width="3"/><path d="M14 100h30M58 100h30M102 100h30" stroke="var(--saffron)" stroke-width="4" stroke-linecap="round"/><path d="M60 62 150 20c8-4 16 0 14 8l-14 8-28 10 14 30-10 4-24-24-22 8-10 14-8-2 4-18-14-6 2-8z" fill="var(--cobalt)"/><circle cx="150" cy="26" r="4" fill="#fff"/><rect x="150" y="76" width="34" height="30" rx="6" fill="${RED}"/><rect x="160" y="68" width="14" height="8" rx="3" fill="${RED2}"/><rect x="156" y="86" width="22" height="4" rx="2" fill="#fff" opacity=".6"/><path d="M20 40c6-10 18-10 24 0M60 24c6-10 18-10 24 0" stroke="var(--line)" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+ // 3 Cafetería: xícara com vapor, tostada
+ 3:`<ellipse cx="80" cy="104" rx="56" ry="8" fill="var(--line)"/><path d="M40 60h70v24a26 26 0 0 1-26 26H66A26 26 0 0 1 40 84z" fill="var(--cobalt)"/><path d="M110 66h12a12 12 0 0 1 0 24h-12" stroke="var(--cobalt)" stroke-width="8" fill="none"/><ellipse cx="75" cy="60" rx="35" ry="7" fill="#6b4a2b"/><path d="M60 46c-6-8 6-12 0-20M76 44c-6-8 6-12 0-20M92 46c-6-8 6-12 0-20" stroke="var(--line)" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M136 100c0-16 10-30 26-30s26 14 26 30z" fill="var(--saffron)"/><path d="M150 86c6-6 12-8 20-6" stroke="${RED}" stroke-width="5" stroke-linecap="round"/><circle cx="170" cy="90" r="4" fill="${RED}"/>`,
+ // 4 Restaurante: prato com talheres e taça
+ 4:`<ellipse cx="96" cy="108" rx="80" ry="8" fill="var(--line)"/><circle cx="90" cy="66" r="40" fill="var(--surface)" stroke="var(--line)" stroke-width="4"/><circle cx="90" cy="66" r="28" fill="var(--saffron)"/><circle cx="80" cy="60" r="7" fill="${RED}"/><circle cx="100" cy="72" r="6" fill="${RED}"/><path d="M78 76c8 4 16 2 22-4" stroke="${GREEN}" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M30 34v64M24 34v16a6 6 0 0 0 12 0V34M36 34v16" stroke="var(--cobalt)" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M150 34v64M150 34c10 10 10 26 0 36" stroke="var(--cobalt)" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M172 40h22l-4 26a7 7 0 0 1-14 0z" fill="${RED}" opacity=".9"/><path d="M183 73v24M174 98h18" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>`,
+ // 5 Cidade: pin num caminho com prédios
+ 5:`<path d="M10 100h180" stroke="var(--line)" stroke-width="3"/><rect x="18" y="56" width="26" height="44" fill="var(--cobalt)" opacity=".35"/><rect x="50" y="40" width="30" height="60" fill="var(--cobalt)" opacity=".5"/><rect x="150" y="48" width="34" height="52" fill="var(--cobalt)" opacity=".35"/><path d="M20 100c30-20 60 10 90-10s40-30 70-20" stroke="var(--saffron)" stroke-width="5" stroke-dasharray="10 8" fill="none" stroke-linecap="round"/><path d="M112 20a22 22 0 0 1 22 22c0 16-22 40-22 40S90 58 90 42a22 22 0 0 1 22-22z" fill="${RED}"/><circle cx="112" cy="42" r="9" fill="#fff"/><rect x="56" y="48" width="6" height="8" fill="var(--saffron)"/><rect x="68" y="48" width="6" height="8" fill="var(--saffron)"/><rect x="56" y="64" width="6" height="8" fill="var(--saffron)"/>`,
+ // 6 Números: etiqueta €, relógio, moedas
+ 6:`<circle cx="60" cy="60" r="36" fill="var(--surface)" stroke="var(--cobalt)" stroke-width="6"/><path d="M60 38v22l14 10" stroke="var(--ink)" stroke-width="5" stroke-linecap="round" fill="none"/><circle cx="60" cy="60" r="4" fill="${RED}"/><path d="M116 36h50l16 16-16 50h-50l-10-33z" fill="var(--saffron)" transform="rotate(-8 150 70)"/><circle cx="164" cy="50" r="5" fill="var(--surface)"/><text x="138" y="84" text-anchor="middle" font-family="Bricolage Grotesque,Arial,sans-serif" font-weight="800" font-size="30" fill="#1d1608" transform="rotate(-8 150 70)">€</text><circle cx="40" cy="106" r="9" fill="var(--saffron)" stroke="#b8860b" stroke-width="2"/><circle cx="58" cy="108" r="9" fill="var(--saffron)" stroke="#b8860b" stroke-width="2"/>`,
+ // 7 Hotel: cama, abajur, chave
+ 7:`<rect x="20" y="70" width="140" height="30" rx="6" fill="var(--cobalt)"/><rect x="20" y="56" width="140" height="18" rx="6" fill="var(--surface)" stroke="var(--line)" stroke-width="3"/><rect x="30" y="60" width="40" height="12" rx="4" fill="var(--saffron)"/><rect x="24" y="100" width="8" height="12" fill="var(--cobalt)"/><rect x="148" y="100" width="8" height="12" fill="var(--cobalt)"/><rect x="20" y="30" width="12" height="28" fill="var(--line)"/><path d="M166 54h20l10 20h-40z" fill="${RED}"/><rect x="174" y="74" width="4" height="14" fill="var(--ink)" opacity=".5"/><circle cx="176" cy="30" r="11" fill="none" stroke="var(--saffron)" stroke-width="6"/><path d="M176 41v22M176 56h8M176 63h6" stroke="var(--saffron)" stroke-width="6" stroke-linecap="round"/>`,
+ // 8 Compras: sacola com etiqueta
+ 8:`<path d="M44 48h92l8 60H36z" fill="${RED}"/><path d="M62 48c0-18 8-28 28-28s28 10 28 28" stroke="var(--ink)" stroke-width="5" fill="none" stroke-linecap="round" opacity=".6"/><rect x="60" y="66" width="60" height="26" rx="6" fill="var(--saffron)" transform="rotate(-6 90 79)"/><text x="90" y="84" text-anchor="middle" font-family="Bricolage Grotesque,Arial,sans-serif" font-weight="800" font-size="16" fill="#1d1608" transform="rotate(-6 90 79)">-50%</text><path d="M160 30c0-6 10-6 10 0 0 4-6 4-6 10M164 48v2" stroke="var(--cobalt)" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="166" cy="78" r="16" fill="var(--cobalt)" opacity=".2"/><path d="M158 78l6 6 12-12" stroke="var(--cobalt)" stroke-width="4" fill="none" stroke-linecap="round"/>`,
+ // 9 Verbos: raio num balão
+ 9:`<path d="M30 26h120a14 14 0 0 1 14 14v34a14 14 0 0 1-14 14H80L56 106V88H30a14 14 0 0 1-14-14V40a14 14 0 0 1 14-14z" fill="var(--cobalt)"/><path d="M100 34 78 64h20l-6 26 26-34H98z" fill="var(--saffron)"/><circle cx="178" cy="40" r="10" fill="${RED}"/><circle cx="184" cy="72" r="6" fill="var(--saffron)"/>`,
+ // 10 Clima: sol, nuvem, guarda-chuva
+ 10:`<circle cx="60" cy="40" r="22" fill="var(--saffron)"/><path d="M60 8v8M60 64v8M28 40h8M84 40h8M37 17l6 6M77 57l6 6M37 63l6-6M77 23l6-6" stroke="var(--saffron)" stroke-width="4" stroke-linecap="round"/><path d="M80 70a18 18 0 0 1 34-8 14 14 0 0 1 22 12 12 12 0 0 1-2 24H84a14 14 0 0 1-4-28z" fill="var(--surface)" stroke="var(--line)" stroke-width="3"/><path d="M150 60a28 28 0 0 1 48 0z" fill="${RED}"/><path d="M174 60v40a6 6 0 0 1-12 0" stroke="var(--ink)" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M96 104l-3 8M110 104l-3 8M124 104l-3 8" stroke="var(--cobalt)" stroke-width="3" stroke-linecap="round"/>`,
+ // 11 Saúde: maleta com cruz, coração
+ 11:`<rect x="40" y="40" width="110" height="70" rx="12" fill="${RED}"/><rect x="76" y="28" width="38" height="14" rx="5" fill="${RED2}"/><rect x="86" y="56" width="18" height="40" rx="3" fill="#fff"/><rect x="75" y="67" width="40" height="18" rx="3" fill="#fff"/><path d="M172 44c-8-10-24-2-18 10 4 8 18 16 18 16s14-8 18-16c6-12-10-20-18-10z" fill="var(--saffron)"/><rect x="156" y="84" width="30" height="12" rx="6" fill="var(--cobalt)"/><rect x="156" y="84" width="15" height="12" rx="6" fill="var(--surface)"/>`,
+ // 12 Amigos: taças brindando
+ 12:`<path d="M40 30h40l-6 34a14 14 0 0 1-28 0z" fill="var(--saffron)"/><path d="M60 76v24M46 102h28" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/><path d="M120 24h40l-6 34a14 14 0 0 1-28 0z" fill="${RED}"/><path d="M140 70v30M126 102h28" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/><path d="M96 20l4 10M110 14l-2 10M88 36l10 2" stroke="var(--cobalt)" stroke-width="4" stroke-linecap="round"/><circle cx="24" cy="80" r="6" fill="var(--cobalt)" opacity=".4"/><circle cx="182" cy="60" r="8" fill="var(--cobalt)" opacity=".3"/>`,
+ // 13 Passado: foto polaroide e relógio voltando
+ 13:`<rect x="30" y="24" width="80" height="90" rx="4" fill="var(--surface)" stroke="var(--line)" stroke-width="3" transform="rotate(-6 70 69)"/><rect x="38" y="32" width="64" height="56" fill="var(--cobalt)" transform="rotate(-6 70 69)"/><circle cx="58" cy="50" r="8" fill="var(--saffron)" transform="rotate(-6 70 69)"/><path d="M40 86l20-22 14 12 10-8 18 18z" fill="${GREEN}" transform="rotate(-6 70 69)"/><circle cx="152" cy="64" r="30" fill="none" stroke="var(--cobalt)" stroke-width="6"/><path d="M152 46v18l-12 8" stroke="var(--ink)" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M122 54l-8-10M118 58l-14-4" stroke="var(--saffron)" stroke-width="4" stroke-linecap="round"/>`,
+ // 14 Listos: mala com adesivos e check
+ 14:`<rect x="40" y="38" width="120" height="76" rx="12" fill="var(--cobalt)"/><rect x="80" y="26" width="40" height="14" rx="5" fill="var(--ink)" opacity=".5"/><rect x="40" y="64" width="120" height="8" fill="var(--saffron)"/><circle cx="66" cy="54" r="9" fill="${RED}"/><rect x="118" y="80" width="26" height="18" rx="4" fill="var(--saffron)" transform="rotate(10 131 89)"/><circle cx="150" cy="30" r="16" fill="${GREEN}"/><path d="M142 30l6 6 10-12" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>`,
+ // cidades
+ madrid:`<rect x="0" y="0" width="200" height="120" fill="var(--cobalt)" opacity=".12"/><circle cx="160" cy="34" r="16" fill="var(--saffron)"/><path d="M0 110h200" stroke="var(--ink)" stroke-width="3" opacity=".3"/><path d="M30 110V60a16 16 0 0 1 32 0v50M70 110V60a16 16 0 0 1 32 0v50M110 110V62a14 14 0 0 1 28 0v48" fill="var(--surface)" stroke="var(--ink)" stroke-width="3"/><rect x="22" y="40" width="124" height="12" fill="var(--surface)" stroke="var(--ink)" stroke-width="3"/><path d="M60 40l24-18 24 18z" fill="var(--surface)" stroke="var(--ink)" stroke-width="3"/><rect x="156" y="70" width="30" height="40" fill="var(--surface)" stroke="var(--ink)" stroke-width="3"/><path d="M156 70a15 15 0 0 1 30 0z" fill="${RED}" stroke="var(--ink)" stroke-width="3"/><path d="M171 44v12" stroke="var(--ink)" stroke-width="3"/><circle cx="171" cy="42" r="3" fill="var(--saffron)"/>`,
+ barcelona:`<rect x="0" y="0" width="200" height="120" fill="var(--saffron)" opacity=".18"/><circle cx="36" cy="30" r="14" fill="var(--saffron)"/><path d="M0 100c20-8 40 8 60 0s40-8 60 0 40 8 60 0 20 0 20 0v20H0z" fill="var(--cobalt)" opacity=".5"/><path d="M70 100V40l8-30 8 30v60M90 100V30l8-26 8 26v70M110 100V38l8-30 8 30v62M130 100V46l6-22 6 22v54" fill="var(--surface)" stroke="var(--ink)" stroke-width="3"/><path d="M60 100V70h100v30" fill="var(--surface)" stroke="var(--ink)" stroke-width="3"/><circle cx="78" cy="14" r="3" fill="${RED}"/><circle cx="98" cy="8" r="3" fill="${RED}"/><circle cx="118" cy="12" r="3" fill="${RED}"/><path d="M160 100V56l12-10 12 10v44" fill="var(--surface)" stroke="var(--ink)" stroke-width="3"/>`,
+ sevilla:`<rect x="0" y="0" width="200" height="120" fill="${RED}" opacity=".10"/><circle cx="170" cy="30" r="16" fill="var(--saffron)"/><path d="M0 110h200" stroke="var(--ink)" stroke-width="3" opacity=".3"/><rect x="86" y="24" width="28" height="86" fill="var(--surface)" stroke="var(--ink)" stroke-width="3"/><rect x="92" y="14" width="16" height="12" fill="var(--surface)" stroke="var(--ink)" stroke-width="3"/><path d="M100 6v8" stroke="var(--ink)" stroke-width="3"/><circle cx="100" cy="5" r="3" fill="var(--saffron)"/><rect x="92" y="40" width="6" height="10" fill="var(--cobalt)"/><rect x="102" y="40" width="6" height="10" fill="var(--cobalt)"/><rect x="92" y="60" width="6" height="10" fill="var(--cobalt)"/><rect x="102" y="60" width="6" height="10" fill="var(--cobalt)"/><path d="M30 110V70h56v40" fill="var(--surface)" stroke="var(--ink)" stroke-width="3"/><path d="M38 70l10-12 10 12M58 70l10-12 10 12" fill="var(--surface)" stroke="var(--ink)" stroke-width="3"/><path d="M150 110V80c0-10 8-10 8 0v30" fill="none" stroke="var(--ink)" stroke-width="3"/><path d="M154 80c-14-6-20-18-10-26 8 8 14 2 16-10 10 6 18 16 10 26-6 6-10 8-16 10z" fill="${GREEN}"/><circle cx="140" cy="62" r="4" fill="${RED}"/><circle cx="166" cy="58" r="4" fill="${RED}"/>`,
+ // cenas
+ ole:`<path d="M100 110 40 50c-10-14 4-30 20-24l40 16 40-16c16-6 30 10 20 24z" fill="${RED}"/><path d="M100 110 60 48M100 110l40-62M100 110V40" stroke="var(--saffron)" stroke-width="3" opacity=".7"/><circle cx="100" cy="110" r="8" fill="var(--ink)"/><circle cx="40" cy="30" r="5" fill="var(--saffron)"/><circle cx="160" cy="26" r="5" fill="var(--cobalt)"/><circle cx="178" cy="60" r="4" fill="${RED}"/><circle cx="22" cy="68" r="4" fill="var(--cobalt)"/>`,
+ viaje:`<path d="M0 108h200" stroke="var(--line)" stroke-width="3"/><rect x="30" y="50" width="70" height="56" rx="10" fill="var(--cobalt)"/><rect x="52" y="40" width="26" height="12" rx="4" fill="var(--ink)" opacity=".5"/><rect x="30" y="70" width="70" height="6" fill="var(--saffron)"/><circle cx="48" cy="62" r="6" fill="${RED}"/><path d="M120 70 180 42c6-3 12 0 10 6l-10 6-20 7 10 22-8 3-18-18-16 6-8 10-6-2 3-13-10-4 1-6z" fill="${RED}"/><circle cx="150" cy="22" r="10" fill="var(--saffron)"/>`
+};
+function illus(key, cls){ const body = ILLUS[key]; if(!body) return ""; return `<svg class="illus${cls?" "+cls:""}" viewBox="0 0 200 120" aria-hidden="true">${body}</svg>`; }
+
+/* Para ver e ouvir: links da missão de cada semana (buscas no YouTube e sites oficiais; funcionam sempre) */
+const yt = q => "https://www.youtube.com/results?search_query="+encodeURIComponent(q);
+const WEEK_LINKS = {
+ 1:[["video","Dreaming Spanish: vídeos para iniciantes (fala devagar)",yt("Dreaming Spanish superbeginner")],["podcast","Hoy Hablamos: podcast diário de Madri",'https://www.hoyhablamos.com'],["site","RTVE Play: TV espanhola grátis",'https://www.rtve.es/play/']],
+ 2:[["video","Como ir do aeroporto de Barajas ao centro",yt("aeropuerto Madrid Barajas cómo llegar al centro metro cercanías")],["site","Aena: aeroportos da Espanha",'https://www.aena.es'],["video","Comprar bilhete na máquina da Renfe",yt("cómo comprar billete máquina Renfe Cercanías")]],
+ 3:[["video","Como pedir num bar na Espanha",yt("cómo pedir en un bar en España vocabulario")],["video","O café espanhol: solo, cortado, con leche…",yt("tipos de café en España cortado manchado bombón")],["podcast","Notes in Spanish: casal de Madri conversando",'https://www.notesinspanish.com']],
+ 4:[["video","Receita de tortilla de patatas (em espanhol)",yt("tortilla de patatas receta")],["video","Como funciona o menú del día",yt("menú del día España qué es")],["video","Pedir num restaurante: diálogo",yt("en el restaurante diálogo español España")]],
+ 5:[["video","Pedir e dar direções em espanhol",yt("pedir direcciones en español todo recto a la derecha")],["video","Passeio pelo centro de Madri (walking tour)",yt("Madrid walking tour 4K centro")],["site","Metro de Madrid: mapa e app",'https://www.metromadrid.es']],
+ 6:[["video","Números em espanhol: pronúncia",yt("números en español pronunciación 1 al 100")],["video","Dizer as horas em espanhol",yt("decir la hora en español")],["podcast","Hoy Hablamos",'https://www.hoyhablamos.com']],
+ 7:[["video","Check-in no hotel: diálogo em espanhol",yt("check in hotel diálogo español reserva habitación")],["video","Vocabulário do hotel",yt("vocabulario hotel español habitación llave")]],
+ 8:[["site","Zara Espanha (navegue em espanhol)",'https://www.zara.com/es/'],["video","Fazer compras em espanhol: tallas, probadores",yt("de compras en español talla probador diálogo")],["video","Rebajas: como funcionam",yt("rebajas de invierno España")]],
+ 9:[["video","Verbos irregulares no presente",yt("verbos irregulares presente español e ie o ue")],["video","Spanish with Vicente (Espanha, fala clara)",yt("Spanish with Vicente")],["podcast","Notes in Spanish",'https://www.notesinspanish.com']],
+ 10:[["site","AEMET: previsão do tempo oficial",'https://www.aemet.es'],["video","El tiempo na TV espanhola",yt("el tiempo RTVE previsión")],["video","Falar do clima em espanhol",yt("hablar del tiempo en español hace frío calor")]],
+ 11:[["video","Na farmácia: diálogo em espanhol",yt("en la farmacia diálogo español me duele")],["video","Partes do corpo em espanhol",yt("partes del cuerpo en español")],["site","112: emergências na Europa",'https://www.112.es']],
+ 12:[["video","Tráiler: La casa de papel",yt("La casa de papel tráiler oficial")],["video","Tráiler: Paquita Salas (comédia, fala rápida)",yt("Paquita Salas tráiler")],["video","Gírias da Espanha: guay, vale, tío",yt("expresiones coloquiales España guay vale tío")]],
+ 13:[["video","Pretérito perfecto explicado",yt("pretérito perfecto español he hecho explicación")],["podcast","Notes in Spanish: episódios sobre viagens",'https://www.notesinspanish.com'],["video","Españoles contando o dia (vlog)",yt("vlog un día en Madrid español")]],
+ 14:[["video","Dreaming Spanish: nível beginner",yt("Dreaming Spanish beginner")],["podcast","Hoy Hablamos",'https://www.hoyhablamos.com'],["site","RTVE Play",'https://www.rtve.es/play/']]
+};
+const RESOURCES = [
+ ["podcast","Hoy Hablamos","Episódio curto todo dia, espanhol de Madri, fala clara. O melhor para ouvir no caminho.",'https://www.hoyhablamos.com'],
+ ["podcast","Notes in Spanish","Ben (inglês) e Marina (madrilenha) conversam. Comece pelo nível Inspired Beginners.",'https://www.notesinspanish.com'],
+ ["video","Dreaming Spanish","Vídeos em que a pessoa fala devagar e desenha. Entende-se sem traduzir.",yt("Dreaming Spanish superbeginner")],
+ ["video","Spanish with Vicente","Professor espanhol, vídeos curtos sobre cultura e vocabulário.",yt("Spanish with Vicente")],
+ ["site","RTVE Play","Séries, noticiário e programas da TV pública espanhola, grátis, com legendas em espanhol.",'https://www.rtve.es/play/'],
+ ["video","Séries da Espanha","La casa de papel, Élite, Paquita Salas, Valeria: áudio e legenda em espanhol.",yt("series españolas tráiler")]
+];
+
 const WICON = {
  1:`<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01M15 9h.01"/>`,
  2:`<path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>`,
@@ -2984,9 +3078,9 @@ function renderHoje(){
   }).join("");
   $("#v-hoje").innerHTML = `
     <div class="lola"><div class="av">${LOLA}</div><button class="bubble" data-act="say" data-say="${h(lola.es)}"><div class="name">Lola · toque numa palavra</div><div class="es">${W(lola.es)}</div><div class="pt">${h(lola.pt)}</div></button></div>
-    <div class="todayhead"><h2>Hoje</h2><div class="wk">Semana ${w.n} · <a href="#" data-act="goweek" data-week="${w.n}">${h(w.title)}</a></div></div>
+    <div class="hero-art"><div class="todayhead" style="flex-direction:column;align-items:flex-start;gap:2px"><h2>Hoje</h2><div class="wk" style="text-align:left">Semana ${w.n} · <a href="#" data-act="goweek" data-week="${w.n}">${h(w.title)}</a></div></div>${illus(w.n)}</div>
     ${allDone && (backupAge()===null ? learnedCount()>=10 : backupAge()>=7) ? `<button class="card tint-s" style="text-align:left;width:100%" data-act="backup"><p class="small"><b>Faça um backup (leva 10 segundos).</b> ${IS_IOS?"No iPhone, apagar o app apaga o progresso. ":""}Toque aqui para gerar o link e guarde nas Notas ou no WhatsApp.</p></button>`:""}
-    ${allDone ? `<div class="alldone"><div class="av" style="width:64px;height:64px;background:rgba(255,255,255,.2)">${LOLA}</div><div><div class="big">Feito por hoje. ¡Hasta mañana!</div><p>Rotina completa em ${streak()} ${streak()===1?"dia seguido":"dias seguidos"}.</p></div></div>
+    ${allDone ? `<div class="alldone"><div style="width:96px;flex:none">${illus("ole")}</div><div><div class="big">Feito por hoje. ¡Hasta mañana!</div><p>Rotina completa em ${streak()} ${streak()===1?"dia seguido":"dias seguidos"}.</p></div></div>
     <div class="card stack" style="gap:10px"><div class="eyebrow">Quer mais? Extras de hoje</div>
       <div class="row" style="gap:8px">
         ${newCards().length ? `<button class="btn soft" style="flex:1 1 46%" data-act="extra">+${S.daily} frases novas <span class="ct">≈ ${sessionMinutes(S.daily,0)} min</span></button>` : `<button class="btn soft" style="flex:1 1 46%" data-act="unlocknext">Liberar próxima semana</button>`}
@@ -3007,7 +3101,10 @@ function renderHoje(){
       ${fdd ? `<div class="card stack" style="gap:6px"><div class="eyebrow">Frase do dia</div><div class="es">${W(fdd.es)}</div><div class="pt small">${h(fdd.pt)}</div>${sayBtn(fdd.es)}</div>`:""}
       <div class="card tint-c stack" style="gap:6px"><div class="eyebrow">¿Sabías que…?</div><p class="fact small">${daily(FACTS)}</p></div>
     </div>
-    <div class="mission"><input type="checkbox" id="m-home-${w.n}" data-act="mission" data-week="${w.n}" ${S.missions[w.n]?"checked":""}><label for="m-home-${w.n}"><b>Missão da semana:</b> ${h(w.mission)}</label></div>`;
+    <div class="card tint-s stack" style="gap:10px">
+      <div class="mission" style="padding:0;background:transparent"><input type="checkbox" id="m-home-${w.n}" data-act="mission" data-week="${w.n}" ${S.missions[w.n]?"checked":""}><label for="m-home-${w.n}"><b>Missão da semana:</b> ${h(w.mission)}</label></div>
+      <div class="eyebrow">Para ver e ouvir</div>${linksHtml(w.n)}
+    </div>`;
 }
 function openProgreso(){
   const lv=level(), lvPct = lv.hi ? Math.round(100*(lv.x-lv.lo)/(lv.hi-lv.lo)) : 100;
@@ -3028,6 +3125,7 @@ function openProgreso(){
 function openOnboarding(){
   const el=$("#sheet");
   el.innerHTML = `<div class="sheet onb" role="dialog" aria-label="Como funciona">
+    <div class="postcard" style="background:var(--cobalt-soft)">${illus("viaje")}</div>
     <div class="lola"><div class="av">${LOLA}</div><div class="bubble"><div class="name">Lola</div><div class="es">¡Hola! Soy Lola, tu amiga de Madrid.</div><div class="pt">Vou te preparar para a Espanha em 14 semanas, uns 10 minutos por noite.</div></div></div>
     <div class="pt-step"><span class="n">1</span><div><b>Toda noite, 3 passos</b><span>Sessão (frases novas e revisões), Conversa falada e Eco. Estão na tela inicial, um de cada vez. Faça na ordem e pronto.</span></div></div>
     <div class="pt-step"><span class="n">2</span><div><b>Fale em voz alta, sempre</b><span>O app mostra em português, você fala em espanhol e depois confere ouvindo. Falar de verdade é o que faz a diferença na viagem.</span></div></div>
@@ -3051,6 +3149,7 @@ function renderPlano(){
     const pill = status==="done" ? `<span class="pill ok">concluída</span>` : status==="now" ? `<span class="pill now">agora</span>` : status==="past" ? `<span class="pill soon">${wp.seen}/${wp.total}</span>` : `<span class="pill soon">em breve</span>`;
     const open = openWeek===w.n;
     const body = !open ? "" : `<div class="wbody">
+      <div class="plan-art">${illus(w.n)}</div>
       <div class="tip">${Wi(w.tip)}</div>
       <div class="stack" style="gap:6px">
         <div class="spread"><span class="eyebrow">Diálogo</span>${canSpeak?`<button class="btn soft" style="min-height:38px;padding:8px 12px" data-act="dialog" data-week="${w.n}">${ICON.say.replace('<svg','<svg width="18" height="18"')} Ouvir tudo</button>`:""}</div>
@@ -3059,12 +3158,14 @@ function renderPlano(){
         <p class="small muted">Toque numa palavra para ver o que significa.</p>
       </div>
       <div class="mission"><input type="checkbox" id="m-${w.n}" data-act="mission" data-week="${w.n}" ${S.missions[w.n]?"checked":""}><label for="m-${w.n}"><b>Missão:</b> ${h(w.mission)}</label></div>
+      <div><div class="eyebrow" style="margin-bottom:6px">Para ver e ouvir nesta semana</div>${linksHtml(w.n)}</div>
       <div><div class="eyebrow">Frases (${CARDS.filter(c=>c.week===w.n).length})</div><div class="list">${CARDS.filter(c=>c.week===w.n).map(phraseRow).join("")}</div></div>
       ${w.n>cw ? `<button class="btn ghost wide" data-act="unlock" data-week="${w.n}">Adiantar: liberar esta semana no treino</button>` : `<button class="btn soft wide" data-act="quiz" data-week="${w.n}">Quiz desta semana</button>`}
     </div>`;
     return `<div class="week ${status}"><button class="head" data-act="toggleweek" data-week="${w.n}" aria-expanded="${open}"><span class="wnum">${wicon(w.n)}</span><span><span class="wtitle">${W(w.title)}</span><br><span class="wdates">${fmtShort(weekStart(w.n))} – ${fmtShort(weekStart(w.n)+6)} · ${h(w.sub)}</span></span>${pill}</button>${body}</div>`;
   }).join("");
-  $("#v-plano").innerHTML = `<div><h2 style="font-size:24px">Plano de ${TOTAL_WEEKS} semanas</h2><p class="muted small" style="margin-top:4px">Uma semana por tema, 5 a 10 minutos por noite. As primeiras semanas são o que você mais vai usar: pedir ajuda, aeroporto e estação, café, comida e direções. Toque numa semana para ver a explicação, o diálogo e as frases.</p></div>${items}`;
+  const res = `<div class="card stack" style="gap:4px;margin-top:8px"><div class="eyebrow">Para ouvir espanhol da Espanha todo dia</div><p class="small muted">Ouvir 10 minutos por dia, mesmo sem entender tudo, acostuma o ouvido ao ritmo e ao sotaque. Escolha um e deixe no caminho do trabalho.</p>${RESOURCES.map(([k,t,d,u])=>`<div class="res"><span class="ic ${k}">${KIND_IC[k]}</span><div><a href="${h(u)}" target="_blank" rel="noopener">${h(t)}</a><p>${h(d)}</p></div></div>`).join("")}</div>`;
+  $("#v-plano").innerHTML = `<div><h2 style="font-size:24px">Plano de ${TOTAL_WEEKS} semanas</h2><p class="muted small" style="margin-top:4px">Uma semana por tema, 5 a 10 minutos por noite. As primeiras semanas são o que você mais vai usar: pedir ajuda, aeroporto e estação, café, comida e direções. Toque numa semana para ver a explicação, o diálogo e as frases.</p></div>${items}${res}`;
 }
 
 /* RENDER: Practicar */
@@ -3123,13 +3224,16 @@ function cityDates(){ let start=numOf(S.trip); const out={}; V.dests.filter(id=>
 function moveDest(id, dir){ const i=V.dests.indexOf(id); const j=i+dir; if(i<0||j<0||j>=V.dests.length) return; [V.dests[i],V.dests[j]]=[V.dests[j],V.dests[i]]; }
 function setArrival(id){ if(!V.dests.includes(id)) return; V.dests=[id, ...V.dests.filter(x=>x!==id)]; }
 function setDeparture(id){ if(!V.dests.includes(id)) return; V.dests=[...V.dests.filter(x=>x!==id), id]; }
+const KIND_PT={video:"vídeo",podcast:"podcast",site:"site"};
+const KIND_IC={video:"▶",podcast:"♪",site:"↗"};
+function linksHtml(n){ const ls=WEEK_LINKS[n]||[]; if(!ls.length) return ""; return `<div class="links">${ls.map(([k,t,u])=>`<a class="lnk" href="${h(u)}" target="_blank" rel="noopener"><span class="ic ${k}">${KIND_IC[k]}</span><span><span class="k">${KIND_PT[k]}</span><b>${h(t)}</b></span><span class="go">abrir</span></a>`).join("")}</div>`; }
 function bkTag(k){ const b=BOOK[k]||BOOK.h; return `<span class="bk ${b[1]}"><i></i>${b[0]}</span>`; }
 function itemHtml(m){ return `<div class="item"><div class="hd"><a href="${h(m.link)}" target="_blank" rel="noopener">${h(m.t)}</a><div class="meta2">${bkTag(m.pay?m.book:"g")}<span class="meta">${h(m.area||m.how||"")}${m.price?` · ${h(m.price)}`:""}</span></div></div><div class="tip">${m.tip}</div></div>`; }
 function renderViaje(){
   const sel = V.dests.filter(id=>DEST[id]);
   const totalDays = sel.reduce((a,id)=>a+(V.days[id]||0),0);
   const setup = `
-    <div><h2 style="font-size:24px">Tu viaje</h2><p class="muted small" style="margin-top:4px">Marque os destinos, diga quantos dias e o que você curte. Eu monto o roteiro, com os links de compra e o que precisa reservar antes.</p></div>
+    <div class="hero-art"><div><h2 style="font-size:24px">Tu viaje</h2><p class="muted small" style="margin-top:4px">Marque os destinos, diga quantos dias e o que você curte. Eu monto o roteiro, com os links de compra e o que precisa reservar antes.</p></div>${illus("viaje")}</div>
     <div class="row" style="gap:8px">${Object.keys(DEST).map(id=>`<button class="dchip${V.dests.includes(id)?" on":""}" data-act="vdest" data-id="${id}"><span class="em">${DEST[id].emoji}</span><span><b>${h(DEST[id].name)}</b><span>${h(DEST[id].region)}</span></span></button>`).join("")}</div>
     ${sel.length?`<div class="card stack" style="gap:12px">
       <div class="row" style="gap:8px">
@@ -3146,6 +3250,7 @@ function renderViaje(){
   const dests = sel.map(id=>{ const d=DEST[id]; const open = V.open===id;
     return `<div class="week${open?" now":""}"><button class="head" data-act="vopen" data-id="${id}" aria-expanded="${open}"><span class="wnum" style="font-size:22px">${d.emoji}</span><span><span class="wtitle">${h(d.name)}</span><br><span class="wdates">${d.stay.ideal} dias ideais · ${d.must.length} imperdíveis · ${d.daytrips.length} bate-voltas</span></span><span class="pill ${open?"now":"soon"}">${open?"aberto":"ver"}</span></button>
     ${open?`<div class="wbody">
+      <div class="postcard">${illus(id)}</div>
       <div class="verd"><b>Quantos dias?</b> ${h(d.stay.text)}</div>
       <details class="sec" open><summary>Curiosidades</summary><div class="in" style="gap:0">${d.curios.map(c=>`<p class="curio">${c}</p>`).join("")}</div></details>
       <details class="sec"><summary>Imperdíveis e ingressos <span class="small muted" style="font-weight:400">${d.must.filter(m=>m.book==="s").length} exigem antecedência</span></summary><div class="in" style="gap:0">${d.must.slice().sort((a,b)=>"sdhg".indexOf(a.pay?a.book:"g")-"sdhg".indexOf(b.pay?b.book:"g")).map(itemHtml).join("")}</div></details>
