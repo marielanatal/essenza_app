@@ -1,5 +1,5 @@
 // Guarda o app no aparelho para funcionar sem internet.
-const CACHE = "rumbo-v19";
+const CACHE = "rumbo-v20";
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", e => {
@@ -13,8 +13,9 @@ self.addEventListener("activate", e => {
 // Rede primeiro (pega atualizações), cache quando estiver offline.
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET") return;
+  const isPage = e.request.mode === "navigate" || /\/(index\.html)?(\?.*)?$/.test(new URL(e.request.url).pathname) && new URL(e.request.url).origin === location.origin;
   e.respondWith(
-    fetch(e.request)
+    fetch(isPage ? new Request(e.request, { cache: "no-store" }) : e.request)
       .then(res => {
         const u = e.request.url;
         if (res.ok && (new URL(u).origin === location.origin || u.includes("fonts.") || u.includes("upload.wikimedia.org") || u.includes("wikipedia.org/api/rest_v1/page/") || u.includes("wikipedia.org/w/api.php"))) {
