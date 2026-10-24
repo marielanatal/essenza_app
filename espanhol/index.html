@@ -25,7 +25,7 @@
   --cobalt:#2443a6; --cobalt-soft:#e5eaf9; --on-cobalt:#ffffff;
   --saffron:#d9920f; --saffron-soft:#fbefd4; --on-saffron:#1d1608;
   --ok:#1d7448; --ok-soft:#dcf2e5; --bad:#b0302a; --bad-soft:#f8e0de;
-  --board:#151b2e; --board-fg:#f6c453; --board-dim:#8c93a8; --board-cell:#222a42;
+  --board:#1b2f80; --board-fg:#f6c453; --board-dim:#8c93a8; --board-cell:#222a42;
   --f-display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
   --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
   --f-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
@@ -36,14 +36,14 @@
   --cobalt:#8ea7ff; --cobalt-soft:#1c2750; --on-cobalt:#0c111e;
   --saffron:#f2bb4b; --saffron-soft:#372c13; --on-saffron:#1d1608;
   --ok:#62d29d; --ok-soft:#14332a; --bad:#ff8c82; --bad-soft:#3b1c1b;
-  --board:#05080f; --board-fg:#f6c453; --board-dim:#7d859b; --board-cell:#131a2b;
+  --board:#1b2f80; --board-fg:#f6c453; --board-dim:#7d859b; --board-cell:#131a2b;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --paper:#0c111e; --surface:#151c2e; --ink:#e6eaf4; --muted:#9aa3b9; --line:#262f47;
   --cobalt:#8ea7ff; --cobalt-soft:#1c2750; --on-cobalt:#0c111e;
   --saffron:#f2bb4b; --saffron-soft:#372c13; --on-saffron:#1d1608;
   --ok:#62d29d; --ok-soft:#14332a; --bad:#ff8c82; --bad-soft:#3b1c1b;
-  --board:#05080f; --board-fg:#f6c453; --board-dim:#7d859b; --board-cell:#131a2b;
+  --board:#1b2f80; --board-fg:#f6c453; --board-dim:#7d859b; --board-cell:#131a2b;
   color-scheme:dark}
 
 *{box-sizing:border-box}
@@ -62,38 +62,22 @@ p{margin:0}
 .small{font-size:14px}
 
 /* Painel de partidas */
-.board{background:var(--board);color:var(--board-fg);margin:0 calc(-1 * max(16px,env(safe-area-inset-right,0px))) 0 calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding:10px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));font-family:var(--f-mono);
-  background-image:
-   conic-gradient(from 45deg at 50% 50%, transparent 0 25%, rgba(255,255,255,.025) 0 50%, transparent 0 75%, rgba(255,255,255,.025) 0);
-  background-size:28px 28px}
-.board-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.board-top .lbl{font-size:12px;letter-spacing:.18em;color:var(--board-dim)}
-.brand{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.18em;color:var(--board-dim);flex:none}
-.brand svg{width:28px;height:28px}
-.board-top{gap:8px}
-.pax{background:var(--board-cell);border:0;color:var(--board-fg);border-radius:99px;height:32px;padding:0 12px;font-family:var(--f-body);font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46%;margin-left:auto;display:inline-flex;align-items:center;gap:6px}
+.board{background:linear-gradient(140deg,#1b2f80 0%,#2443a6 55%,#3b57c4 100%);color:#fff;margin:0 calc(-1 * max(16px,env(safe-area-inset-right,0px))) 0 calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding:10px max(16px,env(safe-area-inset-right,0px)) 18px max(16px,env(safe-area-inset-left,0px));border-radius:0 0 28px 28px;position:relative;overflow:hidden}
+.board::after{content:"";position:absolute;right:-40px;top:-50px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.07);pointer-events:none}
+.board-top{display:flex;justify-content:space-between;align-items:center;gap:8px;position:relative}
+.brand{display:inline-flex;align-items:center;gap:8px;flex:none}
+.brand span{font-family:var(--f-display);font-weight:800;font-size:16px;letter-spacing:.01em;color:#fff}
+.brand svg{width:28px;height:28px;border-radius:7px}
+.pax{background:rgba(255,255,255,.16);border:0;color:#fff;border-radius:99px;height:32px;padding:0 12px;font-family:var(--f-body);font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46%;margin-left:auto;display:inline-flex;align-items:center;gap:6px}
 .pax i{width:8px;height:8px;border-radius:50%;background:#62d29d;display:inline-block;flex:none}
-.prow{display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center;padding:10px 0}
-.prow+.prow{border-top:1px solid var(--line)}
-.prow .av{width:40px;height:40px}
-.prow b{font-family:var(--f-display);font-size:17px}
-.prow .sub{font-size:13px;color:var(--muted)}
-.prow .xp{font-family:var(--f-mono);font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
-.prow .xp small{display:block;font-weight:500;color:var(--muted);font-size:11px}
-.trophy{color:var(--saffron)}
-.crown{font-size:12px;font-weight:700;color:var(--saffron);letter-spacing:.06em}
-.gear{background:transparent;border:0;color:var(--board-dim);border-radius:10px;width:36px;height:36px;display:grid;place-items:center}
+.gear{background:transparent;border:0;color:rgba(255,255,255,.85);border-radius:10px;width:36px;height:36px;display:grid;place-items:center}
 .gear svg{width:20px;height:20px}
-.board-row{display:flex;gap:12px;align-items:center;margin-top:10px}
-.dest{font-size:11px;color:var(--board-dim);letter-spacing:.08em;line-height:1.3;min-width:0}
-.dest .dl{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dest b{display:block;color:var(--board-fg);font-size:17px;letter-spacing:.12em;font-weight:700}
-.flaps{display:flex;gap:3px;flex:none}
-.flap{background:var(--board-cell);border-radius:5px;min-width:26px;padding:5px 4px;text-align:center;font-size:24px;font-weight:700;line-height:1;position:relative}
-.flap::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--board)}
-.sync{display:inline-flex;align-items:center;gap:6px}
-.sync i{width:7px;height:7px;border-radius:50%;background:var(--board-dim);display:inline-block}
-.sync.on i{background:#62d29d}
+.count{display:flex;align-items:center;gap:12px;margin-top:10px;position:relative}
+.count b{font-family:var(--f-display);font-size:44px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.count .lbl{display:flex;flex-direction:column;gap:2px;font-size:14px;line-height:1.25;color:rgba(255,255,255,.85);min-width:0}
+.count .lbl strong{color:#fff;font-family:var(--f-display);font-weight:700}
+.count .lbl span:last-child{font-size:12px;color:rgba(255,255,255,.7)}
+.sync{display:none}
 
 /* Seções */
 main{padding-top:18px}
@@ -447,17 +431,14 @@ nav.tabs button.on{color:var(--cobalt);background:var(--cobalt-soft)}
 <div class="wrap">
   <header class="board" aria-label="Contagem regressiva">
     <div class="board-top">
-      <span class="brand" aria-label="Rumbo a España"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="2" y="10" width="60" height="44" rx="10" fill="#c60b1e"/><rect x="2" y="21" width="60" height="22" fill="#ffc400"/><path d="M14 18h36a6 6 0 0 1 6 6v14a6 6 0 0 1-6 6H30l-9 7v-7h-7a6 6 0 0 1-6-6V24a6 6 0 0 1 6-6z" fill="#fff"/><text x="32" y="38" text-anchor="middle" font-family="DejaVu Sans, Arial, sans-serif" font-weight="700" font-size="15" fill="#151b2e">¡Hola!</text></svg><span>RUMBO</span></span>
+      <span class="brand" aria-label="Rumbo a España"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="2" y="10" width="60" height="44" rx="10" fill="#c60b1e"/><rect x="2" y="21" width="60" height="22" fill="#ffc400"/><path d="M14 18h36a6 6 0 0 1 6 6v14a6 6 0 0 1-6 6H30l-9 7v-7h-7a6 6 0 0 1-6-6V24a6 6 0 0 1 6-6z" fill="#fff"/><text x="32" y="38" text-anchor="middle" font-family="DejaVu Sans, Arial, sans-serif" font-weight="700" font-size="15" fill="#151b2e">¡Hola!</text></svg><span>Rumbo</span></span>
       <button class="pax" data-act="pasajeros" id="b-pax">—</button>
       <button class="gear" data-act="settings" aria-label="Ajustes">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
       </button>
     </div>
-    <div class="board-row">
-      <div class="flaps" id="b-flaps"><span class="flap">1</span><span class="flap">0</span><span class="flap">1</span></div>
-      <div class="dest"><span class="dl">días para</span><b id="b-dest">ESPAÑA</b><span class="dl"><span id="b-date">01 FEB 2027</span> · <span id="b-week">SEMANA 1 / 14</span></span></div>
-      <span class="sync" id="b-sync" hidden><i></i><span></span></span>
-    </div>
+    <div class="count"><b id="b-days">100</b><div class="lbl"><span>dias para <strong id="b-dest">Espanha</strong></span><span><span id="b-date">1 fev 2027</span> · <span id="b-week">semana 1 de 14</span></span></div></div>
+    <span class="sync" id="b-sync" hidden><i></i><span></span></span>
   </header>
 
   <main>
@@ -2345,12 +2326,12 @@ const FACTS = [
 /* Níveis (XP vem do que você já fez: frases, revisões, falas e missões) */
 const LEVELS = [[0,"Turista"],[60,"Fan de las tapas"],[160,"Habitual del bar"],[320,"Parte del barrio"],[560,"Casi de aquí"],[900,"Leyenda del barrio"],[1400,"¡Como en casa!"]];
 
-const LOLA = `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="36" r="21" fill="#f1c6a0"/><path d="M11 38c-1-18 9-28 21-28s22 10 21 28c-3-11-9-16-21-16S14 27 11 38z" fill="#2a1a12"/><path d="M11 38c0 6 2 10 4 12-1-6 0-10 1-13z M53 38c0 6-2 10-4 12 1-6 0-10-1-13z" fill="#2a1a12"/><circle cx="24.5" cy="37" r="2.4" fill="#2a1a12"/><circle cx="39.5" cy="37" r="2.4" fill="#2a1a12"/><path d="M23 45c5 5 13 5 18 0" stroke="#b0302a" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="21" cy="42" r="2.5" fill="#f3a08c" opacity=".6"/><circle cx="43" cy="42" r="2.5" fill="#f3a08c" opacity=".6"/><circle cx="50" cy="22" r="5.5" fill="#d9372b"/><circle cx="50" cy="22" r="2" fill="#f6c453"/></svg>`;
+const LOLA = `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="#f6c453"/><text x="32" y="44" text-anchor="middle" font-family="Bricolage Grotesque, Avenir Next, Segoe UI, Arial, sans-serif" font-weight="800" font-size="34" fill="#1d1608">L</text></svg>`;
 
 
 /* Fotos reais: a imagem principal do artigo da Wikipédia em espanhol, carregada no aparelho (não aqui no Claude). */
-const WP_WEEK = {1:"Puerta_del_Sol",2:"Aeropuerto_Adolfo_Suárez_Madrid-Barajas",3:"Café_con_leche",4:"Tortilla_de_patatas",5:"Gran_Vía_(Madrid)",6:"Mercado_de_San_Miguel",7:"Hotel_Ritz_(Madrid)",8:"Calle_de_Preciados",9:"Metro_de_Madrid",10:"Parque_del_Retiro",11:"Farmacia",12:"Tapa_(gastronomía)",13:"Toledo",14:"Plaza_de_Cibeles"};
-const WP_CITY = {madrid:"Madrid", barcelona:"Barcelona", sevilla:"Sevilla"};
+const WP_WEEK = {1:"Plaza_Mayor_de_Madrid",2:"Aeropuerto_Adolfo_Suárez_Madrid-Barajas",3:"Café_con_leche",4:"Tortilla_de_patatas",5:"Gran_Vía_(Madrid)",6:"Mercado_de_San_Miguel",7:"Hotel_Ritz_(Madrid)",8:"Calle_de_Preciados",9:"Metro_de_Madrid",10:"Parque_del_Retiro",11:"Farmacia",12:"Tapa_(gastronomía)",13:"Toledo",14:"Plaza_de_Cibeles"};
+const WP_CITY = {madrid:"Puerta_de_Alcalá", barcelona:"Templo_Expiatorio_de_la_Sagrada_Familia", sevilla:"Plaza_de_España_(Sevilla)"};
 const WP_PLACE = {
  "Museo del Prado":"Museo_del_Prado","Museo Reina Sofía":"Museo_Nacional_Centro_de_Arte_Reina_Sofía","Palacio Real":"Palacio_Real_de_Madrid","Plaza Mayor e Mercado de San Miguel":"Plaza_Mayor_de_Madrid","Parque del Retiro e Palacio de Cristal":"Palacio_de_Cristal_del_Retiro","Templo de Debod ao pôr do sol":"Templo_de_Debod","Tapas em La Latina":"La_Latina_(Madrid)","Gran Vía, Sol e Chueca a pé":"Gran_Vía_(Madrid)","Tour do Estádio Bernabéu":"Estadio_Santiago_Bernabéu","Museo Sorolla":"Museo_Sorolla","Museo Thyssen":"Museo_Thyssen-Bornemisza","El Rastro (domingo)":"El_Rastro","Flamenco no Corral de la Morería":"Corral_de_la_Morería","Chocolate con churros em San Ginés":"Chocolatería_San_Ginés",
  "Toledo":"Toledo","Segovia":"Acueducto_de_Segovia","El Escorial":"Monasterio_de_El_Escorial","Ávila":"Ávila",
@@ -2360,19 +2341,29 @@ const WP_PLACE = {
  "Córdoba":"Mezquita-catedral_de_Córdoba","Cádiz":"Cádiz","Jerez de la Frontera":"Jerez_de_la_Frontera","Granada e Alhambra (pernoite)":"Alhambra","Itálica (ruínas romanas)":"Itálica"
 };
 const PHOTOS_ON = !window.claude;      // dentro do Claude a rede externa é bloqueada
-let WPCACHE = {}; try{ WPCACHE = JSON.parse(localStorage.getItem("rumbo-wp")||"{}"); }catch(e){}
-function wpSave(){ try{ localStorage.setItem("rumbo-wp", JSON.stringify(WPCACHE)); }catch(e){} }
+let WPCACHE = {}; try{ WPCACHE = JSON.parse(localStorage.getItem("rumbo-wp2")||"{}"); localStorage.removeItem("rumbo-wp"); }catch(e){}
+function wpSave(){ try{ localStorage.setItem("rumbo-wp2", JSON.stringify(WPCACHE)); }catch(e){} }
 function photoEl(title, cls, label){
   if(!title) return "";
   return `<figure class="photo${cls?" "+cls:""}" data-wp="${h(title)}" data-label="${h(label||"")}"><div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div></figure>`;
 }
+const WP_BAD=/escudo|bandera|flag|coat|mapa|map_|_map|locat|situaci|logo|plano|diagram|icon|se[ñn]al|wikidata|commons-logo|placa/i;
+async function wpJson(url){ const res=await fetch(url,{headers:{"Accept":"application/json"}}); if(!res.ok) throw new Error(res.status); return res.json(); }
 async function wpSummary(title){
   if(WPCACHE[title] && WPCACHE[title].t > Date.now()-30*864e5) return WPCACHE[title];
-  const res = await fetch("https://es.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(title), {headers:{"Accept":"application/json"}});
-  if(!res.ok) throw new Error(res.status);
-  const j = await res.json();
-  const src = j.thumbnail && j.thumbnail.source ? j.thumbnail.source.replace(/\/\d+px-/, "/800px-") : null;
-  const out = {t:Date.now(), src, title:j.title, url:(j.content_urls && j.content_urls.desktop && j.content_urls.desktop.page) || ("https://es.wikipedia.org/wiki/"+encodeURIComponent(title))};
+  const enc=t=>encodeURIComponent(t.replace(/ /g,"_"));
+  let t=title, ml=null;
+  try{ ml=await wpJson("https://es.wikipedia.org/api/rest_v1/page/media-list/"+enc(t)); }catch(e){}
+  if(!ml || !(ml.items||[]).length){
+    const sr=await wpJson("https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch="+encodeURIComponent(title.replace(/_/g," "))+"&srlimit=1&format=json&origin=*");
+    const hit=sr && sr.query && sr.query.search && sr.query.search[0]; if(!hit) throw new Error("no article");
+    t=hit.title; ml=await wpJson("https://es.wikipedia.org/api/rest_v1/page/media-list/"+enc(t));
+  }
+  const pics=(ml.items||[]).filter(i=>i.type==="image" && i.showInGallery!==false && /\.jpe?g$/i.test(i.title||"") && !WP_BAD.test(i.title||""));
+  const it=pics[0]; if(!it) throw new Error("no photo");
+  let src=(it.srcset && it.srcset[0] && it.srcset[0].src) || (it.original && it.original.source) || ""; if(!src) throw new Error("no src");
+  if(src.startsWith("//")) src="https:"+src; src=src.replace(/\/\d+px-/, "/800px-");
+  const out={t:Date.now(), src, title:t.replace(/_/g," "), url:"https://es.wikipedia.org/wiki/"+enc(t)};
   WPCACHE[title]=out; wpSave(); return out;
 }
 function loadPhotos(){
@@ -3041,9 +3032,10 @@ function rankCard(){
     <div class="row"><button class="btn saff" style="flex:1" data-act="share">Compartilhar placar</button>${locals().length>1?`<button class="btn ghost" style="flex:1" data-act="duel">Duelo</button>`:`<button class="btn ghost" style="flex:1" data-act="pasajeros">Pasajeros</button>`}</div>
   </div>`;
 }
-const FACES=["#f1c6a0","#c68642","#8d5524","#e0ac69"];
-function faceOf(id){ return LOLAFACE(Math.max(0, PR.list.findIndex(x=>x.id===id))); }
-function LOLAFACE(i){ const skin=FACES[i%FACES.length]; return `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="36" r="21" fill="${skin}"/><path d="M11 38c-1-18 9-28 21-28s22 10 21 28c-3-11-9-16-21-16S14 27 11 38z" fill="#2a1a12"/><circle cx="24.5" cy="37" r="2.4" fill="#2a1a12"/><circle cx="39.5" cy="37" r="2.4" fill="#2a1a12"/><path d="M23 45c5 5 13 5 18 0" stroke="#b0302a" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`; }
+const FACES=[["#2443a6","#fff"],["#1d7448","#fff"],["#d9372b","#fff"],["#8a5a00","#fff"]];
+function monogram(letter, i){ const [bg,fg]=FACES[i%FACES.length]; return `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="${bg}"/><text x="32" y="44" text-anchor="middle" font-family="Bricolage Grotesque, Avenir Next, Segoe UI, Arial, sans-serif" font-weight="800" font-size="32" fill="${fg}">${h(letter)}</text></svg>`; }
+function faceOf(id){ const i=Math.max(0, PR.list.findIndex(x=>x.id===id)); const pf=PR.list[i]; return monogram(((pf&&pf.name)||"?").trim().charAt(0).toUpperCase()||"?", i); }
+function LOLAFACE(i){ return monogram("?", i); }
 function openPasajeros(){
   const rk=ranking(0), tr=trophies();
   const el=$("#sheet");
@@ -3198,12 +3190,11 @@ const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.
    ============================================================ */
 function renderBoard(){
   const days = Math.max(0, numOf(S.trip) - todayN());
-  const digits = String(days).padStart(3,"0").split("");
-  $("#b-flaps").innerHTML = digits.map(d=>`<span class="flap">${d}</span>`).join("");
+  $("#b-days").textContent = days;
   const [y,m,d] = S.trip.split("-");
-  $("#b-date").textContent = `${d} ${MES[+m-1]} ${y}`;
-  $("#b-dest").textContent = (S.dest||"ESPAÑA").toUpperCase();
-  $("#b-week").textContent = `SEMANA ${curWeek()} / ${TOTAL_WEEKS}`;
+  $("#b-date").textContent = `${+d} ${["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"][+m-1]} ${y}`;
+  const dest=(S.dest||"Espanha"); $("#b-dest").textContent = dest.toUpperCase()==="ESPAÑA" ? "Espanha" : dest.charAt(0).toUpperCase()+dest.slice(1).toLowerCase();
+  $("#b-week").textContent = `semana ${curWeek()} de ${TOTAL_WEEKS}`;
   $("#b-pax").innerHTML = `<i></i>${h((me().name||"").slice(0,14))}`;
 }
 
@@ -3280,7 +3271,7 @@ function openProgreso(){
 function openOnboarding(){
   const el=$("#sheet"); setTimeout(loadPhotos, 50);
   el.innerHTML = `<div class="sheet onb" role="dialog" aria-label="Como funciona">
-    ${PHOTOS_ON ? photoEl("Madrid", "banner", "Madrid") : ""}
+    ${PHOTOS_ON ? photoEl("Puerta_de_Alcalá", "banner", "Madrid") : ""}
     <div class="lola"><div class="av">${LOLA}</div><div class="bubble"><div class="name">Lola</div><div class="es">¡Hola! Soy Lola, tu amiga de Madrid.</div><div class="pt">Vou te preparar para a Espanha em 14 semanas, uns 10 minutos por noite.</div></div></div>
     <div class="pt-step"><span class="n">1</span><div><b>Toda noite, 3 passos</b><span>Sessão (frases novas e revisões), Conversa falada e Eco. Estão na tela inicial, um de cada vez. Faça na ordem e pronto.</span></div></div>
     <div class="pt-step"><span class="n">2</span><div><b>Fale em voz alta, sempre</b><span>O app mostra em português, você fala em espanhol e depois confere ouvindo. Falar de verdade é o que faz a diferença na viagem.</span></div></div>
