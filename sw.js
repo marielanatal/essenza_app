@@ -1,5 +1,5 @@
 // Guarda o app no aparelho para funcionar sem internet.
-const CACHE = "rumbo-v16";
+const CACHE = "rumbo-v17";
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", e => {
@@ -16,7 +16,8 @@ self.addEventListener("fetch", e => {
   e.respondWith(
     fetch(e.request)
       .then(res => {
-        if (res.ok && (new URL(e.request.url).origin === location.origin || e.request.url.includes("fonts."))) {
+        const u = e.request.url;
+        if (res.ok && (new URL(u).origin === location.origin || u.includes("fonts.") || u.includes("upload.wikimedia.org") || u.includes("wikipedia.org/api/rest_v1/page/summary"))) {
           const copy = res.clone();
           caches.open(CACHE).then(c => c.put(e.request, copy));
         }
