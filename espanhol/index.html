@@ -1865,6 +1865,46 @@ piso=andar; apartamento
 tercero=terceiro
 asiento=assento, lugar
 enseñar=mostrar; ensinar
+
+## Kit de sobrevivência
+accidente=acidente
+respirar=respirar|respiro,respiras,respira,respiramos,respiran,respirado
+fuego=fogo
+traductor=tradutor
+turismo=turismo
+alojarse=hospedar-se|alojo,alojas,aloja,alojamos,alojan,alojado
+sim=SIM (chip de celular)
+sencillo=simples; (bilhete) de ida
+avisar=avisar|aviso,avisas,avisa,avisamos,avisan,avisé,avisó,avisado,avíseme
+lleguemos=cheguemos (forma de llegar)
+taxímetro=taxímetro
+parar=parar|paro,paras,para,paramos,paran,paré,paró,parado,pare
+guardar=guardar|guardo,guardas,guarda,guardamos,guardan,guardé,guardó,guardado
+aire=ar
+aire acondicionado=ar-condicionado
+despertar=acordar (alguém)|despierto,despiertas,despierta,despiertan,despertado,despiérteme
+probármelo=experimentá-lo (forma de probar)
+tax free=tax free (devolução de impostos)
+free=free (inglês: grátis)
+tax=tax (inglês: imposto)
+diarrea=diarreia
+asma=asma
+señalar=apontar, indicar|señalo,señalas,señala,señalan,señalado
+público=público
+prepago=pré-pago
+giga=giga (GB)
+gigas=gigas (GB)
+cobertura=sinal (de celular); cobertura
+batería=bateria
+prestar=emprestar|presto,prestas,presta,prestamos,prestan,prestado
+prefijo=código (telefônico); prefixo
+copia=cópia
+bloquear=bloquear|bloqueo,bloqueas,bloquea,bloquean,bloqueado
+molestia=incômodo
+molestias=incômodos
+permiso=licença, permissão
+con permiso=com licença
+aprovechar=aproveitar|aprovecho,aprovechas,aprovecha,aprovechamos,aprovechan,aproveche
 </script>
 
 <script>
@@ -2734,6 +2774,45 @@ FALSOS.forEach((c,i) => CARDS.push({id:`fa-${i}`, es:c[0], pt:c[1], note:c[2] ? 
 CARDS.sort((a,b)=>a.ord-b.ord);
 const BYID = Object.fromEntries(CARDS.map(c=>[c.id,c]));
 const KITCARDS = KIT.map(k=>CARDS.find(c=>c.es===k)).filter(Boolean);
+/* Kit de sobrevivência: frases por situação + informações práticas. [es, pt, dica?] */
+const SURVIVAL = [
+{ t:"Emergências", ic:"🚨", info:`<b>112</b> é o número único de emergência na Espanha (polícia, ambulância, bombeiros), grátis e atende em inglês. <b>091</b> Polícia Nacional · <b>092</b> Polícia Municipal · <b>061</b> emergências médicas (em várias regiões).`,
+  p:[["¡Ayuda, por favor!","Ajuda, por favor!"],["¡Llame al ciento doce!","Ligue para o 112!"],["Es una emergencia","É uma emergência"],["Necesito una ambulancia","Preciso de uma ambulância"],["Ha habido un accidente","Houve um acidente"],["Hay una persona herida","Tem uma pessoa ferida"],["No respira","Não está respirando"],["¿Dónde está la salida de emergencia?","Onde fica a saída de emergência?"],["¡Fuego!","Fogo!"],["Estoy embarazada","Estou grávida","'Embarazada' = grávida, não envergonhada."]]},
+{ t:"Pedir ajuda e entender", ic:"🙋", info:`Comece sempre com <b>Perdone</b> (formal) ou <b>Perdona</b> (informal). Os espanhóis ajudam, mas falam rápido: peça <b>más despacio</b> sem vergonha.`,
+  p:[["Perdone, ¿me puede ayudar?","Com licença, pode me ajudar?"],["No entiendo","Não entendo"],["¿Habla inglés o portugués?","Fala inglês ou português?"],["Más despacio, por favor","Mais devagar, por favor"],["¿Puede repetir?","Pode repetir?"],["¿Me lo puede escribir?","Pode escrever para mim?"],["¿Qué significa esto?","O que significa isto?"],["Hablo un poco de español","Falo um pouco de espanhol"],["Soy brasileña / brasileño","Sou brasileira / brasileiro"],["¿Puedo usar el traductor del móvil?","Posso usar o tradutor do celular?"]]},
+{ t:"Aeroporto e chegada", ic:"✈️", info:`Na chegada, siga as placas <b>Salida</b> (saída), <b>Recogida de equipajes</b> (esteira), <b>Taxis</b>, <b>Metro</b>/<b>Cercanías</b>. Brasileiros não precisam de visto para até 90 dias, mas podem pedir passagem de volta, reserva de hotel e comprovante de meios de subsistência.`,
+  p:[["¿Dónde recojo las maletas?","Onde pego as malas?"],["Mi maleta no ha llegado","Minha mala não chegou"],["Vengo de turismo, diez días","Venho a turismo, dez dias"],["Aquí está mi billete de vuelta","Aqui está minha passagem de volta"],["Me alojo en este hotel","Vou ficar neste hotel"],["¿Dónde están los taxis?","Onde ficam os táxis?"],["¿Cuánto cuesta un taxi al centro?","Quanto custa um táxi até o centro?"],["¿Dónde cojo el tren al centro?","Onde pego o trem para o centro?"],["¿Dónde puedo comprar una tarjeta SIM?","Onde posso comprar um chip?"],["¿Hay un cajero por aquí?","Tem um caixa eletrônico por aqui?"]]},
+{ t:"Transporte", ic:"🚇", info:`Nas máquinas de metrô há opção de idioma. Valide o cartão na entrada; em Madri também na saída de algumas estações. Táxi oficial: branco com faixa vermelha (Madri), preto e amarelo (Barcelona), branco (Sevilha). Apps: Cabify, Uber, Bolt, FreeNow.`,
+  p:[["Un billete sencillo, por favor","Uma passagem simples, por favor"],["Diez viajes, por favor","Dez viagens, por favor"],["¿Este tren para en…?","Este trem para em…?"],["¿Qué andén?","Qual plataforma?"],["¿Cuál es la próxima parada?","Qual é a próxima parada?"],["¿Me avisa cuando lleguemos?","Pode me avisar quando chegarmos?"],["Me he equivocado de tren","Peguei o trem errado"],["A esta dirección, por favor","Neste endereço, por favor (táxi)"],["¿Puede poner el taxímetro?","Pode ligar o taxímetro?"],["Pare aquí, por favor","Pare aqui, por favor"],["¿Me da un recibo?","Me dá um recibo?"]]},
+{ t:"Hotel", ic:"🏨", info:`Check-in geralmente a partir das 14h ou 15h; check-out até 11h ou 12h. Hotéis cobram uma <b>tasa turística</b> pequena por noite em Barcelona e na Catalunha. Peça a <b>factura</b> se precisar comprovar gasto.`,
+  p:[["Tengo una reserva a nombre de…","Tenho uma reserva em nome de…"],["¿A qué hora es el check-out?","A que horas é o check-out?"],["¿Pueden guardar las maletas?","Podem guardar as malas?"],["No funciona el aire / la calefacción","O ar / o aquecimento não funciona"],["No hay agua caliente","Não tem água quente"],["¿Cuál es la clave del wifi?","Qual é a senha do wi-fi?"],["He perdido la llave","Perdi a chave"],["Hay mucho ruido, ¿pueden cambiarme de habitación?","Tem muito barulho, podem me trocar de quarto?"],["¿Me puede despertar a las siete?","Pode me acordar às sete?"],["¿Me pide un taxi para las seis?","Pode chamar um táxi para as seis?"]]},
+{ t:"Restaurante e bar", ic:"🍽️", info:`Almoço das 13h30 às 16h, jantar das 20h30 às 23h. O <b>menú del día</b> (entrada + prato + sobremesa + bebida) sai por 12 a 18 €. Gorjeta não é obrigatória; arredonde ou deixe 5%. Pão às vezes é cobrado à parte.`,
+  p:[["Una mesa para dos, por favor","Uma mesa para dois, por favor"],["¿Tienen menú del día?","Tem menu do dia?"],["¿Qué me recomienda?","O que me recomenda?"],["Soy alérgica / alérgico a…","Sou alérgica / alérgico a…"],["Sin gluten / sin lactosa, por favor","Sem glúten / sem lactose, por favor"],["No como carne","Não como carne"],["¿Esto lleva cerdo?","Isto tem porco?"],["Agua del grifo, por favor","Água da torneira, por favor","Grátis e de boa qualidade na maioria das cidades."],["La cuenta, por favor","A conta, por favor"],["¿Puedo pagar con tarjeta?","Posso pagar com cartão?"],["Estaba buenísimo","Estava delicioso"]]},
+{ t:"Dinheiro e compras", ic:"💶", info:`Cartão por aproximação funciona em quase tudo, até no ônibus. Em caixas eletrônicos, escolha <b>sem conversão</b> (pagar em euros) para evitar taxa ruim. Lojas fecham no domingo fora das zonas turísticas e muitas fazem pausa das 14h às 17h.`,
+  p:[["¿Cuánto cuesta?","Quanto custa?"],["¿Aceptan tarjeta?","Aceitam cartão?"],["En efectivo, por favor","Em dinheiro, por favor"],["¿Tiene cambio?","Tem troco?"],["Es demasiado caro","É caro demais"],["¿Me hace un descuento?","Me faz um desconto?"],["Solo estoy mirando","Só estou olhando"],["¿Puedo probármelo?","Posso experimentar?"],["Quiero devolver esto","Quero devolver isto"],["¿Me da una bolsa?","Me dá uma sacola?"],["¿Hacen tax free?","Fazem tax free?","Compras acima de certo valor em lojas aderentes: peça o formulário e carimbe no aeroporto."]]},
+{ t:"Saúde e farmácia", ic:"💊", info:`Farmácia tem <b>cruz verde</b> acesa; sempre há uma <b>de guardia</b> aberta 24 h (a lista fica na porta). Muitos remédios comuns se compram sem receita. Leve seu <b>seguro viagem</b>: atendimento em hospital público para turistas é cobrado.`,
+  p:[["Me encuentro mal","Estou me sentindo mal"],["Me duele aquí","Dói aqui"],["Tengo fiebre / tos / diarrea","Estou com febre / tosse / diarreia"],["Soy diabético / tengo asma","Sou diabético / tenho asma"],["Tomo esta medicación","Tomo este remédio"],["¿Tiene algo para el dolor de cabeza?","Tem algo para dor de cabeça?"],["¿Necesito receta?","Preciso de receita?"],["¿Dónde está la farmacia de guardia?","Onde fica a farmácia de plantão?"],["Necesito un médico que hable inglés","Preciso de um médico que fale inglês"],["Tengo seguro de viaje","Tenho seguro viagem"],["¿Dónde están las urgencias?","Onde fica o pronto-socorro?"]]},
+{ t:"Direções", ic:"🧭", info:`Baixe o mapa offline da cidade no Google Maps antes de sair do hotel. Nas placas: <b>C/</b> = calle (rua), <b>Pza.</b> = plaza, <b>Avda.</b> = avenida, <b>Pº</b> = paseo.`,
+  p:[["¿Dónde está…?","Onde fica…?"],["¿Cómo llego a…?","Como chego a…?"],["¿Está lejos?","É longe?"],["¿Se puede ir andando?","Dá para ir a pé?"],["Todo recto","Sempre em frente"],["A la derecha / a la izquierda","À direita / à esquerda"],["En la esquina","Na esquina"],["Me he perdido","Eu me perdi"],["¿Me lo puede señalar en el mapa?","Pode me mostrar no mapa?"],["¿Dónde hay un baño público?","Onde tem um banheiro público?","Em bares, peça um café e use o baño."]]},
+{ t:"Telefone e internet", ic:"📱", info:`O roaming brasileiro costuma ser caro: compre um <b>eSIM</b> antes de viajar (Holafly, Airalo) ou um chip pré-pago no aeroporto ou em lojas Vodafone, Orange, Movistar e Lebara (precisa do passaporte). Wi-fi grátis em quase todo café e no metrô de Madri.`,
+  p:[["Quiero una tarjeta SIM prepago","Quero um chip pré-pago"],["¿Cuántos gigas tiene?","Quantos gigas tem?"],["¿Tiene wifi? ¿Cuál es la clave?","Tem wi-fi? Qual é a senha?"],["No tengo cobertura","Estou sem sinal"],["¿Puedo cargar el móvil aquí?","Posso carregar o celular aqui?"],["Se me ha acabado la batería","Minha bateria acabou"],["¿Me presta el teléfono para una llamada?","Me empresta o telefone para uma ligação?"],["¿Cuál es el prefijo de España?","Qual é o código da Espanha?","+34. Para ligar ao Brasil: +55."]]},
+{ t:"Problemas: roubo e documentos", ic:"🛂", info:`Furto de carteira é o problema mais comum (metrô, Rambla, Sol). Para o seguro, faça a <b>denuncia</b> numa <b>comisaría</b> (pode ser online em policia.es ou pelo 902 102 112, em inglês). Passaporte perdido: Embaixada do Brasil em Madri ou Consulado em Barcelona.`,
+  p:[["Me han robado","Fui roubado(a)"],["Me han robado la cartera / el móvil","Roubaram minha carteira / meu celular"],["He perdido el pasaporte","Perdi o passaporte"],["Quiero poner una denuncia","Quero registrar uma ocorrência"],["¿Dónde está la comisaría más cercana?","Onde fica a delegacia mais próxima?"],["Necesito una copia de la denuncia para el seguro","Preciso de uma cópia da ocorrência para o seguro"],["Quiero bloquear mi tarjeta","Quero bloquear meu cartão"],["¿Dónde está la embajada de Brasil?","Onde fica a embaixada do Brasil?"],["Necesito llamar a mi familia","Preciso ligar para minha família"],["No he sido yo","Não fui eu"]]},
+{ t:"Cortesia que abre portas", ic:"🤝", info:`Na Espanha o tom é direto, sem muitos "por favor" encadeados, mas <b>gracias</b>, <b>perdone</b> e um <b>hasta luego</b> ao sair de qualquer lugar fazem toda a diferença. <b>Vale</b> serve para "ok", "combinado", "entendi".`,
+  p:[["Buenos días / buenas tardes / buenas noches","Bom dia / boa tarde / boa noite"],["Muchas gracias, muy amable","Muito obrigado(a), muito gentil"],["Perdone las molestias","Desculpe o incômodo"],["No pasa nada","Sem problema"],["¿Le importa si…?","O senhor se importa se…?"],["Con permiso","Com licença (para passar)"],["Que aproveche","Bom apetite","Diz-se a quem está comendo, até a desconhecidos."],["Hasta luego","Até logo"],["Vale, perfecto","Ok, perfeito"],["¡Que tenga un buen día!","Tenha um bom dia!"]]}
+];
+const SURVIVAL_INFO = [
+ ["Telefones","<b>112</b> emergência (grátis, 24 h, inglês) · <b>091</b> Polícia Nacional · <b>092</b> Polícia Municipal · <b>061</b> emergência médica · <b>016</b> violência contra a mulher · <b>+34</b> código da Espanha"],
+ ["Embaixada e consulado","Embaixada do Brasil em Madri: Calle de Fernando el Santo, 6 · tel. +34 917 004 650. Consulado-Geral em Barcelona: Avinguda Diagonal, 468 · tel. +34 934 881 125. Confira horários e plantão em <a href=\"https://www.gov.br/mre/pt-br/embaixada-madri\" target=\"_blank\" rel=\"noopener\">gov.br/mre › Madri</a> e <a href=\"https://www.gov.br/mre/pt-br/consulado-barcelona\" target=\"_blank\" rel=\"noopener\">gov.br/mre › Barcelona</a>."],
+ ["Tomada e voltagem","230 V, 50 Hz, tomada tipo C/F (dois pinos redondos). O plugue brasileiro de dois pinos encaixa; o de três pinos não. Leve um adaptador simples por garantia."],
+ ["Horários","Almoço 13h30–16h, jantar 20h30–23h. Lojas pequenas fecham das 14h às 17h e aos domingos. Museus costumam fechar segunda. Supermercados abrem até 21h ou 22h."],
+ ["Dinheiro","Euro. Cartão por aproximação em todo lugar, inclusive transporte. No caixa eletrônico, recuse a conversão para reais (escolha pagar em EUR). Gorjeta: arredondar ou 5% se gostou."],
+ ["Água e segurança","Água da torneira é potável em Madri, Barcelona e Sevilha. Cidades seguras; o risco real é furto de bolso: bolsa na frente, celular guardado no metrô e em multidões."],
+ ["Clima em fevereiro","Madri 3–12 °C e seco; Barcelona 8–15 °C; Sevilha 7–18 °C. Casaco de verdade, cachecol, e uma camada leve para o meio-dia de sol."],
+ ["Apps úteis","Google Maps (mapa offline), Renfe e Iryo (trens), Metro de Madrid / TMB (metrô), Cabify ou Bolt (táxi), Google Tradutor (baixe espanhol offline), ElTenedor (reservas de restaurante)."]
+];
+
+const SURV_CARDS = SURVIVAL.flatMap((sec,si)=>sec.p.map((x,i)=>({id:`s${si}-${i}`, es:x[0], pt:x[1], note:x[2]||"", week:0, kind:"v", tier:0, sec:si})));
 
 /* ============================================================
    DICIONÁRIO (toque numa palavra)
@@ -3376,12 +3455,22 @@ function renderFrases(){
 }
 function renderPhraseList(){
   const q = norm(phraseQuery.trim());
-  let cs = phraseFilter==="kit" ? KITCARDS : CARDS.filter(c => phraseFilter==="all" || (phraseFilter==="fa" ? c.kind==="fa" : (c.kind==="v" && String(c.week)===phraseFilter)));
+  let cs = phraseFilter==="kit" ? SURV_CARDS : CARDS.filter(c => phraseFilter==="all" || (phraseFilter==="fa" ? c.kind==="fa" : (c.kind==="v" && String(c.week)===phraseFilter)));
+  if(q && phraseFilter==="all") cs = [...cs, ...SURV_CARDS];
   if(q) cs = cs.filter(c => norm(c.es+" "+c.pt+" "+c.note).includes(q));
   const groups = [];
-  if(phraseFilter==="kit") groups.push(["Kit de sobrevivência: as 24 frases que resolvem", cs]);
+  if(phraseFilter==="kit"){
+    if(!q){
+      $("#phr-list").innerHTML = `<div class="card tint-s small"><b>Kit de sobrevivência.</b> ${SURV_CARDS.length} frases por situação, mais os dados práticos. Funciona sem internet: abra isto no aeroporto, no hotel, na farmácia. Toque em 🔊 para ouvir e numa palavra para traduzir.</div>
+        <div class="chips">${SURVIVAL.map((sec,i)=>`<a class="chip" href="#surv-${i}" style="text-decoration:none">${sec.ic} ${h(sec.t)}</a>`).join("")}</div>
+        ${SURVIVAL.map((sec,si)=>`<div class="card group" id="surv-${si}"><h3 style="font-size:17px;color:var(--ink);font-family:var(--f-display)">${sec.ic} ${h(sec.t)}</h3>${sec.info?`<p class="small" style="background:var(--paper);border-radius:12px;padding:10px 12px;margin:6px 0 4px">${sec.info}</p>`:""}<div class="list">${SURV_CARDS.filter(c=>c.sec===si).map(phraseRow).join("")}</div></div>`).join("")}
+        <div class="card tint-c stack" style="gap:8px"><div class="eyebrow">Informações práticas</div>${SURVIVAL_INFO.map(([t,b])=>`<div class="item" style="padding:8px 0"><b style="font-family:var(--f-display)">${h(t)}</b><p class="small">${b}</p></div>`).join("")}<p class="small muted">Telefones e endereços conferidos em outubro de 2026; confirme no site oficial antes de precisar.</p></div>`;
+      return;
+    }
+    groups.push(["Kit de sobrevivência", cs]);
+  }
   else if(phraseFilter==="fa") groups.push(["Falsos amigos", cs]);
-  else WEEKS.forEach(w=>{ const g=cs.filter(c=>c.week===w.n && (c.kind==="v" || phraseFilter==="all")); if(g.length) groups.push([w.title, g]); });
+  else { WEEKS.forEach(w=>{ const g=cs.filter(c=>c.week===w.n && (c.kind==="v" || phraseFilter==="all")); if(g.length) groups.push([w.title, g]); }); const gk=cs.filter(c=>c.week===0); if(gk.length) groups.push(["Kit de sobrevivência", gk]); }
   const dh = q && !q.includes(" ") ? dictLookup(phraseQuery.trim()) : null;
   const dictHtml = dh ? `<div class="card tint-s stack" style="gap:4px"><div class="eyebrow">Dicionário</div><div class="row" style="gap:8px"><span class="es" style="font-size:22px">${h(dh.w)}</span>${sayBtn(dh.w)}</div><div style="font-size:17px">${h(dh.pt)}</div>${dh.note?`<div class="small muted">${h(dh.note)}</div>`:""}</div>` : "";
   $("#phr-list").innerHTML = dictHtml + (groups.length ? groups.map(([t,g])=>`<div class="card group"><h3>${h(t)}</h3><div class="list">${g.map(phraseRow).join("")}</div></div>`).join("") : (dictHtml ? "" : `<div class="card muted">Nada encontrado para “${h(phraseQuery)}”.</div>`));
@@ -3475,7 +3564,8 @@ function renderViaje(){
       ${parts.join("")}`;
   }
   $("#v-viaje").innerHTML = setup + `<div style="margin-top:8px"><h2 style="font-size:22px">Destinos</h2></div>` + dests + plan +
-    `<div class="card tint-g small"><b>Cidades menores?</b> Me diga quais (Toledo, Granada, Córdoba, Girona, Cádiz…) e eu acrescento com curiosidades, dias e links.</div>
+    `<button class="card tint-s" style="text-align:left;width:100%" data-act="gokit"><p class="small"><b>🆘 Kit de sobrevivência</b> · ${SURV_CARDS.length} frases por situação, telefones de emergência, embaixada, dinheiro, chip de celular. Funciona offline.</p></button>
+    <div class="card tint-g small"><b>Cidades menores?</b> Me diga quais (Toledo, Granada, Córdoba, Girona, Cádiz…) e eu acrescento com curiosidades, dias e links.</div>
     ${PHOTOS_ON ? `<p class="small muted" style="padding:0 4px">Fotos: imagens principais dos artigos da Wikipédia em espanhol (Wikimedia Commons, licenças livres). Toque em “Foto: Wikipedia” para ver o autor e a licença.</p>` : ""}`;
   loadPhotos();
 }
@@ -3790,6 +3880,7 @@ document.addEventListener("click", e=>{
     case "vritmo": V.ritmo=el.dataset.k; saveProfiles(); renderViaje(); break;
     case "vmove": moveDest(el.dataset.id, +el.dataset.d); saveProfiles(); renderViaje(); break;
     case "vclear": viajeQ=""; renderViaje(); break;
+    case "gokit": phraseFilter="kit"; phraseQuery=""; renderFrases(); showTab("frases"); break;
     case "vopen": { const id=el.dataset.id; V.open = V.open===id ? null : id; saveProfiles(); renderViaje(); const nb=document.querySelector(`[data-act="vopen"][data-id="${id}"]`); if(nb) nb.scrollIntoView({block:"start",behavior:"smooth"}); break; }
     case "useprofile": switchProfile(el.dataset.id); $("#sheet").hidden=true; toast(`Agora é ${me().name}. ¡Vamos!`); break;
     case "delprofile": { if(el.dataset.armed){ removeProfile(el.dataset.id); openPasajeros(); toast("Removido."); } else { el.dataset.armed="1"; el.style.background="var(--bad-soft)"; el.style.color="var(--bad)"; toast("Toque de novo para remover"); setTimeout(()=>{ delete el.dataset.armed; el.style.background=""; el.style.color=""; }, 2500); } break; }
