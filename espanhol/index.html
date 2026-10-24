@@ -367,6 +367,10 @@ nav.tabs button.on{color:var(--cobalt);background:var(--cobalt-soft)}
 .answer{width:100%;border:1.5px solid var(--line);background:var(--surface);border-radius:14px;padding:14px;font-size:20px;font-family:var(--f-display)}
 .accents{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
 .accents button{width:42px;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:18px}
+.marks{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.wm{padding:4px 10px;border-radius:99px;font-family:var(--f-display);font-weight:600;font-size:18px}
+.wm.ok{background:var(--ok-soft);color:var(--ok)} .wm.bad{background:var(--bad-soft);color:var(--bad);text-decoration:underline dotted}
+.tries{font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;font-weight:700}
 .verdict{border-radius:12px;padding:12px 14px;font-weight:700;text-align:left;width:100%}
 .verdict.ok{background:var(--ok-soft);color:var(--ok)}
 .verdict.bad{background:var(--bad-soft);color:var(--bad)}
@@ -2730,7 +2734,8 @@ function todaySteps(){
   return [
     {id:"session", t:"Sessão", d: (nw===0&&due===0) ? "Frases de hoje em dia" : `${nw} novas · ${due} revisões · ≈ ${sessionMinutes(nw,due)} min`, done: nw===0&&due===0, started:(l.n||0)+(l.r||0)>0, act:"session", go:"Começar"},
     {id:"conv", t:"Conversa falada", d:`${WEEKS[curWeek()-1].title} · ≈ 3 min`, done:(l.c||0)>0, act:"conv", go:"Conversar"},
-    {id:"eco", t:"Eco: repetir imitando", d:"10 frases · ≈ 2 min", done:(l.e||0)>0, act:"eco", go:"Repetir"}
+    MIC ? {id:"eco", t:"Pronúncia no microfone", d:"5 palavras e 7 frases · ≈ 3 min", done:(l.e||0)>0, act:"pron", go:"Falar"}
+        : {id:"eco", t:"Eco: repetir imitando", d:"10 frases · ≈ 2 min", done:(l.e||0)>0, act:"eco", go:"Repetir"}
   ];
 }
 function spokenTotal(){ return Object.values(S.log).reduce((a,l)=>a+(l.s||0),0); }
@@ -2900,6 +2905,16 @@ async function micTest(){
     else { out.textContent="Não ouvi nada em 7 segundos. "+(IS_IOS && STANDALONE ? "No iPhone, o microfone do app instalado costuma falhar: abra o mesmo endereço no Safari para usar o botão Falar." : "Verifique a permissão do microfone e fale mais perto."); out.className="verdict bad"; }
   }catch(code){ out.textContent="Erro: "+code+". "+micHint(code); out.className="verdict bad"; }
 }
+function lev(a,b){ const m=a.length,n=b.length; if(!m) return n; if(!n) return m; let prev=Array.from({length:n+1},(_,j)=>j), cur=[]; for(let i=1;i<=m;i++){ cur=[i]; for(let j=1;j<=n;j++){ cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1)); } prev=cur; } return prev[n]; }
+function wordsOf(x){ return norm(cleanSpeech(x)).replace(/[¿?¡!.,;:…«»"]/g," ").split(/\s+/).filter(Boolean); }
+function wordMatch(a,b){ if(a===b) return true; const L=Math.max(a.length,b.length); return L>=4 && lev(a,b)/L<=0.34; }
+/* devolve {score, marks:[{w,ok}]} comparando a frase-alvo com as alternativas ouvidas */
+function pronScore(alts, target){
+  const T=wordsOf(target); const tw=target.replace(/[¿?¡!.,;:…«»"]/g," ").split(/\s+/).filter(Boolean);
+  let best={score:0, marks:tw.map(w=>({w,ok:false}))};
+  alts.forEach(a=>{ const A=wordsOf(a).slice(); const marks=T.map((t,i)=>{ const k=A.findIndex(x=>wordMatch(x,t)); if(k>=0){ A.splice(k,1); return {w:tw[i]||t, ok:true}; } return {w:tw[i]||t, ok:false}; }); const sc=marks.filter(m=>m.ok).length/Math.max(1,T.length); if(sc>best.score || (sc===best.score && !best.marks.length)) best={score:sc, marks}; });
+  return best;
+}
 function similarity(said, target){ const w=x=>norm(x).replace(/[¿?¡!.,;:…]/g," ").split(/\s+/).filter(Boolean); const T=w(cleanSpeech(target)); const A=new Set(w(said)); return T.length ? T.filter(x=>A.has(x)).length/T.length : 0; }
 function speakDialog(lines){ if(!canSpeak) return; try{ speechSynthesis.cancel(); const who=[...new Set(lines.map(l=>l[0]))]; lines.forEach(l=>speechSynthesis.speak(utter(l[1], who.indexOf(l[0])%2 ? 1.25 : 0.9))); }catch(e){} }
 
@@ -3051,7 +3066,8 @@ function renderTreino(){
     <div><h2 style="font-size:24px">Treinos livres</h2><p class="muted small" style="margin-top:4px">A rotina de hoje (3 passos) está na aba <b>Hoy</b>${todaySteps().filter(x=>x.done).length===3 ? " e já está feita" : `: ${todaySteps().filter(x=>x.done).length} de 3 feitos`}. Aqui ficam os treinos extras para quando sobrar tempo. Regra de ouro: fale em voz alta antes de ver a resposta.</p></div>
     <div class="eyebrow" style="margin-top:4px">Falar e ouvir</div>
     <div class="tiles">
-      <button class="tile t-c" data-act="eco" ${canSpeak?"":"disabled"}><span class="ic">${ICON.repeat}</span><b>Eco</b><span>Ouça e repita junto, devagar e no ritmo normal</span></button>
+      <button class="tile t-r" data-act="pron" ${MIC?"":"disabled"}><span class="ic">${ICON.mic.replace('width="20" height="20"','')}</span><b>Pronúncia</b><span>${MIC?"Repita palavras e frases no microfone e veja o que saiu certo":"Precisa do microfone: use o app instalado"}</span></button>
+      <button class="tile t-c" data-act="eco" ${canSpeak?"":"disabled"}><span class="ic">${ICON.repeat}</span><b>Eco</b><span>Ouça e repita junto, sem microfone</span></button>
       <button class="tile t-s" data-act="sons" ${canSpeak?"":"disabled"}><span class="ic">${ICON.mouth}</span><b>Sons difíceis</b><span>Os sons que denunciam o sotaque brasileiro</span></button>
       <button class="tile t-g" data-act="listen" ${canSpeak?"":"disabled"}><span class="ic">${ICON.ear}</span><b>Escuta</b><span>Ouça e escolha o significado</span></button>
       <button class="tile t-r" data-act="conv" data-pick="1"><span class="ic">${ICON.talk}</span><b>Outras conversas</b><span>Repita os diálogos das semanas anteriores</span></button>
@@ -3198,6 +3214,15 @@ function pickConv(){
   $("#drill").innerHTML = drillTop().replace(/<div class="meter">.*?<\/div><span class="count">.*?<\/span>/,'<h2 style="font-size:20px;flex:1">Escolha a conversa</h2>') +
     `<div class="stage" style="justify-content:flex-start"><div class="opts">${WEEKS.filter(w=>w.n<=cw).map(w=>`<button class="opt" data-act="conv" data-week="${w.n}"><b>${String(w.n).padStart(2,"0")}</b> · ${h(w.title)}<br><span class="muted small">${h(w.dialog[0][1])}</span></button>`).join("")}</div></div>`;
 }
+function startPron(){
+  if(!MIC){ toast(window.claude ? "O microfone não funciona dentro do Claude. Use o app instalado." : "Este navegador não permite microfone. Vou abrir o Eco."); startEco(); return; }
+  const w=curWeek(); let pool=seenCards(); if(pool.length<8) pool=unlockedCards();
+  const soundWords = shuffle(SOUNDS.flatMap(x=>x.ex.filter(e=>!/\s/.test(e)))).slice(0,3);
+  const cardWords = shuffle([...new Set(pool.flatMap(c=>wordsOf(c.es)).filter(x=>x.length>=4))]).slice(0,4).map(x=>{ const c=pool.find(c=>wordsOf(c.es).includes(x)); const orig=c ? c.es.replace(/[¿?¡!.,;:…]/g," ").split(/\s+/).find(o=>norm(o)===x) : x; return orig||x; });
+  const words=[...new Set([...soundWords, ...cardWords])].slice(0,5).map(t=>({t:"pron",kind:"word",txt:t,tries:0}));
+  const phrases=shuffle(pool.filter(c=>!/[\/…]/.test(c.es) && c.es.split(" ").length>=2 && c.es.length<=40)).slice(0,7).map(c=>({t:"pron",kind:"phrase",txt:c.es,pt:c.pt,tries:0}));
+  openDrill({mode:"pron", items:[...words,...phrases], firstTry:0});
+}
 function startEco(){ let pool=seenCards(); if(pool.length<6) pool=unlockedCards(); openDrill({mode:"eco", items:shuffle(pool).slice(0,10).map(c=>({t:"eco",c}))}); }
 function startSons(){ openDrill({mode:"sons", items:SOUNDS.map(x=>({t:"som",s:x}))}); }
 function heardHtml(it){ if(!it.heard) return ""; const sc=it.heard.score; const cls=sc>=.8?"ok":sc>=.5?"mid":"bad";
@@ -3257,6 +3282,19 @@ function drawDrill(){
     stage = `${it.prev?`<div class="ctx">${h(it.prev[0])}: “${h(it.prev[1])}”</div>`:""}<div class="flash"><span class="kind">Sua fala · diga em espanhol</span><div class="big pt">${h(it.line[2])}</div>${heardHtml(it)}${D.revealed?`<hr><div class="ans">${W(it.line[1])}</div>${sayRow(it.line[1])}<p class="small muted">Repita imitando a entonação.</p>`:""}</div>`;
     actions = D.revealed ? `<div class="actions"><button class="btn wide" data-act="next">Próxima fala</button></div>`
       : `<div class="actions${MIC?" duo":""}">${MIC?micBtn(it):""}<button class="btn wide" data-act="reveal">Já falei: ouvir o certo</button></div>`;
+  } else if(it.t==="pron"){
+    if(!it.played){ it.played=true; speak(it.txt); }
+    const hd=it.heard;
+    stage = `<div class="flash"><span class="kind">${it.kind==="word"?"Palavra":"Frase"} · ouça e repita no microfone</span>
+      ${hd ? `<div class="marks">${hd.marks.map(m=>`<span class="wm ${m.ok?"ok":"bad"}">${h(m.w)}</span>`).join("")}</div>` : `<div class="big">${W(it.txt)}</div>`}
+      ${it.pt?`<div class="pt">${h(it.pt)}</div>`:""}
+      ${sayRow(it.txt,true)}
+      ${hd ? `<div class="verdict ${hd.score>=.99?"ok":hd.score>=.5?"mid":"bad"}">${h(hd.msg[0])} <span class="muted" style="font-weight:400">${hd.score>=.99?"Perfeito.":hd.score>=.5?"Quase: repita as palavras em vermelho.":"Não entendi bem. Ouça de novo e fale mais devagar."} Entendi: “${h(hd.text)}”</span></div>` : ""}
+      ${it.tries>1?`<span class="tries">tentativa ${it.tries}</span>`:""}
+    </div>`;
+    actions = hd
+      ? `<div class="actions${hd.score<.99?" duo":""}">${hd.score<.99?`<button class="btn saff" data-act="pronretry">${ICON.mic} De novo</button>`:""}<button class="btn wide" data-act="next">Próxima</button></div>`
+      : `<div class="actions duo">${micBtn(it)}<button class="btn ghost" data-act="next">Pular</button></div>`;
   } else if(it.t==="eco"){
     if(!it.played){ it.played=true; speak(c.es); }
     stage = `<div class="flash"><span class="kind">Eco · ouça e repita junto</span><div class="big">${W(c.es)}</div>${sayRow(c.es,true)}<hr><div class="pt">${h(c.pt)}</div><p class="small muted">Repita 3 vezes: devagar, no ritmo normal e de olhos fechados.</p></div>`;
@@ -3285,7 +3323,7 @@ function drawDrill(){
 }
 function drawDone(){
   if(D.mode==="duel") return drawDuelDone();
-  if(!D.logged){ D.logged=true; const lg=logToday(); if(D.mode==="conv"){ lg.c=(lg.c||0)+1; save(); } if(D.mode==="eco"||D.mode==="sons"){ lg.e=(lg.e||0)+1; save(); } }
+  if(!D.logged){ D.logged=true; const lg=logToday(); if(D.mode==="conv"){ lg.c=(lg.c||0)+1; save(); } if(D.mode==="eco"||D.mode==="sons"||D.mode==="pron"){ lg.e=(lg.e||0)+1; save(); } }
   const good = D.mode==="session" || D.mode==="conv" || D.mode==="eco" || D.mode==="sons" || D.score>=D.total*0.8;
   const pr = good ? rnd(PRAISE) : rnd(CHEER);
   confetti_if(good); tone("done");
@@ -3293,6 +3331,7 @@ function drawDone(){
     session:["¡Olé!","Sessão concluída!",`Agora pratique a conversa da semana. Sequência: ${streak()} ${streak()===1?"dia":"dias"}.`],
     conv:["¡Genial!","Conversa completa!","Agora troque de papel e faça a outra pessoa."],
     eco:["¡Bien!","Eco concluído","Quanto mais você repete em voz alta, mais natural fica."],
+    pron:["¡Qué bien suena!","Pronúncia treinada",`${D.firstTry} de ${D.total} entendidas de primeira. As que falharam voltam amanhã.`],
     sons:["¡Perfecto!","Sons revisados","Volte aqui sempre que algum som travar."]
   }[D.mode];
   const [, msg0, sub] = M || ["", `${D.score} de ${D.total}`, good ? "Você está mandando bem." : "Os erros voltam na sua próxima sessão de revisão."];
@@ -3409,7 +3448,7 @@ document.addEventListener("click", e=>{
     case "recvinv": { const d=parseInvite(($("#s-inv")||{}).value); if(!d){ toast("Não reconheci esse link. Cole o link inteiro."); break; } if(receiveScore(d)){ renderAll(); openPasajeros(); toast(`Placar de ${d.name} atualizado.`); } break; }
     case "addprofile": { const id=addProfile(($("#s-newp")||{}).value); if(!id){ toast("Digite um nome"); break; } openPasajeros(); toast("Passageiro adicionado. Toque em Usar para trocar."); break; }
     case "duel": startDuel(); break;
-    case "again": { const m=D.mode, wk=D.week, me=D.me; closeDrill(); if(m==="write") startWrite(); else if(m==="falsos") startFalsos(); else if(m==="conv") startConv(wk,me); else if(m==="duel") startDuel(); else if(m==="eco") startEco(); else if(m==="sons") startSons(); else startQuiz(m); break; }
+    case "again": { const m=D.mode, wk=D.week, me=D.me; closeDrill(); if(m==="write") startWrite(); else if(m==="falsos") startFalsos(); else if(m==="conv") startConv(wk,me); else if(m==="duel") startDuel(); else if(m==="eco") startEco(); else if(m==="pron") startPron(); else if(m==="sons") startSons(); else startQuiz(m); break; }
     case "conv": { if(el.dataset.pick){ pickConv(); break; } const wk = el.dataset.week ? +el.dataset.week : null; if(D) closeDrill(); startConv(wk); break; }
     case "convswap": { const wk=D.week, me=D.me; const other=[...new Set(WEEKS[wk-1].dialog.map(l=>l[0]))].find(x=>x!==me); closeDrill(); startConv(wk, other); break; }
     case "eco": startEco(); break;
@@ -3419,7 +3458,7 @@ document.addEventListener("click", e=>{
     case "micstop": { try{ if(REC) REC.stop(); }catch(e){} break; }
     case "mic": {
       const it=D.items[D.i]; if(it.listening) break;
-      const target = it.c ? it.c.es : it.line[1];
+      const target = it.txt || (it.c ? it.c.es : it.line[1]);
       it.listening=true; drawDrill(); heardLive("");
       hear(heardLive, 9000).then(r=>{
         it.listening=false;
@@ -3429,6 +3468,13 @@ document.addEventListener("click", e=>{
           it.micFail=(it.micFail||0)+1;
           toast(IS_IOS && STANDALONE && it.micFail>=2 ? "No iPhone instalado o microfone costuma falhar. Abra o mesmo endereço no Safari." : "Não ouvi nada. Toque em Falar e comece a falar logo em seguida.");
           drawDrill(); return;
+        }
+        if(it.t==="pron"){
+          const ps=pronScore(alts, target); it.tries++;
+          it.heard={text:alts[0], score:ps.score, marks:ps.marks, msg: ps.score>=.99 ? rnd(PRAISE) : rnd(CHEER)};
+          if(ps.score>=.99 && it.tries===1) D.firstTry++;
+          tone(ps.score>=.99?"ok":"bad"); if(ps.score>=.99) buzz(15); logToday().s++; save(); drawDrill(); if(ps.score<.99) speak(target, true);
+          return;
         }
         it.heard={text:alts[0], score:Math.max(...alts.map(a=>similarity(a,target)))}; tone(it.heard.score>=.5?"ok":"bad"); if(it.heard.score>=.8) buzz(15);
         D.revealed=true; logToday().s++; save(); drawDrill(); speak(target);
@@ -3440,6 +3486,8 @@ document.addEventListener("click", e=>{
       });
       break; }
     case "mictest": micTest(); break;
+    case "pron": startPron(); break;
+    case "pronretry": { const it=D.items[D.i]; it.heard=null; drawDrill(); break; }
     case "goweek": e.preventDefault(); openWeek=+el.dataset.week; renderPlano(); showTab("plano"); break;
     case "toggleweek": { const n=+el.dataset.week; openWeek = openWeek===n ? -1 : n; renderPlano(); const nb=document.querySelector(`[data-act="toggleweek"][data-week="${n}"]`); if(nb) nb.scrollIntoView({block:"start",behavior:"smooth"}); break; }
     case "unlock": { const n=+el.dataset.week; S.unlocked=Math.max(S.unlocked||1,n); save(); renderAll(); toast(`Semana ${n} liberada no treino`); break; }
