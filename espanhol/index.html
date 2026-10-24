@@ -72,8 +72,8 @@ p{margin:0}
 .brand svg{width:30px;height:30px}
 .board-top{gap:8px}
 .pax{background:transparent;border:1px solid var(--board-cell);color:var(--board-fg);border-radius:10px;height:40px;padding:0 12px;font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46%;margin-left:auto}
-.prow{display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
-.prow:last-child{border-bottom:0}
+.prow{display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center;padding:10px 0}
+.prow+.prow{border-top:1px solid var(--line)}
 .prow .av{width:40px;height:40px}
 .prow b{font-family:var(--f-display);font-size:17px}
 .prow .sub{font-size:13px;color:var(--muted)}
@@ -98,9 +98,26 @@ p{margin:0}
 /* Seções */
 main{padding-top:18px}
 section.view{display:flex;flex-direction:column;gap:16px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
-.hero-week h2{font-size:26px;font-weight:800}
-.hero-week .sub{color:var(--muted);margin-top:4px}
+.card{background:var(--surface);border-radius:22px;padding:18px}
+.card.tint-c{background:var(--cobalt-soft)}
+.card.tint-s{background:var(--saffron-soft)}
+.card.tint-g{background:var(--ok-soft)}
+.card.plain{background:transparent;padding:4px 2px}
+button.card{border:0;font:inherit;color:inherit}
+.hero-week{background:linear-gradient(140deg,#2443a6 0%,#3550bd 60%,#4a63cc 100%);color:#fff;border-radius:26px;position:relative;overflow:hidden}
+.hero-week::after{content:"";position:absolute;right:-30px;top:-30px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.07)}
+.hero-week>*{position:relative}
+.hero-week h2{font-size:28px;font-weight:800;color:#fff}
+.hero-week .sub{color:rgba(255,255,255,.78);margin-top:4px}
+.hero-week .eyebrow{color:rgba(255,255,255,.7)}
+.hero-week .muted{color:rgba(255,255,255,.8)}
+.hero-week .meter{background:rgba(255,255,255,.22)}
+.hero-week .meter>span{background:#f6c453}
+.hero-week .btn{background:#f6c453;color:#1d1608}
+.hero-week .btn.saff{background:rgba(255,255,255,.14);color:#fff;border:1.5px solid rgba(255,255,255,.35)}
+.hero-week .verdict.ok{background:rgba(255,255,255,.14);color:#fff}
+.wicon{width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.18);display:grid;place-items:center;color:#fff;margin-bottom:10px}
+.wicon svg{width:24px;height:24px}
 .meter{height:8px;border-radius:99px;background:var(--cobalt-soft);overflow:hidden}
 .meter>span{display:block;height:100%;background:var(--cobalt);border-radius:99px}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
@@ -115,14 +132,14 @@ section.view{display:flex;flex-direction:column;gap:16px}
 .btn[disabled]{opacity:.45;cursor:default}
 .btn .ct{font-family:var(--f-mono);font-weight:500;font-size:13px;opacity:.85}
 .btn.two{flex-direction:column;gap:2px;padding-block:12px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px}
-.stat b{display:block;font-family:var(--f-display);font-size:26px;font-weight:800;font-variant-numeric:tabular-nums}
-.stat span{font-size:13px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 4px}
+.stat{text-align:center;padding:6px 2px}
+.stat b{display:block;font-family:var(--f-display);font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--cobalt);line-height:1.1}
+.stat span{font-size:12px;color:var(--muted);line-height:1.2;display:block}
 .days{display:flex;gap:6px;margin-top:10px}
 .day{flex:1;text-align:center;font-size:11px;color:var(--muted)}
-.day i{display:block;height:28px;border-radius:8px;background:var(--line);margin-bottom:4px}
-.day.on i{background:var(--saffron)}
+.day i{display:block;height:10px;width:10px;border-radius:50%;background:var(--line);margin:0 auto 6px}
+.day.on i{background:var(--saffron);box-shadow:0 0 0 4px var(--saffron-soft)}
 .day.today{color:var(--ink);font-weight:700}
 
 .phrase{display:flex;gap:12px;align-items:flex-start}
@@ -135,28 +152,34 @@ section.view{display:flex;flex-direction:column;gap:16px}
 .say.lg{width:56px;height:56px}
 .say.lg svg{width:26px;height:26px}
 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;text-align:left;display:flex;flex-direction:column;gap:6px;min-height:104px}
+.tile{background:var(--surface);border:0;border-radius:22px;padding:16px;text-align:left;display:flex;flex-direction:column;gap:6px;min-height:118px}
 .tile b{font-family:var(--f-display);font-size:17px}
-.tile span{font-size:14px;color:var(--muted)}
-.tile .ic{width:30px;height:30px;border-radius:9px;background:var(--cobalt-soft);color:var(--cobalt);display:grid;place-items:center}
-.tile .ic svg{width:18px;height:18px}
+.tile span{font-size:13px;color:var(--muted);line-height:1.35}
+.tile .ic{width:38px;height:38px;border-radius:50%;background:var(--cobalt-soft);color:var(--cobalt);display:grid;place-items:center;margin-bottom:4px}
+.tile .ic svg{width:20px;height:20px}
+.tile.t-s{background:var(--saffron-soft)} .tile.t-s .ic{background:var(--saffron);color:var(--on-saffron)}
+.tile.t-c{background:var(--cobalt-soft)} .tile.t-c .ic{background:var(--cobalt);color:var(--on-cobalt)}
+.tile.t-g{background:var(--ok-soft)} .tile.t-g .ic{background:var(--ok);color:#fff}
+.tile.t-r{background:var(--bad-soft)} .tile.t-r .ic{background:var(--bad);color:#fff}
 
 /* Lola, níveis e conquistas */
 .lola{display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:start}
 .av{width:56px;height:56px;border-radius:50%;background:var(--saffron-soft);display:grid;place-items:center;overflow:hidden;flex:none}
 .av svg{width:100%;height:100%}
-.bubble{background:var(--surface);border:1px solid var(--line);border-radius:4px 16px 16px 16px;padding:12px 14px;text-align:left;width:100%;min-width:0}
+.bubble{background:var(--surface);border:0;border-radius:6px 22px 22px 22px;padding:14px 16px;text-align:left;width:100%;min-width:0}
 .bubble .name{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--saffron);font-weight:700;margin-bottom:2px}
 .bubble .es{font-size:18px}
 .bubble .pt{font-size:14px;margin-top:2px}
 .level .ttl{font-family:var(--f-display);font-size:19px;font-weight:600}
 .level .meter>span{background:var(--saffron)}
-.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.badge{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;padding:10px 6px;border-radius:12px;background:var(--paper);border:1px solid var(--line);font-size:12px;color:var(--muted)}
-.badge.on{background:var(--saffron-soft);color:var(--ink);border-color:transparent}
-.badge .ic{width:36px;height:36px;border-radius:50%;background:var(--line);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:15px;color:var(--muted)}
-.badge.on .ic{background:var(--saffron);color:var(--on-saffron)}
-.badge b{font-size:12px;line-height:1.2}
+.badges{display:flex;gap:14px;overflow-x:auto;padding:4px 2px 6px;scrollbar-width:none}
+.badges::-webkit-scrollbar{display:none}
+.badge{flex:none;width:72px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;font-size:11px;color:var(--muted)}
+.badge .ic{width:52px;height:52px;border-radius:50%;background:var(--line);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:17px;color:var(--muted)}
+.badge.on .ic{background:var(--saffron);color:var(--on-saffron);box-shadow:0 0 0 4px var(--saffron-soft)}
+.badge.on{color:var(--ink)}
+.badge b{font-size:11px;line-height:1.2;font-weight:700}
+.badge span{display:none}
 .fact{font-size:15px}
 .fact b{color:var(--cobalt)}
 .flame{color:var(--saffron)}
@@ -167,18 +190,21 @@ section.view{display:flex;flex-direction:column;gap:16px}
 }
 
 /* Plano */
-.week{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.week{background:var(--surface);border-radius:22px;overflow:hidden}
 .week>button.head{width:100%;background:none;border:0;text-align:left;padding:14px 16px;display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center}
-.wnum{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-family:var(--f-mono);font-weight:700;background:var(--paper);color:var(--muted);border:1px solid var(--line)}
-.week.now .wnum{background:var(--cobalt);color:var(--on-cobalt);border-color:var(--cobalt)}
-.week.done .wnum{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.wnum{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--paper);color:var(--muted)}
+.wnum svg{width:22px;height:22px}
+.week.now .wnum{background:var(--cobalt);color:var(--on-cobalt)}
+.week.done .wnum{background:var(--ok);color:#fff}
+.week.soon .wnum{opacity:.7}
 .wtitle{font-family:var(--f-display);font-weight:600;font-size:17px}
 .wdates{font-size:13px;color:var(--muted)}
 .pill{font-size:12px;font-weight:700;padding:4px 9px;border-radius:99px;white-space:nowrap}
 .pill.now{background:var(--cobalt-soft);color:var(--cobalt)}
 .pill.ok{background:var(--ok-soft);color:var(--ok)}
 .pill.soon{background:var(--paper);color:var(--muted);border:1px solid var(--line)}
-.wbody{padding:0 16px 16px;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:14px}
+.wbody{padding:0 16px 16px;display:flex;flex-direction:column;gap:16px;padding-top:6px}
+.tip{background:var(--paper);border-radius:16px;padding:14px}
 .tip h3{font-size:16px;margin-bottom:6px}
 .tip p,.tip li{font-size:15px}
 .tip ul{margin:6px 0 0;padding-left:18px}
@@ -190,21 +216,30 @@ section.view{display:flex;flex-direction:column;gap:16px}
 .mission input{width:22px;height:22px;margin:2px 0 0;accent-color:var(--saffron);flex:none}
 .mission label{font-size:15px}
 .dlg{display:flex;flex-direction:column;gap:8px}
+.msg{display:flex;gap:8px;align-items:flex-end;max-width:92%}
+.msg.r{align-self:flex-end;flex-direction:row-reverse}
+.msg .bub{background:var(--paper);border-radius:18px 18px 18px 6px;padding:10px 12px;min-width:0}
+.msg.r .bub{background:var(--cobalt-soft);border-radius:18px 18px 6px 18px}
+.msg .bub .es{font-size:16px}
+.msg .bub .pt{font-size:13px;margin-top:2px}
+.msg .say{width:34px;height:34px;flex:none}
+.msg .say svg{width:16px;height:16px}
+.msg .who{font-size:11px;color:var(--muted);margin-bottom:2px;font-weight:700;letter-spacing:.06em}
 .line{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;background:none;border:0;text-align:left;padding:8px 10px;border-radius:10px}
 .line:hover{background:var(--paper)}
 .who{font-family:var(--f-mono);font-size:12px;font-weight:700;color:var(--cobalt);padding-top:3px;min-width:22px}
 .line .es{font-size:16px}
 .line .pt{font-size:14px}
 .list{display:flex;flex-direction:column}
-.list .phrase{padding:10px 0;border-bottom:1px solid var(--line)}
-.list .phrase:last-child{border-bottom:0}
+.list .phrase{padding:10px 0}
+.list .phrase+.phrase{border-top:1px solid var(--line)}
 .list .es{font-size:17px}
 
 /* Frases */
-.search{width:100%;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 14px;font-size:16px}
+.search{width:100%;border:0;background:var(--surface);border-radius:16px;padding:14px 16px;font-size:16px}
 .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
-.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:8px 13px;font-size:14px;font-weight:700;color:var(--muted)}
+.chip{flex:none;border:0;background:var(--surface);border-radius:99px;padding:9px 14px;font-size:14px;font-weight:700;color:var(--muted)}
 .chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .group h3{font-size:15px;color:var(--muted);font-family:var(--f-body);font-weight:700;letter-spacing:.04em;margin:6px 0 2px}
 .tag{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--bad);margin-right:6px}
@@ -224,7 +259,7 @@ nav.tabs button.on{color:var(--cobalt);background:var(--cobalt-soft)}
 .drill .meter{flex:1}
 .drill .count{font-family:var(--f-mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
 .stage{flex:1;max-width:560px;width:100%;margin:0 auto;display:flex;flex-direction:column;justify-content:center;gap:16px;padding:18px 0;overflow-y:auto}
-.flash{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:24px 20px;display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center}
+.flash{background:var(--surface);border:0;border-radius:26px;padding:24px 20px;display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center}
 .flash .kind{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--saffron)}
 .flash .big{font-family:var(--f-display);font-weight:800;font-size:clamp(26px,7vw,34px);line-height:1.15;text-wrap:balance}
 .flash .big.pt{color:var(--ink);font-weight:600}
@@ -234,7 +269,7 @@ nav.tabs button.on{color:var(--cobalt);background:var(--cobalt-soft)}
 .actions{max-width:560px;width:100%;margin:0 auto;display:grid;gap:10px}
 .actions.three{grid-template-columns:1fr 1fr 1fr}
 .opts{display:flex;flex-direction:column;gap:10px}
-.opt{border:1.5px solid var(--line);background:var(--surface);border-radius:14px;padding:14px;text-align:left;font-size:17px;min-height:54px}
+.opt{border:1.5px solid transparent;background:var(--surface);border-radius:16px;padding:14px;text-align:left;font-size:17px;min-height:54px}
 .opt svg{width:18px;height:18px;vertical-align:-3px;color:var(--cobalt);margin-right:8px}
 .actions.duo{grid-template-columns:1fr 1.4fr}
 .slowbtn{min-height:42px;border-radius:99px;padding:8px 14px;border:0;background:var(--cobalt-soft);color:var(--cobalt);font-weight:700;font-size:14px}
@@ -262,6 +297,20 @@ nav.tabs button.on{color:var(--cobalt);background:var(--cobalt-soft)}
 .field textarea{min-height:90px;font-family:var(--f-mono);font-size:12px}
 .field input[type=range]{padding:0;accent-color:var(--cobalt)}
 .hint{font-size:13px;color:var(--muted)}
+.w{cursor:pointer;border-radius:4px;transition:background .12s}
+.w:active,.w.hit{background:var(--saffron-soft);box-shadow:0 0 0 2px var(--saffron-soft)}
+.dic{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(86px + env(safe-area-inset-bottom,0px));z-index:80;width:min(100% - 24px,520px);background:var(--ink);color:var(--paper);border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.dic.hi{bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+.dic .dw{font-family:var(--f-display);font-weight:800;font-size:24px;display:flex;align-items:center;gap:10px}
+.dic .dw .say{background:rgba(255,255,255,.15);color:var(--paper);width:36px;height:36px}
+.dic .dw .say svg{width:18px;height:18px}
+.dic .dpt{font-size:18px}
+.dic .dnote{font-size:13px;opacity:.75}
+.dic .drow{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.dic .drow a,.dic .drow button{font-size:13px;font-weight:700;border-radius:99px;padding:7px 12px;background:rgba(255,255,255,.14);color:var(--paper);border:0;text-decoration:none;min-height:34px;display:inline-flex;align-items:center}
+.dic .dx{position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.12);border:0;color:var(--paper);display:grid;place-items:center}
+.dic .dx svg{width:16px;height:16px}
+.dichint{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center}
 .toast{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:12px;font-weight:700;font-size:14px;max-width:calc(100% - 32px)}
 @media (prefers-reduced-motion: no-preference){
   .flash,.opt,.verdict{animation:pop .18s ease-out}
@@ -308,7 +357,1352 @@ nav.tabs button.on{color:var(--cobalt);background:var(--cobalt-soft)}
 
 <div id="drill" class="drill" hidden></div>
 <div id="sheet" class="sheet-bg" hidden></div>
+<div id="dic" class="dic" hidden></div>
 <div id="toast" class="toast" hidden></div>
+<script type="text/plain" id="dict">
+# Dicionário ES→PT do app. Uma entrada por linha: palavra=tradução
+# Verbos: infinitivo=tradução|forma1,forma2,...  (cada forma aponta para o infinitivo)
+# Linhas com # são comentários.
+
+## Verbos
+ser=ser|soy,eres,es,somos,sois,son,era,eras,éramos,eran,fui,fuiste,fue,fuimos,fueron,sido,sea,seas,sean,siendo
+estar=estar|estoy,estás,está,estamos,estáis,están,estaba,estaban,estuve,estuvo,estuvimos,estado,esté,estés,estén
+tener=ter|tengo,tienes,tiene,tenemos,tenéis,tienen,tenía,tenían,tuve,tuvo,tuvimos,tenido,ten,tenga,tengan
+haber=haver; ter (auxiliar)|he,has,ha,hemos,habéis,han,hay,había,hubo,habido,haya
+ir=ir|voy,vas,va,vamos,vais,van,iba,iban,ido,ve,vaya,vayan,yendo
+hacer=fazer|hago,haces,hace,hacemos,hacéis,hacen,hacía,hice,hiciste,hizo,hicimos,hecho,hecha,haz,haga,hagan
+poder=poder|puedo,puedes,puede,podemos,podéis,pueden,podía,pude,pudo,podido,pueda,puedas,puedan
+querer=querer|quiero,quieres,quiere,queremos,queréis,quieren,quería,quise,quiso,querido,quisiera,quiera
+decir=dizer|digo,dices,dice,decimos,decís,dicen,decía,dije,dijo,dicho,di,diga,digan,diciendo
+ver=ver|veo,ves,vemos,veis,ven,veía,vi,vio,visto,vea,viendo
+dar=dar|doy,das,da,damos,dais,dan,daba,dio,dado,dé,den
+saber=saber|sé,sabes,sabe,sabemos,sabéis,saben,sabía,supe,supo,sabido,sepa,sepas
+conocer=conhecer|conozco,conoces,conoce,conocemos,conocéis,conocen,conocí,conoció,conocido,conozca
+venir=vir|vengo,vienes,viene,venimos,venís,vienen,venía,vine,vinimos,venido,venga,vengan
+salir=sair|salgo,sales,sale,salimos,salís,salen,salí,salió,salido,sal,salga
+poner=pôr, colocar; servir (no bar)|pongo,pones,pone,ponemos,ponéis,ponen,puse,puso,puesto,pon,ponga,ponme
+seguir=seguir, continuar|sigo,sigues,sigue,seguimos,seguís,siguen,seguí,siguió,seguido,siga,sigan
+pedir=pedir|pido,pides,pide,pedimos,pedís,piden,pedí,pidió,pedido,pida
+servir=servir|sirvo,sirves,sirve,servimos,sirven,sirvió,servido,sirva
+dormir=dormir|duermo,duermes,duerme,dormimos,dormís,duermen,durmió,dormido,duerma
+volver=voltar|vuelvo,vuelves,vuelve,volvemos,volvéis,vuelven,volví,volvió,vuelto,vuelva
+costar=custar|cuesta,cuestan,costó,costaron,costado
+cerrar=fechar|cierro,cierras,cierra,cerramos,cerráis,cierran,cerré,cerró,cerrado,cierre,cierren
+empezar=começar|empiezo,empiezas,empieza,empezamos,empezáis,empiezan,empecé,empezó,empezado,empiece
+entender=entender|entiendo,entiendes,entiende,entendemos,entendéis,entienden,entendí,entendió,entendido,entienda
+pensar=pensar|pienso,piensas,piensa,pensamos,piensan,pensé,pensó,pensado
+sentir=sentir|siento,sientes,siente,sentimos,sienten,sintió,sentido,sienta
+recomendar=recomendar|recomiendo,recomiendas,recomienda,recomendamos,recomiendan,recomendó,recomendado,recomiende
+probar=provar, experimentar|pruebo,pruebas,prueba,probamos,prueban,probé,probó,probado,pruebe
+encontrar=encontrar|encuentro,encuentras,encuentra,encontramos,encuentran,encontré,encontró,encontrado
+llover=chover|llueve,llovió,llovido,llueva
+nevar=nevar|nieva,nevó,nevado
+doler=doer|duele,duelen,dolió,dolido,duela
+gustar=gostar, agradar|gusta,gustan,gustó,gustaron,gustado,gustaría,gustarían
+encantar=encantar, adorar|encanta,encantan,encantó,encantaría
+parecer=parecer|parezco,parece,parecen,pareció,parecido
+hablar=falar|hablo,hablas,habla,hablamos,habláis,hablan,hablé,habló,hablado,hable,hablen,hablando
+llamar=chamar|llamo,llamas,llama,llamamos,llamáis,llaman,llamé,llamó,llamado,llame,llamen
+llegar=chegar|llego,llegas,llega,llegamos,llegáis,llegan,llegué,llegó,llegado,llegue,llegando
+llevar=levar; vestir; estar há (tempo)|llevo,llevas,lleva,llevamos,lleváis,llevan,llevé,llevó,llevado,lleve,llévame
+tomar=tomar, pegar|tomo,tomas,toma,tomamos,tomáis,toman,tomé,tomó,tomado,tome,tómese,tómate
+comer=comer|como,comes,come,comemos,coméis,comen,comí,comió,comido,coma,comiendo
+beber=beber|bebo,bebes,bebe,bebemos,bebéis,beben,bebí,bebió,bebido,beba
+cenar=jantar|ceno,cenas,cena,cenamos,cenáis,cenan,cené,cenó,cenado
+desayunar=tomar café da manhã|desayuno,desayunas,desayuna,desayunamos,desayunan,desayunado
+pagar=pagar|pago,pagas,paga,pagamos,pagáis,pagan,pagué,pagó,pagado,pague
+cobrar=cobrar|cobro,cobras,cobra,cobramos,cobran,cobré,cobró,cobrado,cobre
+comprar=comprar|compro,compras,compra,compramos,compráis,compran,compré,compró,comprado,compre
+vender=vender|vendo,vendes,vende,vendemos,venden,vendió,vendido
+abrir=abrir|abro,abres,abre,abrimos,abrís,abren,abrí,abrió,abierto,abierta,abra
+vivir=morar, viver|vivo,vives,vive,vivimos,vivís,viven,viví,vivió,vivido
+trabajar=trabalhar|trabajo,trabajas,trabaja,trabajamos,trabajáis,trabajan,trabajé,trabajó,trabajado
+necesitar=precisar de|necesito,necesitas,necesita,necesitamos,necesitáis,necesitan,necesité,necesitó,necesitado
+buscar=procurar, buscar|busco,buscas,busca,buscamos,buscáis,buscan,busqué,buscó,buscado,busque
+esperar=esperar|espero,esperas,espera,esperamos,esperan,esperé,esperó,esperado,espere
+ayudar=ajudar|ayudo,ayudas,ayuda,ayudamos,ayudáis,ayudan,ayudé,ayudó,ayudado,ayude,ayúdame,ayúdeme
+repetir=repetir|repito,repites,repite,repetimos,repetís,repiten,repitió,repetido,repita
+escribir=escrever|escribo,escribes,escribe,escribimos,escribís,escriben,escribí,escribió,escrito,escriba
+leer=ler|leo,lees,lee,leemos,leen,leí,leyó,leído,lea
+aprender=aprender|aprendo,aprendes,aprende,aprendemos,aprendéis,aprenden,aprendí,aprendió,aprendido,aprendiendo
+enseñar=mostrar; ensinar|enseño,enseñas,enseña,enseñamos,enseñan,enseñé,enseñó,enseñado,enséñame
+mirar=olhar|miro,miras,mira,miramos,miráis,miran,miré,miró,mirado,mire,mirando
+escuchar=escutar, ouvir|escucho,escuchas,escucha,escuchamos,escuchan,escuché,escuchó,escuchado
+oír=ouvir|oigo,oyes,oye,oímos,oyen,oí,oyó,oído,oiga
+visitar=visitar|visito,visitas,visita,visitamos,visitáis,visitan,visité,visitó,visitado
+viajar=viajar|viajo,viajas,viaja,viajamos,viajan,viajé,viajó,viajado
+andar=andar, caminhar|ando,andas,anda,andamos,andan,anduve,anduvo,andado,andando
+caminar=caminhar|camino,caminas,camina,caminamos,caminan,caminó,caminado,caminando
+cruzar=atravessar|cruzo,cruzas,cruza,cruzamos,cruzan,crucé,cruzó,cruzado,cruce
+girar=virar|giro,giras,gira,giramos,giran,giró,girado,gire
+bajar=descer; baixar|bajo,bajas,baja,bajamos,bajáis,bajan,bajé,bajó,bajado,baje,bájate
+subir=subir|subo,subes,sube,subimos,subís,suben,subí,subió,subido,suba
+coger=pegar (transporte, objeto)|cojo,coges,coge,cogemos,cogéis,cogen,cogí,cogió,cogido,coja
+dejar=deixar|dejo,dejas,deja,dejamos,dejáis,dejan,dejé,dejó,dejado,deje
+quedar=ficar; combinar um encontro|quedo,quedas,queda,quedamos,quedáis,quedan,quedé,quedó,quedado
+quitar=tirar, remover|quito,quitas,quita,quitamos,quitan,quité,quitó,quitado,quítate
+tirar=puxar (porta); jogar fora|tiro,tiras,tira,tiramos,tiran,tiré,tiró,tirado
+empujar=empurrar|empujo,empujas,empuja,empujan,empujó,empujado,empuje
+pasar=passar; acontecer|paso,pasas,pasa,pasamos,pasáis,pasan,pasé,pasó,pasado,pase,pasad,pases
+disfrutar=aproveitar, curtir|disfruto,disfrutas,disfruta,disfrutamos,disfrutan,disfruté,disfrutó,disfrutado,disfrutes
+funcionar=funcionar|funciona,funcionan,funcionó,funcionado
+reservar=reservar|reservo,reservas,reserva,reservamos,reservan,reservé,reservó,reservado
+cambiar=trocar, mudar|cambio,cambias,cambia,cambiamos,cambian,cambié,cambió,cambiado,cambie
+devolver=devolver|devuelvo,devuelves,devuelve,devolvemos,devuelven,devolví,devolvió,devuelto,devolverlo
+envolver=embrulhar|envuelvo,envuelves,envuelve,envolvemos,envuelven,envolvió,envuelto
+tardar=demorar|tardo,tardas,tarda,tardamos,tardan,tardé,tardó,tardado
+perder=perder|pierdo,pierdes,pierde,perdemos,perdéis,pierden,perdí,perdió,perdido,perdida,pierda
+robar=roubar|robo,robas,roba,roban,robó,robado,robaron
+significar=significar|significa,significan,significó
+creer=achar, acreditar|creo,crees,cree,creemos,creéis,creen,creí,creyó,creído,crea
+intentar=tentar|intento,intentas,intenta,intentamos,intentan,intenté,intentó,intentado,intentes
+equivocarse=enganar-se, errar|equivoco,equivocas,equivoca,equivocado,equivocada
+acordarse=lembrar-se|acuerdo,acuerdas,acuerda,acordado
+despertarse=acordar|despierto,despiertas,despierta,despertado
+borrar=apagar|borro,borras,borra,borran,borró,borrado
+mejorar=melhorar|mejoro,mejoras,mejora,mejoramos,mejoran,mejoró,mejorado,mejore
+dedicarse=dedicar-se, trabalhar com|dedico,dedicas,dedica,dedican
+sonar=soar|suena,suenan,sonó,sonado
+correr=correr|corro,corres,corre,corremos,corren,corrí,corrió,corrido
+bordar=bordar; (gíria) arrasar|bordo,bordas,borda,bordamos,bordan,bordó,bordado
+alegrarse=ficar feliz|alegro,alegras,alegra,alegran,alegrado
+reírse=rir|río,ríes,ríe,reímos,ríen,reído
+soñar=sonhar|sueño,sueñas,sueña,soñamos,sueñan,soñado
+descansar=descansar|descanso,descansas,descansa,descansan,descansado
+preguntar=perguntar|pregunto,preguntas,pregunta,preguntamos,preguntan,pregunté,preguntó,preguntado
+responder=responder|respondo,respondes,responde,responden,respondió,respondido
+traer=trazer|traigo,traes,trae,traemos,traéis,traen,traje,trajo,traído,traiga,tráigame
+recoger=pegar, recolher|recojo,recoges,recoge,recogemos,recogen,recogí,recogió,recogido,recoja
+facturar=despachar (bagagem)|facturo,facturas,factura,facturamos,facturan,facturado
+embarcar=embarcar|embarco,embarcas,embarca,embarcamos,embarcan,embarcado
+aterrizar=pousar, aterrissar|aterriza,aterrizó,aterrizado
+despegar=decolar|despega,despegó,despegado
+conducir=dirigir|conduzco,conduces,conduce,conducimos,conducen,conducido
+aparcar=estacionar|aparco,aparcas,aparca,aparcan,aparcado
+alquilar=alugar|alquilo,alquilas,alquila,alquilamos,alquilan,alquilado
+sacar=tirar; comprar (ingresso, dinheiro)|saco,sacas,saca,sacamos,sacan,saqué,sacó,sacado
+usar=usar|uso,usas,usa,usamos,usan,usé,usó,usado
+sentarse=sentar-se|siéntate,siéntese,sentado,sentada
+levantarse=levantar-se|levanto,levantas,levanta,levantado
+ducharse=tomar banho|ducho,duchas,duchado
+ganar=ganhar|gano,ganas,gana,ganamos,ganan,gané,ganó,ganado
+olvidar=esquecer|olvido,olvidas,olvida,olvidamos,olvidan,olvidé,olvidó,olvidado
+recordar=lembrar|recuerdo,recuerdas,recuerda,recordamos,recuerdan,recordé,recordó,recordado
+terminar=terminar|termino,terminas,termina,terminamos,terminan,terminé,terminó,terminado
+acabar=acabar, terminar|acabo,acabas,acaba,acabamos,acabáis,acaban,acabé,acabó,acabado
+caer=cair|caigo,caes,cae,caemos,caen,cayó,caído
+limpiar=limpar|limpio,limpias,limpia,limpian,limpió,limpiado
+lavar=lavar|lavo,lavas,lava,lavamos,lavan,lavó,lavado
+cocinar=cozinhar|cocino,cocinas,cocina,cocinan,cocinó,cocinado
+bailar=dançar|bailo,bailas,baila,bailamos,bailan,bailé,bailó,bailado
+cantar=cantar|canto,cantas,canta,cantamos,cantan,canté,cantó,cantado
+fumar=fumar|fumo,fumas,fuma,fuman,fumó,fumado
+prohibir=proibir|prohíbe,prohibido,prohibida
+tocar=tocar; ser a vez de|toco,tocas,toca,tocamos,tocan,tocó,tocado
+valer=valer; custar|valgo,vale,valemos,valen,valió,valido
+importar=importar|importa,importan,importó
+molestar=incomodar|molesto,molestas,molesta,molestan,molestó,molestado
+preocuparse=preocupar-se|preocupo,preocupes,preocupa,preocupado,preocupada
+cuidar=cuidar|cuido,cuidas,cuida,cuidan,cuidó,cuidado,cuídate
+invitar=convidar; pagar para alguém|invito,invitas,invita,invitamos,invitan,invité,invitó,invitado
+celebrar=comemorar|celebro,celebras,celebra,celebramos,celebran,celebró,celebrado
+contar=contar|cuento,cuentas,cuenta,contamos,cuentan,conté,contó,contado
+mandar=mandar, enviar|mando,mandas,manda,mandamos,mandan,mandé,mandó,mandado
+enviar=enviar|envío,envías,envía,enviamos,envían,envié,envió,enviado
+recibir=receber|recibo,recibes,recibe,recibimos,reciben,recibí,recibió,recibido
+cargar=carregar|cargo,cargas,carga,cargamos,cargan,cargué,cargó,cargado
+apagar=desligar; apagar|apago,apagas,apaga,apagan,apagó,apagado
+encender=ligar, acender|enciendo,enciendes,enciende,encienden,encendió,encendido
+llenar=encher|lleno,llenas,llena,llenan,llenó,llenado
+elegir=escolher|elijo,eliges,elige,elegimos,eligen,eligió,elegido,elija
+preferir=preferir|prefiero,prefieres,prefiere,preferimos,prefieren,prefirió,preferido
+sugerir=sugerir|sugiero,sugieres,sugiere,sugieren,sugirió,sugerido
+confirmar=confirmar|confirmo,confirmas,confirma,confirmamos,confirman,confirmó,confirmado
+cancelar=cancelar|cancelo,cancelas,cancela,cancelamos,cancelan,cancelé,canceló,cancelado
+rellenar=preencher|relleno,rellenas,rellena,rellenan,rellenó,rellenado
+firmar=assinar|firmo,firmas,firma,firmamos,firman,firmé,firmó,firmado
+mostrar=mostrar|muestro,muestras,muestra,mostramos,muestran,mostré,mostró,mostrado
+explicar=explicar|explico,explicas,explica,explicamos,explican,expliqué,explicó,explicado
+traducir=traduzir|traduzco,traduces,traduce,traducimos,traducen,tradujo,traducido
+practicar=praticar|practico,practicas,practica,practicamos,practican,practiqué,practicó,practicado
+estudiar=estudar|estudio,estudias,estudia,estudiamos,estudian,estudié,estudió,estudiado
+jugar=jogar, brincar|juego,juegas,juega,jugamos,juegan,jugué,jugó,jugado
+nadar=nadar|nado,nadas,nada,nadamos,nadan,nadó,nadado
+
+## Palavras gramaticais
+el=o
+la=a
+los=os
+las=as
+un=um
+una=uma
+unos=uns
+unas=umas
+lo=o (neutro); isso
+le=lhe
+les=lhes
+me=me
+te=te
+se=se
+nos=nos
+os=vocês (objeto); vos
+mi=meu, minha
+mis=meus, minhas
+tu=teu, tua / seu, sua
+tus=teus, tuas
+su=seu, sua (dele, dela, de você)
+sus=seus, suas
+nuestro=nosso
+nuestra=nossa
+vuestro=vosso, de vocês
+vuestra=vossa, de vocês
+yo=eu
+tú=você (informal)
+usted=o senhor, a senhora (formal)
+ustedes=os senhores, vocês (formal)
+él=ele
+ella=ela
+nosotros=nós
+nosotras=nós (feminino)
+vosotros=vocês (informal, Espanha)
+vosotras=vocês (feminino, informal)
+ellos=eles
+ellas=elas
+mí=mim
+ti=ti, você
+conmigo=comigo
+contigo=com você
+este=este
+esta=esta
+esto=isto
+estos=estes
+estas=estas
+ese=esse
+esa=essa
+eso=isso
+esos=esses
+esas=essas
+aquel=aquele
+aquella=aquela
+aquello=aquilo
+aquí=aqui
+acá=cá, aqui
+ahí=aí
+allí=ali, lá
+allá=lá
+y=e
+e=e (antes de i)
+o=ou
+u=ou (antes de o)
+pero=mas, porém
+sino=mas sim
+porque=porque
+pues=então; bom…
+que=que
+qué=que, o quê
+quién=quem
+quiénes=quem (plural)
+cuál=qual
+cuáles=quais
+cómo=como (pergunta)
+como=como; eu como (de comer)
+cuándo=quando (pergunta)
+cuando=quando
+dónde=onde (pergunta)
+donde=onde
+adónde=aonde
+cuánto=quanto
+cuánta=quanta
+cuántos=quantos
+cuántas=quantas
+por qué=por quê
+para qué=para quê
+a=a, para
+al=ao (a + el)
+de=de
+del=do (de + el)
+en=em
+con=com
+sin=sem
+por=por
+para=para
+sobre=sobre; em cima de
+entre=entre
+hasta=até
+desde=desde
+hacia=em direção a
+según=segundo, de acordo com
+durante=durante
+contra=contra
+tras=atrás de; depois de
+ante=diante de
+bajo=sob, debaixo; baixo
+si=se (condição)
+sí=sim
+no=não; não é?
+ni=nem
+también=também
+tampoco=também não
+ya=já
+aún=ainda
+todavía=ainda
+siempre=sempre
+nunca=nunca
+jamás=jamais
+muy=muito (antes de adjetivo)
+mucho=muito
+mucha=muita
+muchos=muitos
+muchas=muitas
+poco=pouco
+poca=pouca
+pocos=poucos
+pocas=poucas
+bastante=bastante
+demasiado=demais
+más=mais
+menos=menos
+tan=tão
+tanto=tanto
+tanta=tanta
+tantos=tantos
+casi=quase
+solo=só, apenas; sozinho
+sólo=só, apenas
+algo=algo, alguma coisa
+nada=nada
+alguien=alguém
+nadie=ninguém
+algún=algum
+alguno=algum
+alguna=alguma
+algunos=alguns
+algunas=algumas
+ningún=nenhum
+ninguno=nenhum
+ninguna=nenhuma
+todo=tudo; todo
+toda=toda
+todos=todos
+todas=todas
+cada=cada
+otro=outro
+otra=outra
+otros=outros
+otras=outras
+mismo=mesmo
+misma=mesma
+cualquier=qualquer
+bien=bem
+mal=mal
+mejor=melhor
+peor=pior
+así=assim
+entonces=então
+luego=depois; logo
+después=depois
+antes=antes
+ahora=agora
+mientras=enquanto
+quizá=talvez
+quizás=talvez
+tal vez=talvez
+claro=claro
+vale=ok, tá bom, combinado
+bueno=bom; bem…
+buena=boa
+buen=bom (antes de substantivo)
+buenos=bons
+buenas=boas
+malo=mau, ruim
+mala=má, ruim
+cierto=certo, verdade
+verdad=verdade
+mentira=mentira
+señor=senhor
+señora=senhora
+señorita=senhorita
+don=dom (tratamento)
+doña=dona (tratamento)
+ánimo=força, coragem; ânimo
+olé=olé!, isso!
+genial=genial, ótimo
+fenomenal=fenomenal
+perfecto=perfeito
+perfecta=perfeita
+lujo=luxo
+crack=fera, craque (gíria)
+guay=legal (gíria)
+pasada=exagero; (gíria) algo incrível
+pasado=passado
+tiro=tiro
+máquina=máquina; (gíria) pessoa muito boa
+m=M (tamanho médio)
+s=S (tamanho pequeno)
+
+## Saudações e cortesia
+hola=olá, oi
+adiós=adeus, tchau
+chao=tchau
+hasta luego=até logo
+hasta mañana=até amanhã
+hasta pronto=até breve
+buenos días=bom dia
+buenas tardes=boa tarde
+buenas noches=boa noite
+gracias=obrigado, obrigada
+favor=favor
+por favor=por favor
+perdón=desculpa, perdão
+perdona=desculpe, com licença (tú)
+perdone=desculpe, com licença (usted)
+disculpa=desculpa (tú)
+disculpe=desculpe (usted)
+lo siento=sinto muito
+encantado=muito prazer (homem)
+encantada=muito prazer (mulher)
+igualmente=igualmente
+mucho gusto=muito prazer
+bienvenido=bem-vindo
+bienvenida=bem-vinda
+salud=saúde! (brinde); saúde
+enhorabuena=parabéns
+felicidades=parabéns, felicidades
+suerte=sorte
+amable=gentil, simpático
+tal=tal
+qué tal=tudo bem?, como vai?
+
+## Pessoas, nomes e lugares que aparecem no app
+ana=Ana (nome)
+lucía=Lucía (nome)
+souza=Souza (sobrenome)
+lola=Lola (nome; apelido de Dolores)
+brasil=Brasil
+españa=Espanha
+madrid=Madri
+barcelona=Barcelona
+sevilla=Sevilha
+valencia=Valência
+toledo=Toledo
+atocha=Atocha (estação central de Madri)
+prado=Prado (museu de Madri)
+jerez=Jerez (cidade e vinho xerez)
+roma=Roma
+cercanías=trens urbanos (Renfe)
+español=espanhol
+española=espanhola
+inglés=inglês
+inglesa=inglesa
+portugués=português
+portuguesa=portuguesa
+brasileño=brasileiro
+brasileña=brasileira
+francés=francês
+alemán=alemão
+italiano=italiano
+catalán=catalão
+extranjero=estrangeiro
+extranjera=estrangeira
+turista=turista
+guiri=turista estrangeiro (gíria)
+gente=gente, pessoas
+persona=pessoa
+hombre=homem
+mujer=mulher
+chico=garoto, rapaz
+chica=garota, moça
+niño=menino, criança
+niña=menina
+joven=jovem
+amigo=amigo
+amiga=amiga
+novio=namorado; noivo
+novia=namorada; noiva
+marido=marido
+esposa=esposa
+pareja=casal; parceiro(a)
+familia=família
+padre=pai
+madre=mãe
+padres=pais
+hijo=filho
+hija=filha
+hermano=irmão
+hermana=irmã
+abuelo=avô
+abuela=avó
+tío=tio; (gíria) cara
+tía=tia; (gíria) mana
+primo=primo
+prima=prima
+nombre=nome
+apellido=sobrenome
+apodo=apelido
+
+## Números e tempo
+cero=zero
+uno=um
+dos=dois
+tres=três
+cuatro=quatro
+cinco=cinco
+seis=seis
+siete=sete
+ocho=oito
+nueve=nove
+diez=dez
+once=onze
+doce=doze
+trece=treze
+catorce=catorze
+quince=quinze
+dieciséis=dezesseis
+diecisiete=dezessete
+dieciocho=dezoito
+diecinueve=dezenove
+veinte=vinte
+veintiuno=vinte e um
+veintidós=vinte e dois
+veinticinco=vinte e cinco
+treinta=trinta
+cuarenta=quarenta
+cincuenta=cinquenta
+sesenta=sessenta
+setenta=setenta
+ochenta=oitenta
+noventa=noventa
+cien=cem
+ciento=cento
+doscientos=duzentos
+trescientos=trezentos
+quinientos=quinhentos
+mil=mil
+millón=milhão
+primero=primeiro
+primera=primeira
+segundo=segundo
+segunda=segunda
+tercero=terceiro
+tercera=terceira
+último=último
+última=última
+próximo=próximo
+próxima=próxima
+siguiente=seguinte
+medio=meio
+media=meia
+mitad=metade
+cuarto=quarto; quarto de hora
+punto=ponto; en punto = em ponto
+hora=hora
+horas=horas
+minuto=minuto
+minutos=minutos
+segundos=segundos
+rato=um momento, um tempinho
+momento=momento
+vez=vez
+veces=vezes
+tiempo=tempo
+día=dia
+días=dias
+noche=noite
+noches=noites
+tarde=tarde
+tardes=tardes
+mañana=amanhã; manhã
+madrugada=madrugada
+mediodía=meio-dia
+medianoche=meia-noite
+hoy=hoje
+ayer=ontem
+anteayer=anteontem
+semana=semana
+fin=fim
+fin de semana=fim de semana
+mes=mês
+año=ano
+años=anos
+lunes=segunda-feira
+martes=terça-feira
+miércoles=quarta-feira
+jueves=quinta-feira
+viernes=sexta-feira
+sábado=sábado
+domingo=domingo
+enero=janeiro
+febrero=fevereiro
+marzo=março
+abril=abril
+mayo=maio
+junio=junho
+julio=julho
+agosto=agosto
+septiembre=setembro
+octubre=outubro
+noviembre=novembro
+diciembre=dezembro
+temprano=cedo
+pronto=logo, em breve
+despacio=devagar
+rápido=rápido
+lento=lento
+festivo=feriado
+vacaciones=férias
+cumpleaños=aniversário
+navidad=Natal
+nochevieja=véspera de Ano-Novo
+
+## Café, bar e comida
+café=café
+cafetería=cafeteria
+bar=bar
+restaurante=restaurante
+terraza=mesas na calçada; terraço
+camarero=garçom
+camarera=garçonete
+cocinero=cozinheiro
+carta=cardápio
+menú=menu, cardápio
+menú del día=menu do dia (preço fixo)
+plato=prato
+platos=pratos
+primero=primeiro (de primero = entrada)
+postre=sobremesa
+postres=sobremesas
+desayuno=café da manhã
+comida=almoço; comida
+almuerzo=almoço
+merienda=lanche da tarde
+cena=jantar
+cuenta=conta
+propina=gorjeta
+tique=recibo, notinha
+ticket=recibo
+reserva=reserva
+mesa=mesa
+silla=cadeira
+servilleta=guardanapo
+cubiertos=talheres
+tenedor=garfo
+cuchillo=faca
+cuchara=colher
+vaso=copo
+copa=taça
+taza=xícara
+botella=garrafa
+jarra=jarra
+caña=chope pequeno
+doble=chope grande (bebida); duplo
+cerveza=cerveja
+cervezas=cervejas
+vino=vinho; (também) veio, forma de venir
+tinto=tinto
+blanco=branco
+rosado=rosé
+cava=espumante espanhol
+sangría=sangria
+sidra=sidra
+agua=água
+gas=gás
+con gas=com gás
+sin gas=sem gás
+hielo=gelo
+zumo=suco
+jugo=suco (América Latina)
+naranja=laranja
+limón=limão
+leche=leite
+cortado=café com um pouco de leite
+solo=café puro (café solo); só
+descafeinado=descafeinado
+té=chá
+infusión=chá de ervas
+chocolate=chocolate
+churros=churros
+azúcar=açúcar
+sal=sal
+pimienta=pimenta-do-reino
+aceite=azeite, óleo
+vinagre=vinagre
+pan=pão
+tostada=torrada
+bocadillo=sanduíche (no pão baguete)
+sándwich=sanduíche (pão de forma)
+tapa=petisco, tapa
+tapas=petiscos, tapas
+ración=porção
+pincho=petisco espetado
+croqueta=croquete
+croquetas=croquetes
+tortilla=omelete de batata (tortilla de patatas)
+paella=paella
+gazpacho=gazpacho (sopa fria de tomate)
+salmorejo=salmorejo (creme frio de tomate)
+jamón=presunto
+jamón ibérico=presunto ibérico
+chorizo=linguiça defumada
+queso=queijo
+huevo=ovo
+huevos=ovos
+carne=carne
+ternera=vitela, carne bovina
+cerdo=porco
+cordero=cordeiro
+pollo=frango
+pescado=peixe (alimento)
+pez=peixe (animal)
+marisco=frutos do mar
+gambas=camarões
+calamares=lulas
+pulpo=polvo (animal)
+merluza=merluza
+bacalao=bacalhau
+atún=atum
+salmón=salmão
+arroz=arroz
+pasta=massa
+sopa=sopa
+ensalada=salada
+verdura=verdura, legume
+verduras=verduras, legumes
+patata=batata
+patatas=batatas
+bravas=patatas bravas (batatas com molho picante)
+papa=batata (América Latina)
+tomate=tomate
+cebolla=cebola
+ajo=alho
+lechuga=alface
+pimiento=pimentão
+champiñón=cogumelo
+fruta=fruta
+manzana=maçã
+plátano=banana
+fresa=morango
+uva=uva
+uvas=uvas
+melocotón=pêssego
+sandía=melancia
+pastel=bolo, torta
+tarta=torta
+helado=sorvete
+flan=pudim
+galleta=biscoito
+salsa=molho
+mayonesa=maionese
+alioli=molho de alho
+picante=picante
+dulce=doce
+salado=salgado
+amargo=amargo
+caliente=quente
+frío=frio
+fría=fria
+plancha=chapa; a la plancha = grelhado
+frito=frito
+asado=assado
+hecho=feito; cozido (ponto da carne)
+hecha=feita
+poco hecha=malpassada
+al punto=ao ponto
+muy hecha=bem passada
+crudo=cru
+casero=caseiro
+vegetariano=vegetariano
+vegetariana=vegetariana
+vegano=vegano
+alérgico=alérgico
+alérgica=alérgica
+alergia=alergia
+gluten=glúten
+lactosa=lactose
+frutos secos=castanhas, oleaginosas
+hambre=fome
+sed=sede
+rico=gostoso; rico
+riquísimo=delicioso
+buenísimo=ótimo, delicioso
+buenísima=ótima, deliciosa
+buenísimas=ótimas
+delicioso=delicioso
+exquisito=delicioso, requintado
+aprovechar=aproveitar
+que aproveche=bom apetite
+llevar=levar; para llevar = para viagem
+aquí=aqui; para tomar aquí = para consumir aqui
+
+## Aeroporto, estação e transporte
+aeropuerto=aeroporto
+terminal=terminal
+vuelo=voo
+vuelos=voos
+avión=avião
+compañía=companhia
+puerta=porta; portão de embarque
+embarque=embarque
+tarjeta de embarque=cartão de embarque
+pasaporte=passaporte
+documento=documento
+dni=documento de identidade
+visado=visto
+aduana=alfândega
+control=controle
+seguridad=segurança
+equipaje=bagagem
+maleta=mala
+maletas=malas
+mochila=mochila
+bolso=bolsa (de mão)
+bolsa=sacola
+cinta=esteira; fita
+recogida=retirada (de bagagem)
+facturación=check-in (despacho de bagagem)
+mostrador=balcão
+información=informação
+retraso=atraso
+retrasado=atrasado
+cancelado=cancelado
+salida=saída; partida
+salidas=saídas; partidas
+llegada=chegada
+llegadas=chegadas
+destino=destino
+origen=origem
+asiento=assento
+ventanilla=janela; guichê
+pasillo=corredor
+escala=escala
+conexión=conexão
+estación=estação
+tren=trem
+trenes=trens
+metro=metrô
+autobús=ônibus
+autobuses=ônibus (plural)
+autocar=ônibus de viagem
+tranvía=bonde
+taxi=táxi
+taxis=táxis
+coche=carro
+carro=carrinho (de compras, de bagagem); carro (América Latina)
+moto=moto
+bici=bicicleta
+bicicleta=bicicleta
+parada=ponto (de ônibus), parada
+andén=plataforma
+vía=via, linha (trem)
+línea=linha
+billete=passagem, bilhete; cédula
+billetes=passagens; cédulas
+abono=passe (de transporte)
+tarjeta=cartão
+ida=ida
+vuelta=volta
+ida y vuelta=ida e volta
+horario=horário
+máquina=máquina
+taquilla=bilheteria
+consigna=guarda-volumes
+conductor=motorista
+revisor=fiscal (do trem)
+transbordo=baldeação
+próxima parada=próxima parada
+dirección=endereço; direção
+sentido=sentido
+gasolinera=posto de gasolina
+peaje=pedágio
+carretera=estrada
+autopista=rodovia
+cajero=caixa eletrônico
+banco=banco
+cambio=troco; câmbio
+efectivo=dinheiro em espécie
+dinero=dinheiro
+moneda=moeda
+euro=euro
+euros=euros
+céntimo=centavo
+precio=preço
+caro=caro
+cara=cara (preço); rosto
+barato=barato
+barata=barata
+gratis=grátis
+descuento=desconto
+oferta=oferta
+rebajas=liquidação
+rebajado=em promoção
+rebajada=em promoção
+factura=nota fiscal, fatura
+recibo=recibo
+
+## Cidade e direções
+ciudad=cidade
+pueblo=vilarejo, cidade pequena; povo
+barrio=bairro
+centro=centro
+calle=rua
+avenida=avenida
+plaza=praça
+paseo=passeio, alameda
+esquina=esquina
+manzana=quarteirão; maçã
+edificio=prédio
+puente=ponte
+río=rio
+parque=parque
+jardín=jardim
+mercado=mercado
+supermercado=supermercado
+tienda=loja
+museo=museu
+iglesia=igreja
+catedral=catedral
+castillo=castelo
+palacio=palácio
+torre=torre
+playa=praia
+montaña=montanha
+mapa=mapa
+plano=mapa (da cidade); plano
+derecha=direita
+izquierda=esquerda
+recto=reto; todo recto = sempre em frente
+derecho=direito; reto (América Latina)
+cerca=perto
+lejos=longe
+lado=lado
+al lado de=ao lado de
+enfrente=em frente
+delante=na frente
+detrás=atrás
+dentro=dentro
+fuera=fora
+arriba=em cima
+abajo=embaixo
+encima=em cima
+debajo=debaixo
+fondo=fundo
+al fondo=no fundo
+semáforo=semáforo
+cruce=cruzamento
+rotonda=rotatória
+paso de cebra=faixa de pedestres
+acera=calçada
+señal=placa, sinal
+señales=placas, sinais
+entrada=entrada
+abierto=aberto
+abierta=aberta
+cerrado=fechado
+cerrada=fechada
+perdido=perdido
+perdida=perdida
+andando=a pé, andando
+a pie=a pé
+sitio=lugar
+lugar=lugar
+zona=zona, área
+aseos=banheiros (públicos)
+servicios=banheiros; serviços
+baño=banheiro
+baños=banheiros
+oficina=escritório
+oficina de turismo=posto de informação turística
+ayuntamiento=prefeitura
+comisaría=delegacia
+policía=polícia
+embajada=embaixada
+consulado=consulado
+correos=correios
+sello=selo
+carta=carta; cardápio
+
+## Hotel e casa
+hotel=hotel
+hostal=pousada
+albergue=albergue
+apartamento=apartamento
+piso=apartamento; andar
+planta=andar; planta
+planta baja=térreo
+habitación=quarto
+habitación doble=quarto duplo
+habitación individual=quarto individual
+cama=cama
+almohada=travesseiro
+manta=cobertor
+sábana=lençol
+toalla=toalha
+ducha=chuveiro, banho
+bañera=banheira
+jabón=sabonete
+champú=xampu
+papel higiénico=papel higiênico
+secador=secador
+llave=chave
+llaves=chaves
+tarjeta de la habitación=cartão do quarto
+recepción=recepção
+recepcionista=recepcionista
+ascensor=elevador
+escaleras=escadas
+calefacción=aquecimento
+aire acondicionado=ar-condicionado
+ventana=janela
+puerta=porta
+cerradura=fechadura
+enchufe=tomada
+adaptador=adaptador
+cargador=carregador
+móvil=celular
+teléfono=telefone
+wifi=wi-fi
+contraseña=senha
+clave=senha; chave
+internet=internet
+ordenador=computador
+televisión=televisão
+mando=controle remoto
+nevera=geladeira
+cocina=cozinha; fogão
+microondas=micro-ondas
+lavadora=máquina de lavar
+limpieza=limpeza
+limpio=limpo
+sucio=sujo
+ruido=barulho
+ruidoso=barulhento
+tranquilo=tranquilo
+incluido=incluído
+incluida=incluída
+desayuno incluido=café da manhã incluído
+check-in=check-in
+salida=check-out; saída
+
+## Compras e roupa
+compras=compras
+de compras=às compras
+probador=provador
+probadores=provadores
+talla=tamanho (roupa)
+número=número (calçado)
+grande=grande
+pequeño=pequeno
+pequeña=pequena
+mediano=médio
+largo=comprido
+corto=curto
+ancho=largo
+estrecho=estreito, apertado
+ropa=roupa
+camiseta=camiseta
+camisa=camisa
+pantalón=calça
+pantalones=calça
+vaqueros=jeans
+falda=saia
+vestido=vestido
+jersey=suéter
+sudadera=moletom
+abrigo=casaco
+chaqueta=jaqueta
+cazadora=jaqueta
+bufanda=cachecol
+gorro=gorro, touca
+guantes=luvas
+calcetines=meias
+zapato=sapato
+zapatos=sapatos
+zapatillas=tênis
+botas=botas
+bolso=bolsa
+cartera=carteira
+gafas=óculos
+gafas de sol=óculos de sol
+reloj=relógio
+paraguas=guarda-chuva
+regalo=presente
+recuerdo=lembrança, suvenir
+color=cor
+colores=cores
+rojo=vermelho
+roja=vermelha
+azul=azul
+verde=verde
+amarillo=amarelo
+negro=preto
+blanco=branco
+gris=cinza
+marrón=marrom
+morado=roxo
+rosa=rosa
+naranja=laranja
+dorado=dourado
+plateado=prateado
+bonito=bonito
+bonita=bonita
+feo=feio
+nuevo=novo
+nueva=nova
+viejo=velho
+vieja=velha
+funda=capinha, capa
+tienda=loja
+dependiente=vendedor
+dependienta=vendedora
+caja=caixa
+devolución=devolução
+garantía=garantia
+envolver=embrulhar
+bolsa=sacola
+
+## Saúde e emergências
+ayuda=ajuda; (ele/ela) ajuda
+socorro=socorro
+emergencia=emergência
+urgencias=pronto-socorro
+ambulancia=ambulância
+hospital=hospital
+médico=médico
+médica=médica
+enfermero=enfermeiro
+enfermera=enfermeira
+farmacia=farmácia
+farmacia de guardia=farmácia de plantão
+guardia=plantão; guarda
+medicamento=remédio
+medicina=remédio; medicina
+pastilla=comprimido
+receta=receita (médica ou de cozinha)
+crema=creme, pomada
+tirita=curativo, band-aid
+vendas=ataduras
+termómetro=termômetro
+seguro=seguro; certo
+seguro de viaje=seguro viagem
+dolor=dor
+duele=dói
+fiebre=febre
+tos=tosse
+gripe=gripe
+resfriado=resfriado
+resfriada=resfriada
+constipado=resfriado (não é intestino preso!)
+constipada=resfriada
+mareado=tonto, enjoado
+mareada=tonta, enjoada
+cansado=cansado
+cansada=cansada
+enfermo=doente
+enferma=doente (f.)
+herida=ferimento
+sangre=sangue
+cabeza=cabeça
+garganta=garganta
+estómago=estômago
+barriga=barriga
+espalda=costas
+pierna=perna
+pie=pé
+pies=pés
+mano=mão
+manos=mãos
+brazo=braço
+ojo=olho
+ojos=olhos
+oído=ouvido
+nariz=nariz
+boca=boca
+diente=dente
+muela=dente (molar)
+dentista=dentista
+corazón=coração
+embarazada=grávida
+avergonzada=envergonhada
+alergia=alergia
+robo=roubo
+robado=roubado
+ladrón=ladrão
+denuncia=boletim de ocorrência
+policía=polícia
+bombero=bombeiro
+incendio=incêndio
+peligro=perigo
+cuidado=cuidado
+prohibido=proibido
+empujar=empurrar
+tirar=puxar
+
+## Clima
+tiempo=tempo (clima e duração)
+clima=clima
+calor=calor
+frío=frio
+sol=sol
+viento=vento
+lluvia=chuva
+nieve=neve
+nube=nuvem
+nublado=nublado
+niebla=neblina
+tormenta=tempestade
+grado=grau
+grados=graus
+temperatura=temperatura
+húmedo=úmido
+seco=seco
+estación=estação (do ano; de trem)
+primavera=primavera
+verano=verão
+otoño=outono
+invierno=inverno
+
+## Trabalho, estudo e vida
+trabajo=trabalho; eu trabalho
+empresa=empresa
+firma=assinatura; empresa
+oficina=escritório
+taller=oficina mecânica; ateliê; workshop
+jefe=chefe
+compañero=colega
+reunión=reunião
+cita=encontro marcado; consulta
+escuela=escola
+colegio=escola (ensino fundamental e médio)
+universidad=universidade
+clase=aula; classe
+profesor=professor
+profesora=professora
+estudiante=estudante
+libro=livro
+cuaderno=caderno
+carpeta=pasta (de papéis)
+bolígrafo=caneta
+papel=papel
+hoja=folha
+periódico=jornal
+noticias=notícias
+revista=revista
+película=filme
+serie=série
+música=música
+canción=música, canção
+fiesta=festa
+viaje=viagem
+viajes=viagens
+vacaciones=férias
+foto=foto
+fotos=fotos
+cámara=câmera
+idioma=idioma
+lengua=língua
+palabra=palavra
+frase=frase
+pregunta=pergunta
+respuesta=resposta
+cosa=coisa
+cosas=coisas
+problema=problema
+ejemplo=exemplo
+razón=razão
+pena=pena; vale la pena = vale a pena
+suerte=sorte
+vida=vida
+mundo=mundo
+país=país
+cultura=cultura
+historia=história
+arte=arte
+deporte=esporte
+fútbol=futebol
+partido=jogo (esportivo); partido
+equipo=time; equipe
+perro=cachorro
+perra=cadela
+gato=gato
+cachorro=filhote
+pájaro=pássaro
+ratón=rato; mouse
+polvo=pó, poeira
+largo=comprido
+
+## Adjetivos e sentimentos
+feliz=feliz
+contento=contente
+contenta=contente (f.)
+triste=triste
+nervioso=nervoso
+tranquilo=tranquilo
+aburrido=entediado; chato
+divertido=divertido
+interesante=interessante
+fácil=fácil
+difícil=difícil
+importante=importante
+posible=possível
+imposible=impossível
+listo=pronto; esperto
+lista=pronta; esperta
+listos=prontos
+ocupado=ocupado
+libre=livre
+lleno=cheio
+vacío=vazio
+pesado=pesado; chato
+ligero=leve
+fuerte=forte
+débil=fraco
+alto=alto
+bajo=baixo
+gordo=gordo
+delgado=magro
+guapo=bonito (pessoa)
+guapa=bonita (pessoa)
+simpático=simpático
+antipático=antipático
+raro=estranho, esquisito
+normal=normal
+igual=igual; talvez (a lo mejor)
+diferente=diferente
+mejor=melhor
+peor=pior
+mayor=maior; mais velho
+menor=menor; mais novo
+primero=primeiro
+único=único
+verdadero=verdadeiro
+falso=falso
+limpio=limpo
+sucio=sujo
+peligroso=perigoso
+seguro=seguro
+amable=gentil
+educado=educado
+cómodo=confortável
+incómodo=desconfortável
+despacio=devagar
+deprisa=depressa
+suave=suave
+duro=duro
+blando=macio
+nuevo=novo
+antiguo=antigo
+moderno=moderno
+dulce=doce
+cariño=querido(a), amor (tratamento carinhoso)
+
+## Complementos
+individual=individual
+depender=depender|depende,dependen,dependía,dependido
+garaje=garagem
+paisaje=paisagem
+casa=casa
+en casa=em casa
+particípio=particípio (termo gramatical)
+</script>
 
 <script>
 /* ============================================================
@@ -771,6 +2165,24 @@ const LEVELS = [[0,"Turista"],[60,"Fan de las tapas"],[160,"Habitual del bar"],[
 
 const LOLA = `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="36" r="21" fill="#f1c6a0"/><path d="M11 38c-1-18 9-28 21-28s22 10 21 28c-3-11-9-16-21-16S14 27 11 38z" fill="#2a1a12"/><path d="M11 38c0 6 2 10 4 12-1-6 0-10 1-13z M53 38c0 6-2 10-4 12 1-6 0-10-1-13z" fill="#2a1a12"/><circle cx="24.5" cy="37" r="2.4" fill="#2a1a12"/><circle cx="39.5" cy="37" r="2.4" fill="#2a1a12"/><path d="M23 45c5 5 13 5 18 0" stroke="#b0302a" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="21" cy="42" r="2.5" fill="#f3a08c" opacity=".6"/><circle cx="43" cy="42" r="2.5" fill="#f3a08c" opacity=".6"/><circle cx="50" cy="22" r="5.5" fill="#d9372b"/><circle cx="50" cy="22" r="2" fill="#f6c453"/></svg>`;
 
+const WICON = {
+ 1:`<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01M15 9h.01"/>`,
+ 2:`<path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>`,
+ 3:`<path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8zM6 1v3M10 1v3M14 1v3"/>`,
+ 4:`<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>`,
+ 5:`<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>`,
+ 6:`<path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/>`,
+ 7:`<path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M6 8v9"/>`,
+ 8:`<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/>`,
+ 9:`<path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>`,
+ 10:`<path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0z"/>`,
+ 11:`<circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/>`,
+ 12:`<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>`,
+ 13:`<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>`,
+ 14:`<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/>`
+};
+const wicon = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${WICON[n]||WICON[1]}</svg>`;
+
 const TOTAL_WEEKS = WEEKS.length;
 const INTERVALS = [0,1,3,7,14,30,60];
 
@@ -784,6 +2196,73 @@ FALSOS.forEach((c,i) => CARDS.push({id:`fa-${i}`, es:c[0], pt:c[1], note:c[2] ? 
 CARDS.sort((a,b)=>a.ord-b.ord);
 const BYID = Object.fromEntries(CARDS.map(c=>[c.id,c]));
 const KITCARDS = KIT.map(k=>CARDS.find(c=>c.es===k)).filter(Boolean);
+
+/* ============================================================
+   DICIONÁRIO (toque numa palavra)
+   ============================================================ */
+const DICT = {};            // palavra → {pt, lemma}
+const DICTN = {};           // sem acento → palavra
+const strip = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+(function buildDict(){
+  const src = (document.getElementById("dict")||{}).textContent || "";
+  src.split("\n").forEach(line=>{
+    line=line.trim(); if(!line || line[0]==="#") return;
+    const eq=line.indexOf("="); if(eq<0) return;
+    const w=line.slice(0,eq).trim().toLowerCase(); let rest=line.slice(eq+1);
+    let forms=[]; const bar=rest.indexOf("|"); if(bar>=0){ forms=rest.slice(bar+1).split(",").map(x=>x.trim().toLowerCase()).filter(Boolean); rest=rest.slice(0,bar); }
+    const pt=rest.trim();
+    if(!DICT[w]) DICT[w]={pt}; else if(!DICT[w].lemma) DICT[w].pt = DICT[w].pt;   // primeira definição direta vence
+    forms.forEach(f=>{ if(!DICT[f]) DICT[f]={pt, lemma:w}; });
+  });
+  Object.keys(DICT).forEach(k=>{ const n=strip(k); if(!DICTN[n]) DICTN[n]=k; });
+})();
+function dictLookup(raw){
+  const w0=(raw||"").toLowerCase().replace(/[^a-záéíóúñü]/g,""); if(!w0) return null;
+  const tryW = w => { if(DICT[w]) return {w, ...DICT[w]}; const n=DICTN[strip(w)]; if(n) return {w:n, ...DICT[n]}; return null; };
+  const cands=[w0];
+  if(w0.length>3){
+    if(/es$/.test(w0)) cands.push(w0.slice(0,-2), w0.slice(0,-2)+"e");                 // plurais
+    if(/s$/.test(w0)) cands.push(w0.slice(0,-1));
+    if(/a$/.test(w0)) cands.push(w0.slice(0,-1)+"o");                                   // feminino
+    if(/as$/.test(w0)) cands.push(w0.slice(0,-2)+"o", w0.slice(0,-2)+"a");
+    if(/os$/.test(w0)) cands.push(w0.slice(0,-2)+"o");
+    if(/mente$/.test(w0)) cands.push(w0.slice(0,-5), w0.slice(0,-5).replace(/a$/,"o"));  // advérbios
+    if(/(ísimo|ísima|ísimos|ísimas)$/.test(w0)) cands.push(w0.replace(/(ísimo|ísima|ísimos|ísimas)$/,"o"), w0.replace(/(ísimo|ísima|ísimos|ísimas)$/,"e"), w0.replace(/qu(ísimo|ísima)$/,"co"), w0.replace(/gu(ísimo|ísima)$/,"go"));
+    if(/(ito|ita|itos|itas|illo|illa)$/.test(w0)) cands.push(w0.replace(/(ito|ita|itos|itas|illo|illa)$/,"o"), w0.replace(/(ito|ita|itos|itas|illo|illa)$/,"a"), w0.replace(/c(ito|ita)$/,""), w0.replace(/qu(ito|ita)$/,"co"));
+  }
+  for(const c of cands){ const hit=tryW(c); if(hit){ let note=""; if(hit.lemma) note=`forma de ${hit.lemma}`; else if(c!==w0) note=`de ${hit.w}`; return {w:w0, pt:hit.pt, note, lemma:hit.lemma||hit.w}; } }
+  return null;
+}
+/* envolve cada palavra em <span class="w"> para ficar clicável */
+function W(t){ return String(t==null?"":t).split(/([A-Za-zÁÉÍÓÚÑÜáéíóúñü]+)/).map((p,i)=> i%2 ? `<span class="w">${h(p)}</span>` : h(p)).join(""); }
+function Wi(html){ return String(html).replace(/<i>([^<]*)<\/i>/g, (m,inner)=>`<i>${W(inner)}</i>`); }
+let SAMPLE=null, sampleTried=false;
+async function getSample(){ if(sampleTried) return SAMPLE; sampleTried=true; try{ if(window.claude && typeof window.claude.use==="function") SAMPLE=await window.claude.use("sample"); }catch(e){ SAMPLE=null; } return SAMPLE; }
+let dicTimer=null;
+function showDict(word, context){
+  const el=$("#dic"); const hit=dictLookup(word);
+  const inDrill = !$("#drill").hidden;
+  el.className = "dic"+(inDrill?" hi":"");
+  const wr = `https://www.wordreference.com/espt/${encodeURIComponent(word.toLowerCase())}`;
+  el.innerHTML = `<button class="dx" data-act="dicclose" aria-label="Fechar">${ICON.x}</button>
+    <div class="dw">${h(word)}${sayBtn(word)}</div>
+    ${hit ? `<div class="dpt">${h(hit.pt)}</div>${hit.note?`<div class="dnote">${h(hit.note)}</div>`:""}`
+          : `<div class="dpt" style="opacity:.8">Essa não está no meu dicionário.</div>`}
+    <div class="drow">${!hit ? `<button data-act="asklola" data-w="${h(word)}" data-ctx="${h(context||"")}" id="asklola" hidden>Perguntar à Lola</button>` : ""}<a href="${wr}" target="_blank" rel="noopener">Ver no WordReference ↗</a>${hit && hit.lemma && hit.lemma!==word.toLowerCase() ? `<button data-act="dictword" data-w="${h(hit.lemma)}">${h(hit.lemma)}</button>`:""}</div>`;
+  el.hidden=false;
+  if(!hit) getSample().then(sm=>{ const b=$("#asklola"); if(sm && b) b.hidden=false; });
+  clearTimeout(dicTimer);
+}
+function hideDict(){ $("#dic").hidden=true; }
+async function askLola(word, ctx){
+  const sm=await getSample(); const b=$("#asklola"); if(!sm) return;
+  if(b){ b.textContent="Lola pensando…"; b.disabled=true; }
+  try{
+    const res = await sm(`Você é professora de espanhol da Espanha para brasileiros. Traduza a palavra espanhola "${word}"${ctx?` como usada na frase "${ctx}"`:""} para português do Brasil. Responda em uma linha curta: a tradução, e entre parênteses o infinitivo se for verbo conjugado. Sem explicações extras.`, {modelTier:"quick"});
+    const out=$("#dic .dpt"); if(out){ out.style.opacity=1; out.textContent=(res.text||"").trim(); }
+    if(b) b.remove();
+  }catch(e){ if(b){ b.textContent = e && e.code==="not_granted" ? "Lola não pôde ajudar" : "Tente de novo"; b.disabled=false; } }
+}
 
 /* ============================================================
    DATAS
@@ -1029,7 +2508,7 @@ const ICON = {
 const slowBtn = t => canSpeak ? `<button class="slowbtn" data-act="slow" data-say="${h(t)}">Devagar</button>` : "";
 const sayRow = (t, lg) => `<div class="row" style="justify-content:center">${sayBtn(t,lg)}${slowBtn(t)}</div>`;
 const sayBtn = (t, lg) => canSpeak ? `<button class="say${lg?" lg":""}" data-act="say" data-say="${h(t)}" aria-label="Ouvir">${ICON.say}</button>` : "";
-function phraseRow(c){ return `<div class="phrase"><div class="txt"><div class="es">${c.kind==="fa"?'<span class="tag">falso amigo</span>':""}${h(c.es)}</div><div class="pt">${h(c.pt)}</div>${c.note?`<div class="note">${h(c.note)}</div>`:""}</div>${sayBtn(c.es)}</div>`; }
+function phraseRow(c){ return `<div class="phrase"><div class="txt"><div class="es">${c.kind==="fa"?'<span class="tag">falso amigo</span>':""}${W(c.es)}</div><div class="pt">${h(c.pt)}</div>${c.note?`<div class="note">${h(c.note)}</div>`:""}</div>${sayBtn(c.es)}</div>`; }
 let toastT;
 function toast(msg){ const t=$("#toast"); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true, 2200); }
 const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
@@ -1071,11 +2550,12 @@ function renderHoje(){
   const lv = level();
   const lvPct = lv.hi ? Math.round(100*(lv.x-lv.lo)/(lv.hi-lv.lo)) : 100;
   $("#v-hoje").innerHTML = `
-    <div class="lola"><div class="av">${LOLA}</div><button class="bubble" data-act="say" data-say="${h(lola.es)}"><div class="name">Lola</div><div class="es">${h(lola.es)}</div><div class="pt">${h(lola.pt)}</div></button></div>
+    <div class="lola"><div class="av">${LOLA}</div><button class="bubble" data-act="say" data-say="${h(lola.es)}"><div class="name">Lola · toque numa palavra</div><div class="es">${W(lola.es)}</div><div class="pt">${h(lola.pt)}</div></button></div>
     <div class="card hero-week stack">
       <div>
+        <div class="wicon">${wicon(w.n)}</div>
         <div class="eyebrow">Semana ${w.n} · ${fmtShort(weekStart(w.n))} a ${fmtShort(weekStart(w.n)+6)}</div>
-        <h2 style="margin-top:6px">${h(w.title)}</h2>
+        <h2 style="margin-top:6px">${W(w.title)}</h2>
         <p class="sub">${h(w.sub)}</p>
       </div>
       <div class="stack" style="gap:6px">
@@ -1088,29 +2568,27 @@ function renderHoje(){
         : `<button class="btn wide two" data-act="session">${todayDone?"Continuar a sessão de hoje":"¡Vamos! Sessão de hoje"} <span class="ct">${nw} novas · ${due} revisões · ≈ ${sessionMinutes(nw,due)} min</span></button>${convBtn}`}
     </div>
     ${behind ? `<div class="card small"><b>A viagem chega antes do fim do plano.</b> <span class="muted">Faltam ${daysLeft} dias e ${weeksLeftPlan} semanas de conteúdo. Você pode adiantar semanas na aba Plan.</span></div>`:""}
-    <div class="stats">
-      <div class="stat"><b>${streak()>=3?'<span class="flame">🔥</span> ':""}${streak()}</b><span>dias seguidos</span></div>
-      <div class="stat"><b>${learnedCount()}</b><span>frases aprendidas</span></div>
-      <div class="stat"><b>${spokenTotal()}</b><span>falas em voz alta</span></div>
-    </div>
-    ${PR.list.length>1 ? rankCard() : `<button class="card" style="text-align:left;width:100%;cursor:pointer" data-act="pasajeros"><div class="eyebrow">Competir</div><p class="small" style="margin-top:4px"><b>Adicione um segundo passageiro</b> <span class="muted">para ter ranking da semana, troféus e duelos.</span></p></button>`}
-    <div class="card level stack" style="gap:8px">
-      <div class="spread"><span class="eyebrow">Nível ${lv.i+1}</span><span class="small muted" style="font-variant-numeric:tabular-nums">${lv.x} XP${lv.hi?` · faltam ${lv.hi-lv.x}`:""}</span></div>
-      <div class="ttl">${h(lv.title)}</div>
-      <div class="meter"><span style="width:${lvPct}%"></span></div>
-      <p class="small muted">${lv.hi ? `Próximo nível: ${h(LEVELS[lv.i+1][1])}. Cada fala em voz alta vale 2 XP, cada missão 25.` : "Nível máximo. ¡Olé!"}</p>
-    </div>
-    <div class="card">
-      <div class="spread"><span class="eyebrow">Últimos 7 dias</span><span class="small muted">meta: ${S.daily} novas/dia</span></div>
+    <div class="card stack" style="gap:12px">
+      <div class="stats">
+        <div class="stat"><b>${streak()>=3?'<span class="flame">🔥</span>':""}${streak()}</b><span>dias seguidos</span></div>
+        <div class="stat"><b>${learnedCount()}</b><span>frases aprendidas</span></div>
+        <div class="stat"><b>${spokenTotal()}</b><span>falas em voz alta</span></div>
+      </div>
       <div class="days">${daysHtml}</div>
     </div>
-    ${fdd ? `<div class="card stack" style="gap:8px"><div class="eyebrow">Frase do dia</div>${phraseRow(fdd)}</div>`:""}
-    <div class="card stack" style="gap:6px"><div class="eyebrow">¿Sabías que…?</div><p class="fact">${daily(FACTS)}</p></div>
+    ${PR.list.length>1 ? rankCard() : `<button class="card tint-g" style="text-align:left;width:100%;cursor:pointer" data-act="pasajeros"><p class="small"><b>Quer competir?</b> Adicione um segundo passageiro em PASAJERO.</p></button>`}
+    <div class="card level tint-s stack" style="gap:8px">
+      <div class="spread"><span class="eyebrow">Nível ${lv.i+1} · ${lv.x} XP</span><span class="small muted" style="font-variant-numeric:tabular-nums">${lv.hi?`faltam ${lv.hi-lv.x} para ${h(LEVELS[lv.i+1][1])}`:"nível máximo"}</span></div>
+      <div class="ttl">${W(lv.title)}</div>
+      <div class="meter" style="background:rgba(0,0,0,.08)"><span style="width:${lvPct}%"></span></div>
+    </div>
+    ${fdd ? `<div class="card stack" style="gap:8px"><div class="eyebrow">Frase do dia</div>${phraseRow(fdd)}<div class="dichint">${ICON.say.replace('<svg','<svg width="14" height="14"')} Ouça, e toque em qualquer palavra em espanhol para ver o significado.</div></div>`:""}
+    <div class="card tint-c stack" style="gap:6px"><div class="eyebrow">¿Sabías que…?</div><p class="fact">${daily(FACTS)}</p></div>
     <div class="card stack" style="gap:8px">
       <div class="eyebrow">Missão da semana</div>
       <div class="mission"><input type="checkbox" id="m-home-${w.n}" data-act="mission" data-week="${w.n}" ${S.missions[w.n]?"checked":""}><label for="m-home-${w.n}">${h(w.mission)}</label></div>
     </div>
-    <div class="card stack" style="gap:10px">
+    <div class="card plain stack" style="gap:10px">
       <div class="spread"><span class="eyebrow">Conquistas</span><span class="small muted">${BADGES.filter(b=>S.badges[b.id]).length} / ${BADGES.length}</span></div>
       <div class="badges">${BADGES.map(b=>`<div class="badge${S.badges[b.id]?" on":""}" title="${h(b.d)}"><span class="ic">${h(b.g)}</span><b>${h(b.t)}</b><span>${h(b.d)}</span></div>`).join("")}</div>
     </div>`;
@@ -1127,17 +2605,18 @@ function renderPlano(){
     const pill = status==="done" ? `<span class="pill ok">concluída</span>` : status==="now" ? `<span class="pill now">agora</span>` : status==="past" ? `<span class="pill soon">${wp.seen}/${wp.total}</span>` : `<span class="pill soon">em breve</span>`;
     const open = openWeek===w.n;
     const body = !open ? "" : `<div class="wbody">
-      <div class="tip">${w.tip}</div>
+      <div class="tip">${Wi(w.tip)}</div>
       <div class="stack" style="gap:6px">
         <div class="spread"><span class="eyebrow">Diálogo</span>${canSpeak?`<button class="btn soft" style="min-height:38px;padding:8px 12px" data-act="dialog" data-week="${w.n}">${ICON.say.replace('<svg','<svg width="18" height="18"')} Ouvir tudo</button>`:""}</div>
         <button class="btn saff wide" data-act="conv" data-week="${w.n}">Praticar esta conversa falando</button>
-        <div class="dlg">${w.dialog.map(l=>`<button class="line" data-act="say" data-say="${h(l[1])}"><span class="who">${h(l[0])}</span><span><span class="es">${h(l[1])}</span><br><span class="pt">${h(l[2])}</span></span></button>`).join("")}</div>
+        <div class="dlg">${w.dialog.map(l=>{ const mine=l[0]===(w.me||"A"); return `<div class="msg${mine?" r":""}"><div class="bub"><div class="who">${h(l[0])}${mine?" · você":""}</div><div class="es">${W(l[1])}</div><div class="pt">${h(l[2])}</div></div>${sayBtn(l[1])}</div>`; }).join("")}</div>
+        <p class="small muted">Toque numa palavra para ver o que significa.</p>
       </div>
       <div class="mission"><input type="checkbox" id="m-${w.n}" data-act="mission" data-week="${w.n}" ${S.missions[w.n]?"checked":""}><label for="m-${w.n}"><b>Missão:</b> ${h(w.mission)}</label></div>
       <div><div class="eyebrow">Frases (${CARDS.filter(c=>c.week===w.n).length})</div><div class="list">${CARDS.filter(c=>c.week===w.n).map(phraseRow).join("")}</div></div>
       ${w.n>cw ? `<button class="btn ghost wide" data-act="unlock" data-week="${w.n}">Adiantar: liberar esta semana no treino</button>` : `<button class="btn soft wide" data-act="quiz" data-week="${w.n}">Quiz desta semana</button>`}
     </div>`;
-    return `<div class="week ${status}"><button class="head" data-act="toggleweek" data-week="${w.n}" aria-expanded="${open}"><span class="wnum">${String(w.n).padStart(2,"0")}</span><span><span class="wtitle">${h(w.title)}</span><br><span class="wdates">${fmtShort(weekStart(w.n))} – ${fmtShort(weekStart(w.n)+6)} · ${h(w.sub)}</span></span>${pill}</button>${body}</div>`;
+    return `<div class="week ${status}"><button class="head" data-act="toggleweek" data-week="${w.n}" aria-expanded="${open}"><span class="wnum">${wicon(w.n)}</span><span><span class="wtitle">${W(w.title)}</span><br><span class="wdates">${fmtShort(weekStart(w.n))} – ${fmtShort(weekStart(w.n)+6)} · ${h(w.sub)}</span></span>${pill}</button>${body}</div>`;
   }).join("");
   $("#v-plano").innerHTML = `<div><h2 style="font-size:24px">Plano de ${TOTAL_WEEKS} semanas</h2><p class="muted small" style="margin-top:4px">Uma semana por tema, 5 a 10 minutos por noite. As primeiras semanas são o que você mais vai usar: pedir ajuda, aeroporto e estação, café, comida e direções. Toque numa semana para ver a explicação, o diálogo e as frases.</p></div>${items}`;
 }
@@ -1152,11 +2631,11 @@ function renderTreino(){
     <button class="btn saff wide two" data-act="conv">Conversa: ${h(WEEKS[curWeek()-1].title)} <span class="ct">o app faz uma parte, você responde falando</span></button>
     <div class="eyebrow" style="margin-top:4px">Falar e ouvir</div>
     <div class="tiles">
-      <button class="tile" data-act="eco" ${canSpeak?"":"disabled"}><span class="ic">${ICON.repeat}</span><b>Eco</b><span>Ouça e repita junto, devagar e no ritmo normal</span></button>
-      <button class="tile" data-act="sons" ${canSpeak?"":"disabled"}><span class="ic">${ICON.mouth}</span><b>Sons difíceis</b><span>Os sons que denunciam o sotaque brasileiro</span></button>
-      <button class="tile" data-act="listen" ${canSpeak?"":"disabled"}><span class="ic">${ICON.ear}</span><b>Escuta</b><span>Ouça e escolha o significado</span></button>
-      <button class="tile" data-act="conv" data-pick="1"><span class="ic">${ICON.talk}</span><b>Outras conversas</b><span>Repita os diálogos das semanas anteriores</span></button>
-      <button class="tile" data-act="duel" style="background:var(--saffron-soft);border-color:transparent"><span class="ic" style="background:var(--saffron);color:var(--on-saffron)">${ICON.trophy}</span><b>Duelo</b><span>${PR.list.length>1?"Quiz a dois passando o celular":"Adicione um 2º passageiro para duelar"}</span></button>
+      <button class="tile t-c" data-act="eco" ${canSpeak?"":"disabled"}><span class="ic">${ICON.repeat}</span><b>Eco</b><span>Ouça e repita junto, devagar e no ritmo normal</span></button>
+      <button class="tile t-s" data-act="sons" ${canSpeak?"":"disabled"}><span class="ic">${ICON.mouth}</span><b>Sons difíceis</b><span>Os sons que denunciam o sotaque brasileiro</span></button>
+      <button class="tile t-g" data-act="listen" ${canSpeak?"":"disabled"}><span class="ic">${ICON.ear}</span><b>Escuta</b><span>Ouça e escolha o significado</span></button>
+      <button class="tile t-r" data-act="conv" data-pick="1"><span class="ic">${ICON.talk}</span><b>Outras conversas</b><span>Repita os diálogos das semanas anteriores</span></button>
+      <button class="tile t-s" data-act="duel"><span class="ic">${ICON.trophy}</span><b>Duelo</b><span>${PR.list.length>1?"Quiz a dois passando o celular":"Adicione um 2º passageiro para duelar"}</span></button>
     </div>
     <div class="eyebrow" style="margin-top:4px">Reforço</div>
     <div class="tiles">
@@ -1175,7 +2654,7 @@ function renderFrases(){
   const chips = [["all","Todas"],["kit","Kit de sobrevivência"],["fa","Falsos amigos"],...WEEKS.map(w=>[String(w.n), w.title])];
   $("#v-frases").innerHTML = `
     <div><h2 style="font-size:24px">Guia de frases</h2><p class="muted small" style="margin-top:4px">Todas as frases do plano, para consultar na viagem. Funciona sem internet.</p></div>
-    <input class="search" id="q" type="search" placeholder="Buscar em português ou espanhol" value="${h(phraseQuery)}" autocomplete="off">
+    <input class="search" id="q" type="search" placeholder="Buscar frase ou palavra (ex.: andén)" value="${h(phraseQuery)}" autocomplete="off">
     <div class="chips">${chips.map(([k,l])=>`<button class="chip${phraseFilter===k?" on":""}" data-act="chip" data-k="${k}">${h(l)}</button>`).join("")}</div>
     <div id="phr-list" class="stack"></div>`;
   renderPhraseList();
@@ -1188,13 +2667,15 @@ function renderPhraseList(){
   if(phraseFilter==="kit") groups.push(["Kit de sobrevivência: as 24 frases que resolvem", cs]);
   else if(phraseFilter==="fa") groups.push(["Falsos amigos", cs]);
   else WEEKS.forEach(w=>{ const g=cs.filter(c=>c.week===w.n && (c.kind==="v" || phraseFilter==="all")); if(g.length) groups.push([w.title, g]); });
-  $("#phr-list").innerHTML = groups.length ? groups.map(([t,g])=>`<div class="card group"><h3>${h(t)}</h3><div class="list">${g.map(phraseRow).join("")}</div></div>`).join("") : `<div class="card muted">Nada encontrado para “${h(phraseQuery)}”.</div>`;
+  const dh = q && !q.includes(" ") ? dictLookup(phraseQuery.trim()) : null;
+  const dictHtml = dh ? `<div class="card tint-s stack" style="gap:4px"><div class="eyebrow">Dicionário</div><div class="row" style="gap:8px"><span class="es" style="font-size:22px">${h(dh.w)}</span>${sayBtn(dh.w)}</div><div style="font-size:17px">${h(dh.pt)}</div>${dh.note?`<div class="small muted">${h(dh.note)}</div>`:""}</div>` : "";
+  $("#phr-list").innerHTML = dictHtml + (groups.length ? groups.map(([t,g])=>`<div class="card group"><h3>${h(t)}</h3><div class="list">${g.map(phraseRow).join("")}</div></div>`).join("") : (dictHtml ? "" : `<div class="card muted">Nada encontrado para “${h(phraseQuery)}”.</div>`));
 }
 
 let tab = "hoje";
 function renderAll(){ renderBoard(); renderHoje(); renderPlano(); renderTreino(); if(tab==="frases") renderPhraseList(); checkBadges(); }
 function showTab(t){
-  tab = t;
+  hideDict(); tab = t;
   ["hoje","plano","treino","frases"].forEach(k=>{ $("#v-"+k).hidden = k!==t; });
   document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.toggle("on", b.dataset.tab===t));
   if(t==="frases" && !$("#q")) renderFrases();
@@ -1206,7 +2687,7 @@ function showTab(t){
    ============================================================ */
 let D = null; // treino atual
 function openDrill(d){ D = d; D.i = 0; D.score = 0; D.revealed = false; D.total = d.items.length; $("#drill").hidden = false; document.body.style.overflow="hidden"; drawDrill(); }
-function closeDrill(){ D = null; $("#drill").hidden = true; document.body.style.overflow=""; try{ speechSynthesis.cancel(); }catch(e){} renderAll(); }
+function closeDrill(){ hideDict(); D = null; $("#drill").hidden = true; document.body.style.overflow=""; try{ speechSynthesis.cancel(); }catch(e){} renderAll(); }
 function drillTop(){ const pct = D.items.length ? Math.round(100*D.i/D.items.length) : 100;
   return `<div class="top"><button class="x" data-act="closedrill" aria-label="Fechar">${ICON.x}</button><div class="meter"><span style="width:${pct}%"></span></div><span class="count">${Math.min(D.i+1,D.items.length)}/${D.items.length}</span></div>`; }
 
@@ -1289,33 +2770,33 @@ function drawDrill(){
   let stage = "", actions = "";
   if(it.t==="learn"){
     if(!it.played){ it.played=true; speak(c.es); }
-    stage = `<div class="flash"><span class="kind">${c.kind==="fa"?"Falso amigo":"Frase nova"} · ouça e repita em voz alta</span><div class="big">${h(c.es)}</div>${sayRow(c.es,true)}<hr><div class="ans" style="color:var(--muted)">${h(c.pt)}</div>${c.note?`<div class="note">${h(c.note)}</div>`:""}</div>`;
+    stage = `<div class="flash"><span class="kind">${c.kind==="fa"?"Falso amigo":"Frase nova"} · ouça e repita em voz alta</span><div class="big">${W(c.es)}</div>${sayRow(c.es,true)}<hr><div class="ans" style="color:var(--muted)">${h(c.pt)}</div>${c.note?`<div class="note">${h(c.note)}</div>`:""}</div>`;
     actions = `<div class="actions"><button class="btn wide" data-act="learned">¡Dicho! Próxima</button></div>`;
   } else if(it.t==="test"){
     const oral = it.dir==="pt";
     if(!oral && !it.played){ it.played=true; speak(c.es); }
     const front = oral ? c.pt : c.es;
     const back = oral ? c.es : c.pt;
-    stage = `<div class="flash"><span class="kind">${oral?"Diga em voz alta, em espanhol":"Ouça: o que significa?"}</span><div class="big ${oral?"pt":""}">${h(front)}</div>${!oral?sayBtn(c.es,true):""}${heardHtml(it)}${D.revealed?`<hr><div class="ans">${h(back)}</div>${oral?sayRow(c.es):""}${c.note?`<div class="note">${h(c.note)}</div>`:""}`:""}</div>`;
+    stage = `<div class="flash"><span class="kind">${oral?"Diga em voz alta, em espanhol":"Ouça: o que significa?"}</span><div class="big ${oral?"pt":""}">${oral?h(front):W(front)}</div>${!oral?sayBtn(c.es,true):""}${heardHtml(it)}${D.revealed?`<hr><div class="ans">${oral?W(back):h(back)}</div>${oral?sayRow(c.es):""}${c.note?`<div class="note">${h(c.note)}</div>`:""}`:""}</div>`;
     actions = D.revealed
       ? `<div class="actions three"><button class="btn bad" data-act="grade" data-g="bad">Não saiu</button><button class="btn soft" data-act="grade" data-g="mid">Quase</button><button class="btn ok" data-act="grade" data-g="good">${oral?"Falei bem":"Entendi"}</button></div>`
       : `<div class="actions${MIC&&oral?" duo":""}">${MIC&&oral?micBtn(it):""}<button class="btn wide" data-act="reveal">${oral?"Já falei: ouvir a resposta":"Mostrar significado"}</button></div>`;
   } else if(it.t==="theirs"){
     if(!it.played){ it.played=true; speak(it.line[1]); }
     const nextMine = D.items[D.i+1] && D.items[D.i+1].t==="mine";
-    stage = `<div class="flash"><span class="kind">${h(it.line[0])} fala</span><div class="big">${h(it.line[1])}</div>${sayRow(it.line[1],true)}<hr><div class="pt">${h(it.line[2])}</div></div>`;
+    stage = `<div class="flash"><span class="kind">${h(it.line[0])} fala</span><div class="big">${W(it.line[1])}</div>${sayRow(it.line[1],true)}<hr><div class="pt">${h(it.line[2])}</div></div>`;
     actions = `<div class="actions"><button class="btn wide" data-act="next">${nextMine?"Sua vez de responder":"Continuar"}</button></div>`;
   } else if(it.t==="mine"){
-    stage = `${it.prev?`<div class="ctx">${h(it.prev[0])}: “${h(it.prev[1])}”</div>`:""}<div class="flash"><span class="kind">Sua fala · diga em espanhol</span><div class="big pt">${h(it.line[2])}</div>${heardHtml(it)}${D.revealed?`<hr><div class="ans">${h(it.line[1])}</div>${sayRow(it.line[1])}<p class="small muted">Repita imitando a entonação.</p>`:""}</div>`;
+    stage = `${it.prev?`<div class="ctx">${h(it.prev[0])}: “${h(it.prev[1])}”</div>`:""}<div class="flash"><span class="kind">Sua fala · diga em espanhol</span><div class="big pt">${h(it.line[2])}</div>${heardHtml(it)}${D.revealed?`<hr><div class="ans">${W(it.line[1])}</div>${sayRow(it.line[1])}<p class="small muted">Repita imitando a entonação.</p>`:""}</div>`;
     actions = D.revealed ? `<div class="actions"><button class="btn wide" data-act="next">Próxima fala</button></div>`
       : `<div class="actions${MIC?" duo":""}">${MIC?micBtn(it):""}<button class="btn wide" data-act="reveal">Já falei: ouvir o certo</button></div>`;
   } else if(it.t==="eco"){
     if(!it.played){ it.played=true; speak(c.es); }
-    stage = `<div class="flash"><span class="kind">Eco · ouça e repita junto</span><div class="big">${h(c.es)}</div>${sayRow(c.es,true)}<hr><div class="pt">${h(c.pt)}</div><p class="small muted">Repita 3 vezes: devagar, no ritmo normal e de olhos fechados.</p></div>`;
+    stage = `<div class="flash"><span class="kind">Eco · ouça e repita junto</span><div class="big">${W(c.es)}</div>${sayRow(c.es,true)}<hr><div class="pt">${h(c.pt)}</div><p class="small muted">Repita 3 vezes: devagar, no ritmo normal e de olhos fechados.</p></div>`;
     actions = `<div class="actions"><button class="btn wide" data-act="spoke">Repeti, próxima</button></div>`;
   } else if(it.t==="som"){
     const x = it.s;
-    stage = `<div class="flash" style="text-align:left;align-items:stretch"><span class="kind">Som difícil</span><div class="big" style="font-size:26px">${h(x.t)}</div><p>${h(x.d)}</p><div class="opts">${x.ex.map(e=>`<button class="opt" data-act="say" data-say="${h(e)}">${ICON.say}${h(e)}</button>`).join("")}</div><p class="small muted">Toque em cada uma, ouça e repita em voz alta.</p></div>`;
+    stage = `<div class="flash" style="text-align:left;align-items:stretch"><span class="kind">Som difícil</span><div class="big" style="font-size:26px">${h(x.t)}</div><p>${h(x.d)}</p><div class="opts">${x.ex.map(e=>`<button class="opt" data-act="say" data-say="${h(e)}">${ICON.say}${W(e)}</button>`).join("")}</div><p class="small muted">Toque em cada uma, ouça e repita em voz alta.</p></div>`;
     actions = `<div class="actions"><button class="btn wide" data-act="spoke">Repeti todas, próximo som</button></div>`;
   } else if(it.t==="turn"){
     stage = `<div class="flash"><span class="kind">Duelo · ${D.dscore[D.players[0].id]} × ${D.dscore[D.players[1].id]}</span><div class="av" style="width:84px;height:84px">${faceOf(it.who.id)}</div><div class="big">Vez de ${h(it.who.name)}</div><p class="muted">Passe o celular. Vale 1 ponto por acerto.</p></div>`;
@@ -1415,8 +2896,19 @@ function applySettings(){
    EVENTOS
    ============================================================ */
 document.addEventListener("click", e=>{
+  const wd = e.target.closest(".w");
+  if(wd && !e.target.closest('[data-act="pick"]')){
+    e.preventDefault(); e.stopPropagation();
+    document.querySelectorAll(".w.hit").forEach(x=>x.classList.remove("hit")); wd.classList.add("hit");
+    const ctxEl = wd.closest(".es,.big,.ans,.bub,.opt,.ttl,.wtitle,i"); showDict(wd.textContent, ctxEl ? ctxEl.textContent.trim() : "");
+    return;
+  }
+  if(!e.target.closest("#dic") && !$("#dic").hidden) hideDict();
   const el = e.target.closest("[data-act]"); if(!el) return;
   const act = el.dataset.act;
+  if(act==="dicclose"){ hideDict(); return; }
+  if(act==="dictword"){ showDict(el.dataset.w, ""); return; }
+  if(act==="asklola"){ askLola(el.dataset.w, el.dataset.ctx); return; }
   if(act==="mission") return; // tratado no change
   switch(act){
     case "tab": showTab(el.dataset.tab); break;
