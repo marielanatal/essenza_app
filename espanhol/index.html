@@ -2639,6 +2639,41 @@ async function sharePlacar(){
   try{ await navigator.clipboard.writeText(text+url); toast("Link copiado. Cole no WhatsApp."); }
   catch(e){ const ta=$("#s-inv"); if(ta){ ta.value=url; ta.select(); } toast("Copie o link do campo abaixo."); }
 }
+/* Backup completo (todos os perfis deste celular) num link: abrir o link restaura tudo */
+function packState(st){
+  const cards=Object.entries(st.cards||{}).map(([id,c])=>`${id}.${c.b}.${c.d-20000}`).join(";");
+  const log=Object.entries(st.log||{}).map(([k,l])=>`${numOf(k)-20000}:${l.n||0},${l.r||0},${l.q||0},${l.s||0},${l.c||0},${l.e||0}`).join(";");
+  return {n:st.name,st:st.start,tr:st.trip,de:st.dest,da:st.daily,ra:st.rate,so:st.sound?1:0,un:st.unlocked,mi:Object.keys(st.missions||{}).filter(k=>st.missions[k]).join(","),ba:Object.keys(st.badges||{}).filter(k=>st.badges[k]).join(","),cards,log,u:st.updatedAt||0};
+}
+function unpackState(x){
+  const st=defaults();
+  Object.assign(st,{name:x.n||"",start:x.st||st.start,trip:x.tr||st.trip,dest:x.de||st.dest,daily:x.da||st.daily,rate:x.ra||st.rate,sound:x.so!==0,unlocked:x.un||1,updatedAt:x.u||Date.now()});
+  (x.mi||"").split(",").filter(Boolean).forEach(k=>st.missions[k]=true);
+  (x.ba||"").split(",").filter(Boolean).forEach(k=>st.badges[k]=true);
+  (x.cards||"").split(";").filter(Boolean).forEach(e=>{ const [id,b,d]=e.split("."); st.cards[id]={b:+b,d:+d+20000}; });
+  (x.log||"").split(";").filter(Boolean).forEach(e=>{ const [k,v]=e.split(":"); const [n,r,q,s2,c,ee]=v.split(",").map(Number); st.log[keyFromNum(+k+20000)]={n,r,q,s:s2,c,e:ee}; });
+  return normalize(st);
+}
+function fullBackup(){ persistLocal(); const states={}; locals().forEach(pf=>{ states[pf.id]=packState(stateOf(pf.id)); }); return {v:2,t:Date.now(),uid:PR.uid,active:PR.active,list:PR.list,duels:PR.duels,viaje:PR.viaje,states}; }
+function backupLink(){ return APP_URL+"#bk="+b64e(fullBackup()); }
+function restoreBackup(bk){
+  if(!bk || bk.v!==2 || !bk.states) return false;
+  persistLocal(); clearTimeout(remoteTimer);
+  PR={list:bk.list||[], active:bk.active, duels:bk.duels||{}, viaje:bk.viaje||PR.viaje, uid:bk.uid||PR.uid, onboarded:true, lastBackup:Date.now()};
+  if(!PR.list.length) return false;
+  Object.entries(bk.states).forEach(([id,x])=>{ try{ localStorage.setItem(stateKey(id), JSON.stringify(unpackState(x))); }catch(e){} });
+  if(!PR.list.some(x=>x.id===PR.active && !x.remote)) PR.active=(locals()[0]||PR.list[0]).id;
+  saveProfiles(); S=loadState(stateKey(PR.active))||defaults(); remote=null; openWeek=null; renderAll(); connectRemote(); return true;
+}
+function parseBackup(text){ const m=String(text||"").match(/bk=([A-Za-z0-9_-]+)/); if(m){ try{ return b64d(m[1]); }catch(e){ return null; } } try{ const o=JSON.parse(text); if(o && o.cards) return {v:2,legacy:o}; if(o && o.v===2) return o; }catch(e){} return null; }
+async function shareBackup(){
+  const url=backupLink(); PR.lastBackup=Date.now(); saveProfiles();
+  const text="Backup do Rumbo a España. Guarde esta mensagem: para recuperar o progresso, basta abrir o link no celular. ";
+  try{ if(navigator.share){ await navigator.share({title:"Backup Rumbo a España", text, url}); toast("Backup salvo. Guarde a mensagem!"); return; } }catch(e){ if(e && e.name==="AbortError") return; }
+  try{ await navigator.clipboard.writeText(text+url); toast("Link de backup copiado. Cole nas Notas ou mande para você mesma."); }
+  catch(e){ const ta=$("#s-io"); if(ta){ ta.value=url; ta.select(); } toast("Copie o link do campo abaixo."); }
+}
+function backupAge(){ return PR.lastBackup ? Math.floor((Date.now()-PR.lastBackup)/864e5) : null; }
 function removeProfile(id){
   const pf=PR.list.find(x=>x.id===id); if(!pf) return;
   if(!pf.remote && locals().length<=1){ toast("Precisa ficar ao menos um perfil neste celular."); return; }
@@ -2935,6 +2970,7 @@ function renderHoje(){
   $("#v-hoje").innerHTML = `
     <div class="lola"><div class="av">${LOLA}</div><button class="bubble" data-act="say" data-say="${h(lola.es)}"><div class="name">Lola · toque numa palavra</div><div class="es">${W(lola.es)}</div><div class="pt">${h(lola.pt)}</div></button></div>
     <div class="todayhead"><h2>Hoje</h2><div class="wk">Semana ${w.n} · <a href="#" data-act="goweek" data-week="${w.n}">${h(w.title)}</a></div></div>
+    ${allDone && (backupAge()===null ? learnedCount()>=10 : backupAge()>=7) ? `<button class="card tint-s" style="text-align:left;width:100%" data-act="backup"><p class="small"><b>Faça um backup (leva 10 segundos).</b> ${IS_IOS?"No iPhone, apagar o app apaga o progresso. ":""}Toque aqui para gerar o link e guarde nas Notas ou no WhatsApp.</p></button>`:""}
     ${allDone ? `<div class="alldone"><div class="av" style="width:64px;height:64px;background:rgba(255,255,255,.2)">${LOLA}</div><div><div class="big">Feito por hoje. ¡Hasta mañana!</div><p>Rotina completa em ${streak()} ${streak()===1?"dia seguido":"dias seguidos"}. Se sobrar vontade, os treinos livres estão em Practicar.</p></div></div>` : ""}
     <div class="steps">${stepsHtml}<div class="stepfoot"><span>${doneN} de 3 · uns 10 minutos no total</span><span>Fale em voz alta de verdade</span></div></div>
     ${behind ? `<div class="card tint-s small"><b>A viagem chega antes do fim do plano.</b> Faltam ${daysLeft} dias e ${weeksLeftPlan} semanas de conteúdo. Você pode adiantar semanas na aba Plan.</div>`:""}
@@ -2975,6 +3011,7 @@ function openOnboarding(){
     <div class="pt-step"><span class="n">3</span><div><b>Toque numa palavra para traduzir</b><span>Qualquer palavra em espanhol no app abre o dicionário. E a aba Viaje monta o roteiro das cidades.</span></div></div>
     <div class="field"><label for="ob-name">Como posso te chamar?</label><input id="ob-name" maxlength="20" placeholder="Seu nome" value="${h(S.name && S.name!=="Jogador 1" ? S.name : "")}"></div>
     <button class="btn wide" data-act="obdone">¡Vamos!</button>
+    <button class="btn ghost wide" data-act="obrestore">Já usava o app? Restaurar meu progresso</button>
   </div>`;
   el.hidden=false;
   setTimeout(()=>{ const i=$("#ob-name"); if(i) i.focus(); }, 50);
@@ -3305,9 +3342,13 @@ function openSettings(){
         `<button class="btn soft" data-act="mictest">${ICON.mic} Testar microfone</button><div id="mic-test-out" class="hint">${SR ? (IS_IOS && STANDALONE ? "Você está no app instalado do iPhone. Se o teste falhar, abra o endereço no Safari: lá o microfone funciona." : "Toque para testar. Vou pedir permissão ao celular na primeira vez.") : "Este navegador não tem reconhecimento de voz. Use Chrome (Android) ou Safari (iPhone)."}</div>`}</div>
     <div class="field"><label class="row" style="gap:10px"><input type="checkbox" id="s-sound" style="width:22px;height:22px;accent-color:var(--cobalt)" ${S.sound?"checked":""}> Sons e vibração nos acertos</label></div>
     <p class="hint" id="s-sync">${remote?"Progresso sincronizado na sua conta Claude.":"Progresso salvo neste aparelho."}</p>
-    <div class="field"><label for="s-io">Backup do progresso</label><textarea id="s-io" placeholder="Cole aqui um backup para restaurar"></textarea>
-      <div class="row"><button class="btn soft" data-act="export" style="flex:1">Copiar backup</button><button class="btn ghost" data-act="import" style="flex:1">Restaurar</button></div>
-      <span class="hint">Use para levar seu progresso para outro aparelho.</span></div>
+    <div class="card tint-s stack" style="gap:8px">
+      <b>Backup do progresso</b>
+      <p class="small">${IS_IOS ? "No iPhone, apagar o app da tela inicial apaga também o progresso. " : ""}Salve um link de backup nas Notas ou mande para você mesma no WhatsApp. Para recuperar, basta abrir o link.${backupAge()!==null?` Último backup: ${backupAge()===0?"hoje":backupAge()===1?"ontem":"há "+backupAge()+" dias"}.`:" Você ainda não fez nenhum."}</p>
+      <button class="btn saff wide" data-act="backup">Salvar backup agora</button>
+      <div class="field" style="gap:4px"><textarea id="s-io" placeholder="Para restaurar: cole aqui o link de backup" style="min-height:60px;background:var(--surface);border:0"></textarea>
+      <button class="btn soft wide" data-act="import">Restaurar deste link</button></div>
+    </div>
     <button class="btn bad wide" data-act="reset" id="s-reset">Apagar todo o progresso</button>
   </div>`;
   el.hidden = false;
@@ -3427,9 +3468,11 @@ document.addEventListener("click", e=>{
     case "acc": { const a=$("#ans"); if(a){ const s=a.selectionStart??a.value.length, en=a.selectionEnd??a.value.length; a.value=a.value.slice(0,s)+el.dataset.a+a.value.slice(en); a.focus(); a.setSelectionRange(s+1,s+1); } break; }
     case "settings": openSettings(); break;
     case "closesheet": $("#sheet").hidden=true; break;
-    case "export": { const txt=JSON.stringify(S); const ta=$("#s-io"); ta.value=txt;
-      try{ navigator.clipboard.writeText(txt).then(()=>toast("Backup copiado"), ()=>{ ta.select(); toast("Selecionado: copie o texto"); }); }catch(err){ ta.select(); toast("Selecionado: copie o texto"); } break; }
-    case "import": { try{ const obj=JSON.parse($("#s-io").value); if(!obj || typeof obj!=="object" || !obj.cards) throw 0; S=normalize(obj); save(); renderAll(); $("#sheet").hidden=true; toast("Progresso restaurado"); }catch(err){ toast("Backup inválido: cole o texto completo copiado antes"); } break; }
+    case "backup": shareBackup(); break;
+    case "import": { const bk=parseBackup(($("#s-io")||{}).value); if(!bk){ toast("Não reconheci. Cole o link de backup inteiro."); break; }
+      if(bk.legacy){ S=normalize(bk.legacy); save(); renderAll(); $("#sheet").hidden=true; toast("Progresso restaurado"); break; }
+      if(restoreBackup(bk)){ $("#sheet").hidden=true; toast(`Progresso de ${me().name} restaurado. ¡Bienvenida de vuelta!`); } else toast("Esse backup está vazio ou é de outra versão."); break; }
+    case "obrestore": { $("#sheet").hidden=true; openSettings(); setTimeout(()=>{ const ta=$("#s-io"); if(ta){ ta.focus(); ta.scrollIntoView({block:"center"}); } }, 100); break; }
     case "reset": { if(!resetArmed){ resetArmed=true; el.textContent="Toque de novo para confirmar"; break; } const keep={trip:S.trip,dest:S.dest,name:S.name,sound:S.sound}; S=Object.assign(defaults(),keep); save(); renderAll(); $("#sheet").hidden=true; openWeek=null; toast("Progresso apagado"); break; }
   }
 });
@@ -3443,8 +3486,13 @@ $("#sheet").addEventListener("click", e=>{ if(e.target.id==="sheet") $("#sheet")
 if(!S.updatedAt){ persistLocal(); }
 renderAll();
 connectRemote();
-if(!PR.onboarded) setTimeout(openOnboarding, 400);
-(function(){ const d=parseInvite(location.hash); if(d && receiveScore(d)){ try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} renderAll(); setTimeout(()=>{ toast(`Placar de ${d.name} recebido. Agora mande o seu!`); if(PR.onboarded) openPasajeros(); }, 600); } })();
+setTimeout(()=>{ if(!PR.onboarded && $("#sheet").hidden) openOnboarding(); }, 400);
+(function(){ const m=location.hash.match(/bk=([A-Za-z0-9_-]+)/); if(m){ let bk=null; try{ bk=b64d(m[1]); }catch(e){} try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){}
+  if(bk && bk.v===2){ const names=(bk.list||[]).filter(x=>!x.remote).map(x=>x.name).join(", "); const el=$("#sheet");
+    el.innerHTML=`<div class="sheet" role="dialog"><h2 style="font-size:22px">Restaurar backup?</h2><p>Encontrei um backup de <b>${h(names)}</b> feito ${h(agoText(bk.t||Date.now()))}. Restaurar substitui o que está neste aparelho agora.</p><button class="btn wide" id="bk-yes">Restaurar</button><button class="btn ghost wide" data-act="closesheet">Agora não</button></div>`;
+    el.hidden=false; $("#bk-yes").onclick=()=>{ if(restoreBackup(bk)){ el.hidden=true; toast(`Pronto, ${me().name}. Tudo de volta!`); confetti(); } else toast("Não consegui restaurar esse backup."); };
+  } else toast("Esse link de backup não é válido."); return; }
+  const d=parseInvite(location.hash); if(d && receiveScore(d)){ try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} renderAll(); setTimeout(()=>{ toast(`Placar de ${d.name} recebido. Agora mande o seu!`); if(PR.onboarded) openPasajeros(); }, 600); } })();
 if("serviceWorker" in navigator && !window.claude && location.protocol==="https:"){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
 </script>
 <!-- APP END -->
