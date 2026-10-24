@@ -2369,7 +2369,7 @@ async function wpSummary(title){
     const pg=pi && pi.query && pi.query.pages && Object.values(pi.query.pages)[0];
     src=(pg && pg.thumbnail && pg.thumbnail.source) || ""; if(!src) throw new Error("no photo");
   }
-  if(src.startsWith("//")) src="https:"+src; src=src.replace(/\/\d+px-/, "/800px-");
+  if(src.startsWith("//")) src="https:"+src; src=src.replace(/\/\d+px-/, "/800px-").replace(/([?&])width=\d+/, "$1width=800");
   const out={t:Date.now(), src, title:t.replace(/_/g," "), url:"https://es.wikipedia.org/wiki/"+enc(t)};
   WPCACHE[title]=out; wpSave(); return out;
 }
@@ -3896,7 +3896,7 @@ setTimeout(()=>{ if(!PR.onboarded && $("#sheet").hidden) openOnboarding(); }, 40
   } else toast("Esse link de backup não é válido."); return; }
   const d=parseInvite(location.hash); if(d && receiveScore(d)){ try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} renderAll(); setTimeout(()=>{ toast(`Placar de ${d.name} recebido. Agora mande o seu!`); if(PR.onboarded) openPasajeros(); }, 600); } })();
 /* Atualização automática: quando sai versão nova, o app baixa e recarrega sozinho (fora de um treino). */
-const APP_VERSION = "2026.10.24-1149";
+const APP_VERSION = "2026.10.24-1159";
 let pendingReload = false;
 function maybeReload(){ if(!pendingReload) return; if(D || !$("#drill").hidden){ return; } pendingReload=false; toast("Atualizando o app…"); setTimeout(()=>location.reload(), 600); }
 if("serviceWorker" in navigator && !window.claude && location.protocol==="https:"){
