@@ -3619,6 +3619,15 @@ function moveDest(id, dir){ const i=V.dests.indexOf(id); const j=i+dir; if(i<0||
 function setArrival(id){ if(!DEST[id]) return; if(!V.days[id]) V.days[id]=DEST[id].stay.ideal; V.dests=[id, ...V.dests.filter(x=>x!==id)]; if(V.dep!==id && V.dests.includes(V.dep)) V.dests=[...V.dests.filter(x=>x!==V.dep), V.dep]; V.city=id; }
 function setDeparture(id){ if(!DEST[id]) return; V.dep=id; if(!V.days[id]) V.days[id]=DEST[id].stay.ideal; if(id!==V.dests[0]) V.dests=[...V.dests.filter(x=>x!==id), id]; }
 function arrivalId(){ return V.dests[0]; }
+function availableDays(){ if(!V.ret || !/^\d{4}-\d{2}-\d{2}$/.test(V.ret)) return null; return numOf(V.ret)-numOf(S.trip); }
+function autoDays(){
+  const av=availableDays(); const sel=V.dests.filter(id=>DEST[id]); if(!av || av<sel.length) return false;
+  const ideal=sel.map(id=>DEST[id].stay.ideal); const sum=ideal.reduce((a,b)=>a+b,0);
+  let days=sel.map((id,i)=>Math.max(1, Math.floor(av*ideal[i]/sum))); let left=av-days.reduce((a,b)=>a+b,0);
+  // sobra vai para as cidades com maior "ideal", uma a uma
+  const order=sel.map((id,i)=>i).sort((a,b)=>ideal[b]-ideal[a]); let k=0; while(left>0){ days[order[k%order.length]]++; left--; k++; }
+  sel.forEach((id,i)=>V.days[id]=Math.min(14,days[i])); return true;
+}
 function toggleMiddle(id){
   if(id===arrivalId() || id===V.dep) return;
   if(V.dests.includes(id)) V.dests=V.dests.filter(x=>x!==id);
@@ -3666,7 +3675,8 @@ function renderViaje(){
   let html="";
 
   if(V.screen==="home"){
-    html = `<div><h2 style="font-size:24px">Tu viaje</h2><p class="muted small" style="margin-top:4px">${fmtShort(numOf(S.trip))} a ${fmtShort(numOf(S.trip)+totalDays-1)} · ${totalDays} dias</p></div>
+    const av=availableDays(); const mismatch = av!==null && av>=1 && av!==totalDays;
+    html = `<div><h2 style="font-size:24px">Tu viaje</h2><p class="muted small" style="margin-top:4px">${fmtShort(numOf(S.trip))} a ${V.ret?fmtShort(numOf(V.ret)):fmtShort(numOf(S.trip)+totalDays-1)} · ${av!==null&&av>=1?av:totalDays} dias${mismatch?` · <span style="color:var(--bad);font-weight:700">cidades somam ${totalDays}</span>`:""}</p></div>
       ${searchBox}
       <button class="menu" data-act="vgo" data-s="rota"><span class="ic" style="background:var(--ok-soft)">✈️</span><span><b>Sua rota</b><span>${h(routeText)}</span><span style="color:var(--cobalt);font-weight:700;margin-top:4px">Editar chegada, volta, cidades e dias</span></span><span class="chev">›</span></button>
       <div class="sec-h"><span class="n">🏙️</span><h3>Cidades</h3></div>
@@ -3685,8 +3695,10 @@ function renderViaje(){
       <div class="route">
         <label><span class="eyebrow" style="color:var(--ok)">Chego em</span><select id="v-arr" data-act="varr">${selOpt(arr)}</select></label>
         <label><span class="eyebrow" style="color:var(--bad)">Volto de</span><select id="v-dep" data-act="vdep">${selOpt(dep)}</select></label>
-        <label class="full"><span class="eyebrow">Dia da chegada na Espanha</span><input type="date" id="v-trip" data-act="vtrip" value="${h(S.trip)}"></label>
+        <label><span class="eyebrow">Dia da chegada</span><input type="date" id="v-trip" data-act="vtrip" value="${h(S.trip)}"></label>
+        <label><span class="eyebrow">Dia da volta</span><input type="date" id="v-ret" data-act="vret" value="${h(V.ret||"")}" min="${h(S.trip)}"></label>
       </div>
+      ${(()=>{ const av=availableDays(); if(av===null) return `<p class="small muted">Informe o dia da volta e eu confiro se os dias das cidades cabem na viagem.</p>`; if(av<1) return `<p class="small" style="color:var(--bad)">A volta precisa ser depois da chegada.</p>`; const diff=av-totalDays; return diff===0 ? `<p class="small" style="color:var(--ok)"><b>Fecha certinho:</b> ${av} dias entre a chegada e a volta, e as cidades somam ${totalDays}.</p>` : `<div class="card tint-s small" style="padding:12px"><b>${av} dias</b> entre a chegada (${fmtShort(numOf(S.trip))}) e a volta (${fmtShort(numOf(V.ret))}), mas as cidades somam <b>${totalDays}</b> (${diff>0?`sobram ${diff}`:`faltam ${-diff}`}). <button class="btn soft" style="min-height:34px;padding:6px 12px;margin-top:6px" data-act="vauto">Distribuir os ${av} dias automaticamente</button></div>`; })()}
       ${middles.length ? `<div><div class="eyebrow" style="margin-bottom:6px">Cidades no meio do caminho</div><div class="row" style="gap:8px">${middles.map(id=>`<button class="ichip${V.dests.includes(id)?" on":""}" data-act="vdest" data-id="${id}">${V.dests.includes(id)?"✓ ":"+ "}${h(DEST[id].name)}</button>`).join("")}</div></div>` : ""}
       <div><div class="eyebrow" style="margin-bottom:4px">Dias em cada cidade</div>
       ${sel.map((id,i)=>{ const cd=CD[id]; const role = id===arr ? "a" : (id===dep && dep!==arr ? "d" : ""); const canMove = role==="";
@@ -3725,7 +3737,9 @@ function renderViaje(){
         else parts.push(`<div class="dayc"><h3>${h(day.title)}</h3><div class="blk"><span class="sl m">Dia</span><div><a href="${h(day.trip.link)}" target="_blank" rel="noopener">${h(day.trip.t)}</a> ${bkTag(day.trip.book)}<div class="meta">${h(day.trip.how)} · ${h(day.trip.price)}</div><p class="small" style="margin-top:6px">${day.trip.tip}</p></div></div></div>`);
       });
     });
-    const last=sel[sel.length-1]; const backDay=CD[last][1]+1;
+    const last=sel[sel.length-1]; const backDay = V.ret ? numOf(V.ret) : CD[last][1]+1; const gap = V.ret ? numOf(V.ret)-(CD[last][1]+1) : 0;
+    if(gap>0) parts.push(`<div class="card tint-s small"><b>${gap} ${gap===1?"dia livre":"dias livres"}</b> entre o fim do roteiro (${fmtShort(CD[last][1])}) e a volta (${fmtShort(numOf(V.ret))}). Dê mais dias a alguma cidade em <a href="#" data-act="vgo" data-s="rota" style="color:var(--cobalt);font-weight:700;text-decoration:none">Sua rota</a> ou use “Distribuir automaticamente”.</div>`);
+    else if(gap<0) parts.push(`<div class="card small" style="background:var(--bad-soft)"><b>Faltam ${-gap} ${-gap===1?"dia":"dias"}:</b> as cidades somam mais dias do que há entre a chegada e a volta (${fmtShort(numOf(V.ret))}). Reduza em <a href="#" data-act="vgo" data-s="rota" style="color:var(--bad);font-weight:700;text-decoration:none">Sua rota</a>.</div>`);
     if(dep===arr && sel.length>1){ const lg=legFor(last,arr); parts.push(`<div class="leg"><b>${h(fmtDay(backDay))} · ${h(DEST[last].name)} → ${h(DEST[arr].name)} e voo de volta</b>${lg?`<span>${h(lg.how)}</span><span>${lg.links.map(l=>`<a href="${h(l[1])}" target="_blank" rel="noopener">${h(l[0])} ↗</a>`).join("")}</span>`:""}<span class="muted">Deixe folga: chegue em ${h(DEST[arr].name)} com pelo menos 4 horas antes do voo.</span></div>`); }
     else parts.push(`<div class="leg"><b>${h(fmtDay(backDay))} · Volta, saindo de ${h(DEST[last].name)}</b><span class="muted">Reserve o voo de volta a partir desta cidade. Confira o tempo até o aeroporto em Cidades › ${h(DEST[last].name)} › Transporte.</span></div>`);
     const toBook = sel.flatMap(id=>DEST[id].must.filter(m=>m.book==="s").map(m=>`${h(DEST[id].name)}: <a href="${h(m.link)}" target="_blank" rel="noopener" style="color:var(--cobalt);font-weight:700;text-decoration:none">${h(m.t)}</a>`));
@@ -4048,6 +4062,7 @@ document.addEventListener("click", e=>{
     case "obdone": { const n=(($("#ob-name")||{}).value||"").trim().slice(0,20); if(n){ S.name=n; me().name=n; } PR.onboarded=true; saveProfiles(); save(); $("#sheet").hidden=true; renderAll(); toast(n?`¡Encantada, ${n}!`:"¡Vamos!"); break; }
     case "vdest": { toggleMiddle(el.dataset.id); saveProfiles(); renderViaje(); break; }
     case "vgo": { e.preventDefault(); if(el.disabled) break; vgo(el.dataset.s, el.dataset.city||null); break; }
+    case "vauto": { if(autoDays()){ saveProfiles(); renderViaje(); toast("Dias distribuídos. Ajuste com − e + se quiser."); } else toast("Precisa de pelo menos 1 dia por cidade."); break; }
     case "vdays": { const id=el.dataset.id; V.days[id]=Math.min(7,Math.max(1,(V.days[id]||1)+(+el.dataset.d))); saveProfiles(); renderViaje(); break; }
     case "vint": { const k=el.dataset.k; V.interests = V.interests.includes(k) ? V.interests.filter(x=>x!==k) : [...V.interests,k]; saveProfiles(); renderViaje(); break; }
     case "vritmo": V.ritmo=el.dataset.k; saveProfiles(); renderViaje(); break;
@@ -4162,7 +4177,8 @@ document.addEventListener("change", e=>{
   const el = e.target;
   if(el.dataset && el.dataset.act==="varr"){ setArrival(el.value); saveProfiles(); renderViaje(); return; }
   if(el.dataset && el.dataset.act==="vdep"){ setDeparture(el.value); saveProfiles(); renderViaje(); return; }
-  if(el.dataset && el.dataset.act==="vtrip"){ if(/^\d{4}-\d{2}-\d{2}$/.test(el.value)){ S.trip=el.value; save(); renderAll(); renderViaje(); } return; } if(el.dataset && el.dataset.act==="mission"){ S.missions[el.dataset.week] = el.checked; save(); if(el.checked){ const pm=rnd(PRAISE); toast(`Missão cumprida. ${pm[0]} +25 XP`); confetti(); tone("done"); } renderAll(); }
+  if(el.dataset && el.dataset.act==="vtrip"){ if(/^\d{4}-\d{2}-\d{2}$/.test(el.value)){ S.trip=el.value; save(); renderAll(); renderViaje(); } return; }
+  if(el.dataset && el.dataset.act==="vret"){ V.ret = /^\d{4}-\d{2}-\d{2}$/.test(el.value) ? el.value : null; saveProfiles(); renderViaje(); return; } if(el.dataset && el.dataset.act==="mission"){ S.missions[el.dataset.week] = el.checked; save(); if(el.checked){ const pm=rnd(PRAISE); toast(`Missão cumprida. ${pm[0]} +25 XP`); confetti(); tone("done"); } renderAll(); }
 });
 document.addEventListener("input", e=>{ if(e.target.id==="q"){ phraseQuery=e.target.value; renderPhraseList(); } if(e.target.id==="kq"){ kitQ=e.target.value; kitQFocus=true; renderPhraseList(); } if(e.target.id==="tr-in"){ trInput(e.target.value); } if(e.target.id==="vq"){ const was=viajeQ.trim().length>=2; viajeQ=e.target.value; const is=viajeQ.trim().length>=2; if(was||is) renderViaje(); } });
 $("#sheet").addEventListener("click", e=>{ if(e.target.id==="sheet") $("#sheet").hidden=true; });
@@ -4179,7 +4195,7 @@ setTimeout(()=>{ if(!PR.onboarded && $("#sheet").hidden) openOnboarding(); }, 40
   } else toast("Esse link de backup não é válido."); return; }
   const d=parseInvite(location.hash); if(d && receiveScore(d)){ try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} renderAll(); setTimeout(()=>{ toast(`Placar de ${d.name} recebido. Agora mande o seu!`); if(PR.onboarded) openPasajeros(); }, 600); } })();
 /* Atualização automática: quando sai versão nova, o app baixa e recarrega sozinho (fora de um treino). */
-const APP_VERSION = "2026.10.24-1301";
+const APP_VERSION = "2026.10.24-1308";
 let pendingReload = false;
 function maybeReload(){ if(!pendingReload) return; if(D || !$("#drill").hidden){ return; } pendingReload=false; toast("Atualizando o app…"); setTimeout(()=>location.reload(), 600); }
 if("serviceWorker" in navigator && !window.claude && location.protocol==="https:"){
