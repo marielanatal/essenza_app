@@ -2729,11 +2729,53 @@ function utter(t, pitch, slow){ const u=new SpeechSynthesisUtterance(cleanSpeech
 function speak(t, slow){ if(!canSpeak) return; try{ speechSynthesis.cancel(); speechSynthesis.speak(utter(t, 0, slow)); }catch(e){} }
 
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const IS_IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+const STANDALONE = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone===true;
 let MIC = !!SR && !window.claude && window.isSecureContext;
-function hear(){ return new Promise((res,rej)=>{ let done=false; const r=new SR(); r.lang="es-ES"; r.interimResults=false; r.maxAlternatives=3;
-  r.onresult=e=>{ done=true; res(Array.from(e.results[0]).map(a=>a.transcript)); };
-  r.onerror=e=>{ done=true; rej(e.error); }; r.onend=()=>{ if(!done) res([]); };
-  try{ speechSynthesis.cancel(); r.start(); }catch(e){ rej("start"); } }); }
+let REC=null;
+/* Ouve uma fala. Resolve com {alts:[...], partial:bool}. Nunca fica pendurado: tem tempo limite.
+   onPartial recebe o texto parcial enquanto a pessoa fala. */
+function hear(onPartial, maxMs){
+  return new Promise((res,rej)=>{
+    let done=false, best="", alts=[];
+    const finish = v => { if(done) return; done=true; clearTimeout(tAll); clearTimeout(tSilence); try{ r.abort(); }catch(e){} REC=null; res(v); };
+    const fail = c => { if(done) return; done=true; clearTimeout(tAll); clearTimeout(tSilence); REC=null; rej(c); };
+    let r; try{ r=new SR(); }catch(e){ return rej("start"); }
+    REC=r; r.lang="es-ES"; r.interimResults=true; r.maxAlternatives=3; r.continuous=false;
+    let tSilence=null;
+    const armSilence = () => { clearTimeout(tSilence); tSilence=setTimeout(()=>{ try{ r.stop(); }catch(e){} setTimeout(()=>finish({alts: alts.length?alts:(best?[best]:[]), partial:true}), 600); }, 1800); };
+    r.onresult=e=>{
+      let txt=""; for(let i=0;i<e.results.length;i++){ txt += e.results[i][0].transcript+" "; }
+      best=txt.trim(); if(onPartial && best) onPartial(best);
+      const last=e.results[e.results.length-1];
+      if(last.isFinal){ alts=Array.from(last).map(a=>a.transcript.trim()).filter(Boolean); if(!alts.length && best) alts=[best]; finish({alts, partial:false}); }
+      else armSilence();
+    };
+    r.onerror=e=>{ if(e.error==="no-speech" || e.error==="aborted"){ finish({alts: best?[best]:[], partial:true}); } else fail(e.error||"error"); };
+    r.onend=()=>{ finish({alts: alts.length?alts:(best?[best]:[]), partial:true}); };
+    r.onaudiostart=()=>{ if(onPartial) onPartial(""); };
+    const tAll=setTimeout(()=>{ try{ r.stop(); }catch(e){} setTimeout(()=>finish({alts: best?[best]:[], partial:true, timeout:true}), 800); }, maxMs||9000);
+    try{ speechSynthesis.cancel(); r.start(); }catch(e){ fail("start"); }
+  });
+}
+function micHint(code){
+  if(code==="not-allowed" || code==="service-not-allowed") return "O celular bloqueou o microfone para este app. iPhone: Ajustes › Safari › Microfone › Permitir. Android: toque no cadeado da barra de endereço › Permissões › Microfone.";
+  if(code==="network") return "O reconhecimento de voz precisa de internet neste aparelho. Conecte e tente de novo.";
+  if(code==="language-not-supported") return "Este aparelho não tem reconhecimento de espanhol. No Android, instale 'Espanhol (Espanha)' em Configurações › Idioma › Digitação por voz.";
+  if(code==="audio-capture") return "Nenhum microfone encontrado. Feche outros apps que estejam usando o microfone.";
+  if(code==="start") return "Não consegui iniciar o reconhecimento de voz neste navegador.";
+  return "O reconhecimento de voz não respondeu. Tente de novo, mais perto do celular.";
+}
+async function micTest(){
+  const out=$("#mic-test-out"); if(!out) return;
+  if(!SR){ out.textContent="Este navegador não oferece reconhecimento de voz. Use Chrome (Android) ou Safari (iPhone)."; return; }
+  out.textContent="Ouvindo… diga: hola, buenos días"; out.className="verdict mid";
+  try{
+    const r = await hear(t=>{ if(t) out.textContent="Ouvindo: "+t; }, 7000);
+    if(r.alts.length){ out.textContent="Funcionou! Entendi: “"+r.alts[0]+"”"; out.className="verdict ok"; MIC=true; }
+    else { out.textContent="Não ouvi nada em 7 segundos. "+(IS_IOS && STANDALONE ? "No iPhone, o microfone do app instalado costuma falhar: abra o mesmo endereço no Safari para usar o botão Falar." : "Verifique a permissão do microfone e fale mais perto."); out.className="verdict bad"; }
+  }catch(code){ out.textContent="Erro: "+code+". "+micHint(code); out.className="verdict bad"; }
+}
 function similarity(said, target){ const w=x=>norm(x).replace(/[¿?¡!.,;:…]/g," ").split(/\s+/).filter(Boolean); const T=w(cleanSpeech(target)); const A=new Set(w(said)); return T.length ? T.filter(x=>A.has(x)).length/T.length : 0; }
 function speakDialog(lines){ if(!canSpeak) return; try{ speechSynthesis.cancel(); const who=[...new Set(lines.map(l=>l[0]))]; lines.forEach(l=>speechSynthesis.speak(utter(l[1], who.indexOf(l[0])%2 ? 1.25 : 0.9))); }catch(e){} }
 
@@ -3034,7 +3076,10 @@ function startSons(){ openDrill({mode:"sons", items:SOUNDS.map(x=>({t:"som",s:x}
 function heardHtml(it){ if(!it.heard) return ""; const sc=it.heard.score; const cls=sc>=.8?"ok":sc>=.5?"mid":"bad";
   if(!it.heard.msg) it.heard.msg = sc>=.8 ? rnd(PRAISE) : rnd(CHEER);
   return `<div class="verdict ${cls}">${h(it.heard.msg[0])} ${sc>=.8?"":sc>=.5?"Quase lá.":"Não ficou claro."} <span class="muted" style="font-weight:400">Entendi: “${h(it.heard.text)}”</span></div>`; }
-function micBtn(it){ return `<button class="btn saff" data-act="mic">${ICON.mic} ${it.listening?"Ouvindo…":"Falar"}</button>`; }
+function micBtn(it){ return it.listening
+  ? `<button class="btn bad" data-act="micstop">${ICON.mic} Ouvindo… <span class="ct">toque para parar</span></button>`
+  : `<button class="btn saff" data-act="mic">${ICON.mic} Falar</button>`; }
+function heardLive(txt){ let el=$("#heard-live"); if(!el){ const flash=$("#drill .flash"); if(!flash) return; el=document.createElement("div"); el.id="heard-live"; el.className="verdict mid"; flash.appendChild(el); } el.textContent = txt ? "Ouvindo: "+txt : "Ouvindo… pode falar"; }
 function mcItem(c, dir, pool){
   const field = dir==="pt" ? "es" : "pt";
   const same = CARDS.filter(x=>x.id!==c.id && x.kind===c.kind && x[field]!==c[field]);
@@ -3164,6 +3209,9 @@ function openSettings(){
     <div class="field"><label for="s-start">Início do plano (semana 1)</label><input type="date" id="s-start" value="${h(S.start)}"><span class="hint">As semanas avançam sozinhas a cada 7 dias a partir desta data.</span></div>
     <div class="field"><label for="s-daily">Frases novas por dia</label><select id="s-daily">${[3,5,8,10,15].map(n=>`<option value="${n}" ${S.daily===n?"selected":""}>${n}${n===5?" (≈ 5 min por noite)":""}</option>`).join("")}</select></div>
     <div class="field"><label for="s-rate">Velocidade da voz: <span id="s-rate-v">${S.rate.toFixed(2)}</span>×</label><input type="range" id="s-rate" min="0.6" max="1.1" step="0.05" value="${S.rate}">${canSpeak?`<button class="btn soft" data-act="say" data-say="Hola, ¿qué tal? Me llamo Lucía y vivo en Madrid.">Testar voz</button>`:`<span class="hint">Este navegador não oferece voz.</span>`}<span class="hint">${canSpeak ? (esVoice() ? "Voz em uso: "+h(esVoice().name) : "Nenhuma voz de espanhol instalada; o aparelho usará a voz padrão. No Android, instale 'Espanhol (Espanha)' em Configurações › Idioma › Conversão de texto em voz.") : ""}</span></div>
+    <div class="field"><label>Microfone (botão Falar)</label>
+      ${window.claude ? `<span class="hint">Dentro do Claude o microfone não está disponível. Use o app instalado pelo endereço do GitHub.</span>` :
+        `<button class="btn soft" data-act="mictest">${ICON.mic} Testar microfone</button><div id="mic-test-out" class="hint">${SR ? (IS_IOS && STANDALONE ? "Você está no app instalado do iPhone. Se o teste falhar, abra o endereço no Safari: lá o microfone funciona." : "Toque para testar. Vou pedir permissão ao celular na primeira vez.") : "Este navegador não tem reconhecimento de voz. Use Chrome (Android) ou Safari (iPhone)."}</div>`}</div>
     <div class="field"><label class="row" style="gap:10px"><input type="checkbox" id="s-sound" style="width:22px;height:22px;accent-color:var(--cobalt)" ${S.sound?"checked":""}> Sons e vibração nos acertos</label></div>
     <div class="field"><label for="s-io">Backup do progresso</label><textarea id="s-io" placeholder="Cole aqui um backup para restaurar"></textarea>
       <div class="row"><button class="btn soft" data-act="export" style="flex:1">Copiar backup</button><button class="btn ghost" data-act="import" style="flex:1">Restaurar</button></div>
@@ -3230,23 +3278,30 @@ document.addEventListener("click", e=>{
     case "sons": startSons(); break;
     case "slow": speak(el.dataset.say, true); break;
     case "spoke": logToday().s++; save(); D.i++; drawDrill(); break;
+    case "micstop": { try{ if(REC) REC.stop(); }catch(e){} break; }
     case "mic": {
       const it=D.items[D.i]; if(it.listening) break;
       const target = it.c ? it.c.es : it.line[1];
-      it.listening=true; drawDrill();
-      hear().then(alts=>{
+      it.listening=true; drawDrill(); heardLive("");
+      hear(heardLive, 9000).then(r=>{
         it.listening=false;
         if(!D || D.items[D.i]!==it) return;
-        if(!alts.length){ toast("Não ouvi nada. Tente de novo, mais perto do celular."); drawDrill(); return; }
+        const alts=r.alts;
+        if(!alts.length){
+          it.micFail=(it.micFail||0)+1;
+          toast(IS_IOS && STANDALONE && it.micFail>=2 ? "No iPhone instalado o microfone costuma falhar. Abra o mesmo endereço no Safari." : "Não ouvi nada. Toque em Falar e comece a falar logo em seguida.");
+          drawDrill(); return;
+        }
         it.heard={text:alts[0], score:Math.max(...alts.map(a=>similarity(a,target)))}; tone(it.heard.score>=.5?"ok":"bad"); if(it.heard.score>=.8) buzz(15);
         D.revealed=true; logToday().s++; save(); drawDrill(); speak(target);
-      }).catch(err=>{
+      }).catch(code=>{
         it.listening=false;
-        if(err==="not-allowed"||err==="service-not-allowed"||err==="start"){ MIC=false; toast("Microfone indisponível. Fale em voz alta e confira ouvindo."); }
-        else toast("Não ouvi direito. Tente de novo.");
+        if(code==="not-allowed"||code==="service-not-allowed"||code==="start"||code==="language-not-supported") MIC=false;
+        toast(micHint(code));
         if(D) drawDrill();
       });
       break; }
+    case "mictest": micTest(); break;
     case "goweek": openWeek=+el.dataset.week; renderPlano(); showTab("plano"); break;
     case "toggleweek": { const n=+el.dataset.week; openWeek = openWeek===n ? -1 : n; renderPlano(); const nb=document.querySelector(`[data-act="toggleweek"][data-week="${n}"]`); if(nb) nb.scrollIntoView({block:"start",behavior:"smooth"}); break; }
     case "unlock": { const n=+el.dataset.week; S.unlocked=Math.max(S.unlocked||1,n); save(); renderAll(); toast(`Semana ${n} liberada no treino`); break; }

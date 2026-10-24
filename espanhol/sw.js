@@ -1,5 +1,5 @@
 // Guarda o app no aparelho para funcionar sem internet.
-const CACHE = "rumbo-v5";
+const CACHE = "rumbo-v6";
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", e => {
