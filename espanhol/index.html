@@ -2369,7 +2369,7 @@ async function wpSummary(title){
     const pg=pi && pi.query && pi.query.pages && Object.values(pi.query.pages)[0];
     src=(pg && pg.thumbnail && pg.thumbnail.source) || ""; if(!src) throw new Error("no photo");
   }
-  if(src.startsWith("//")) src="https:"+src; src=src.replace(/\/\d+px-/, "/800px-");
+  if(src.startsWith("//")) src="https:"+src; src=src.replace(/\/\d+px-/, "/800px-").replace(/([?&])width=\d+/, "$1width=800");
   const out={t:Date.now(), src, title:t.replace(/_/g," "), url:"https://es.wikipedia.org/wiki/"+enc(t)};
   WPCACHE[title]=out; wpSave(); return out;
 }
