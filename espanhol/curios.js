@@ -1,6 +1,28 @@
 /* Curiosidades extras por cidade. `on` liga a curiosidade a um imperdível ou bate-volta (parte do título);
    sem `on`, é geral e aparece nas listas, nos cartões "¿Sabías que…?" e no roteiro. `k` é só a categoria. */
 const CURIOS = {
+  segovia: [
+    {on:["Acueducto"], k:"história", t:"Diz a lenda que o aqueduto foi obra do diabo numa só noite, em troca da alma de uma moça; faltou uma pedra ao amanhecer e o pacto se desfez. No nicho onde ficava a estátua de Hércules há hoje uma Virgem."},
+    {on:["Alcázar"], k:"história", t:"Um incêndio em 1862 destruiu o interior do Alcázar: os tetos mudéjares que você vê são reconstruções do século XIX. Felipe II casou-se ali com Ana de Áustria."},
+    {on:["Catedral"], k:"história", t:"A catedral anterior ficava ao lado do Alcázar e foi destruída na revolta dos Comuneros, em 1520. A nova foi erguida na Plaza Mayor com pedras carregadas em procissão pelos fiéis."},
+    {on:["Vera Cruz"], k:"história", t:"A Vera Cruz guardava uma relíquia da cruz de Cristo. O pequeno edifício de dois andares no centro servia para as vigílias de armas dos cavaleiros antes de serem ordenados."},
+    {on:["Casa de los Picos"], k:"história", t:"A Casa de los Picos tem 617 pontas de granito na fachada. Reza a lenda que o dono as mandou pôr para apagar o apelido de 'casa do judeu'."},
+    {on:["Judería"], k:"história", t:"A sinagoga maior virou o convento do Corpus Christi em 1410. O Centro Didáctico de la Judería ocupa a casa de Abraham Seneor, rabino-mor de Castela e banqueiro dos Reis Católicos."},
+    {on:["Cochinillo"], k:"comida", t:"O leitão certo tem três semanas e uns 4 kg; assa duas horas em forno de lenha, em prato de barro, só com água e sal. O ritual de cortá-lo com um prato foi popularizado por Cándido, nos anos 1930."},
+    {on:["Ponche"], k:"comida", t:"O ponche segoviano foi criado em 1926 na confeitaria El Alcázar, de Frutos García, e ganhou medalha de ouro na Exposição de Barcelona de 1929."},
+    {on:["Casa de Moneda"], k:"história", t:"Felipe II mandou construir a Casa de Moneda em 1583 com máquinas trazidas de Innsbruck: foi a primeira a cunhar moedas com rodas movidas pela água, no caso do rio Eresma."},
+    {on:["La Granja"], k:"história", t:"La Granja foi mandada construir por Felipe V, o primeiro Bourbon espanhol, com saudade de Versalhes, onde cresceu. Dizem que ao vê-la pronta comentou: 'custou-me três milhões e divertiu-me três minutos'."},
+    {on:["Pedraza"], k:"festas", t:"Em julho, Pedraza apaga as luzes e acende milhares de velas nas 'Noches de las Velas', com concertos na praça: um dos espetáculos mais bonitos de Castela."},
+    {on:["Ávila"], k:"comida", t:"Santa Teresa de Jesus nasceu em Ávila em 1515. O doce da cidade, as <i>yemas de Santa Teresa</i>, é feito só de gema e açúcar."},
+    {on:["Madrid"], k:"transporte", t:"Segovia-Guiomar, a estação do AVE, abriu em 2007 e cortou a viagem a Madri de 2 horas para 27 minutos: muita gente mora em Segovia e trabalha na capital."},
+    {k:"idioma", t:"Em português se escreve Segóvia, com acento; em espanhol é Segovia, e a sílaba forte é 'go'."},
+    {k:"história", t:"A cidade velha fica num esporão de rocha entre dois rios, o Eresma e o Clamores. Vista de longe parece um navio: o Alcázar é a proa e a catedral, o mastro."},
+    {k:"história", t:"Nos séculos XV e XVI Segovia viveu da lã: seus panos eram vendidos em toda a Europa, e dessa riqueza vieram os palácios e a catedral."},
+    {k:"cinema", t:"A inspiração do Alcázar para o castelo da Disney é verdadeira (os desenhistas usaram fotos dele e do Neuschwanstein), mas a visita de Walt Disney à cidade nunca foi comprovada."},
+    {k:"comida", t:"Antes do cochinillo, peça uma <i>sopa castellana</i> (alho, pão, presunto e ovo): é o prato de inverno dos castelhanos e cai bem no frio de fevereiro."},
+    {k:"costumes", t:"Segovia é cidade universitária pequena: à noite, nos bares da Calle Infanta Isabel (a 'calle de los bares'), ao lado da Plaza Mayor, é onde todo mundo está."},
+    {k:"fevereiro", t:"Fevereiro em Segovia: 0 a 10 °C, dias curtos e, com sorte, a serra de Guadarrama branca de neve atrás do Alcázar. Luvas e gorro não são exagero."}
+  ],
   madrid: [
     {on:["La Latina"], k:"bairros", t:"La Latina segue o traçado da antiga muralha muçulmana: a Cava Baja, a rua das tabernas, era o fosso. Domingo depois do Rastro, ao meio-dia, não cabe mais ninguém."},
     {on:["San Ginés"], k:"comida", t:"San Ginés serve churros no mesmo beco desde 1894. O chocolate é grosso de propósito: molha-se o churro e o que sobra se toma de colher."},
