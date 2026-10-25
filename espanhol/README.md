@@ -34,7 +34,7 @@ Funciona sem internet e guarda o progresso no próprio aparelho.
 - **Kit de sobrevivência** (aba Frases › Kit, e atalho na aba Viaje): 122 frases em 12 situações (emergências, pedir ajuda, aeroporto, transporte, hotel, restaurante, dinheiro e compras, saúde, direções, telefone, roubo e documentos, cortesia), cada seção com um bloco de contexto, mais informações práticas (telefones de emergência, embaixada e consulado, tomada, horários, dinheiro, clima de fevereiro, apps). Conteúdo em `survival.js`; funciona offline.
 - **Níveis e conquistas**: XP por frases, falas em voz alta e missões; 7 níveis (de *Turista* a *¡Como en casa!*) e 9 conquistas. Sons e vibração podem ser desligados em Ajustes.
 
-O áudio usa a voz de espanhol do próprio celular. No Android, se a voz soar estranha, instale "Espanhol (Espanha)" em
+O áudio usa a voz de espanhol do próprio celular; em Ajustes › Voz do espanhol dá para escolher entre as vozes instaladas (a escolha fica salva e toca uma amostra). No Android, se a voz soar estranha, instale "Espanhol (Espanha)" em
 Configurações › Sistema › Idioma › Conversão de texto em voz. No iPhone, em Ajustes › Acessibilidade › Conteúdo Falado › Vozes.
 
 ## Como instalar no celular
