@@ -4413,16 +4413,26 @@ function voiceLabel(v){ const q=isGoodVoice(v) ? (/premium/i.test(v.name+" "+v.v
 function cleanSpeech(t){ return t.replace(/\(.*?\)/g,"").replace(/…/g,"").replace(/\s\/\s/g,", ").trim(); }
 function utter(t, pitch, slow){ const u=new SpeechSynthesisUtterance(cleanSpeech(t)); u.lang="es-ES"; const v=esVoice(); if(v) u.voice=v; u.rate=slow ? Math.max(0.5,S.rate*0.7) : S.rate; if(pitch) u.pitch=pitch; return u; }
 /* Fala com a voz escolhida; se ela não começar em 1,8 s (acontece no iPhone logo após baixar uma voz), tenta de novo sem fixar a voz. */
-let SPEAK_FAILS=0;
+let SPEAK_FAILS=0, SPEAK_SEQ=0;
 function speak(t, slow){ if(!canSpeak) return;
-  try{ loadVoices(); speechSynthesis.cancel(); try{ speechSynthesis.resume(); }catch(e){}
-    const u=utter(t, 0, slow); let started=false; u.onstart=()=>{ started=true; SPEAK_FAILS=0; LAST_VOICE = u.voice ? voiceLabel(u.voice) : "a voz padrão do iPhone para espanhol (a marcada em Ajustes › Vozes)"; voiceNow(); }; u.onerror=()=>{ started=true; };
-    speechSynthesis.speak(u);
-    setTimeout(()=>{ if(started || !speechSynthesis.speaking && !speechSynthesis.pending) return;
-      try{ speechSynthesis.cancel(); }catch(e){}
-      const u2=new SpeechSynthesisUtterance(cleanSpeech(t)); u2.lang="es-ES"; u2.rate=slow ? Math.max(0.5,S.rate*0.7) : S.rate; u2.onstart=()=>{ LAST_VOICE="voz automática do sistema (a escolhida não respondeu)"; voiceNow(); }; speechSynthesis.speak(u2);
-      SPEAK_FAILS++; if(SPEAK_FAILS===2 && S.voice){ toast("A voz escolhida não está respondendo. Voltei para a automática."); S.voice=""; save(); }
-    }, 1800);
+  const seq=++SPEAK_SEQ;
+  try{ loadVoices();
+    const busy = speechSynthesis.speaking || speechSynthesis.pending;
+    if(busy){ try{ speechSynthesis.cancel(); }catch(e){} }
+    try{ speechSynthesis.resume(); }catch(e){}
+    const go=()=>{ if(seq!==SPEAK_SEQ) return;
+      const u=utter(t, 0, slow); let started=false;
+      u.onstart=()=>{ started=true; SPEAK_FAILS=0; LAST_VOICE = u.voice ? voiceLabel(u.voice) : "a voz padrão do iPhone para espanhol (a marcada em Ajustes › Vozes)"; voiceNow(); };
+      u.onerror=()=>{ started=true; };
+      speechSynthesis.speak(u);
+      if(u.voice){ setTimeout(()=>{ if(started || seq!==SPEAK_SEQ || !(speechSynthesis.speaking || speechSynthesis.pending)) return;
+        try{ speechSynthesis.cancel(); }catch(e){}
+        const u2=new SpeechSynthesisUtterance(cleanSpeech(t)); u2.lang="es-ES"; u2.rate=slow ? Math.max(0.5,S.rate*0.7) : S.rate; u2.onstart=()=>{ LAST_VOICE="a voz padrão do iPhone (a escolhida não respondeu)"; voiceNow(); }; speechSynthesis.speak(u2);
+        SPEAK_FAILS++; if(SPEAK_FAILS===2 && S.voice && S.voice!=="system"){ toast("A voz escolhida não está respondendo. Voltei para a padrão do iPhone."); S.voice=IS_IOS?"system":""; save(); }
+      }, 3000); }
+    };
+    // no iPhone, falar logo depois de cancelar costuma cair na voz comum: dá uma pausa curta
+    if(busy) setTimeout(go, 180); else go();
   }catch(e){} }
 
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
