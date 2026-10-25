@@ -434,6 +434,10 @@ details.more>summary{list-style:none;cursor:pointer;padding:10px 0;font-weight:7
 details.more>summary::-webkit-details-marker{display:none}
 details.more>summary::before{content:"+ "}
 details.more[open]>summary::before{content:"– "}
+.curio-in.food{border-left-color:var(--ok)}
+.curio-in.food b{color:var(--ok)}
+.sabias.food{background:var(--ok-soft)} .sabias.food .eyebrow{color:var(--ok)}
+.sabias.food p+p{margin-top:8px}
 .curio{font-size:15px;padding:8px 0}
 .curio+.curio{border-top:1px solid var(--line)}
 .curio b{color:var(--cobalt)}
@@ -3205,6 +3209,88 @@ const CURIOS = {
     {k:"fevereiro", t:"Fevereiro em Sevilla: 17 °C de dia, laranjeiras carregadas e a cidade sem o calor sufocante. Leve casaco leve para a noite, que fica em uns 7 °C."}
   ]
 };
+/* Comida local por cidade. k: salgado | doce | bebida. w: onde provar. s: época (quando importa). */
+const FOODS = {
+  madrid: [
+    {k:"salgado", t:"Bocadillo de calamares", d:"Pão com anéis de lula à milanesa, só isso. O lanche mais madrilenho, uns 4 €.", w:"Bar La Campana e La Ideal, ao lado da Plaza Mayor"},
+    {k:"salgado", t:"Cocido madrileño", d:"Ensopado de grão-de-bico, carnes, chouriço e legumes, servido em três voltas: sopa, legumes, carnes. Prato de inverno, perfeito em fevereiro.", w:"La Bola, Malacatín (reserve), Lhardy; quarta-feira é o dia tradicional do cocido"},
+    {k:"salgado", t:"Huevos rotos", d:"Batatas fritas com ovos estalados por cima e presunto ibérico. Mistura-se tudo no prato.", w:"Casa Lucio, na Cava Baja (La Latina)"},
+    {k:"salgado", t:"Tortilla de patatas", d:"A omelete de batata espanhola. Em Madri a disputa é entre a mais cremosa e a mais firme; peça <i>poco cuajada</i> se gosta mole.", w:"Casa Dani (Mercado de la Paz), Sylkar, Pez Tortilla"},
+    {k:"salgado", t:"Callos a la madrileña", d:"Dobradinha com chouriço e morcela, picante e espessa. Prato de taberna antiga.", w:"Casa Revuelta, Taberna La Daniela"},
+    {k:"salgado", t:"Gambas al ajillo", d:"Camarões no azeite fervente com alho e pimenta, servidos na frigideira de barro. Molhe o pão.", w:"La Casa del Abuelo (desde 1906), perto de Sol"},
+    {k:"salgado", t:"Patatas bravas", d:"Batatas fritas com molho levemente picante. Cada bar tem o seu; o de Docamar é famoso.", w:"Docamar (Quintana), Las Bravas (Sol)"},
+    {k:"salgado", t:"Oreja a la plancha", d:"Orelha de porco na chapa, crocante, com pimentão. Tapa clássica de La Latina para corajosos.", w:"La Oreja de Jaime, Cava Baja"},
+    {k:"salgado", t:"Jamón ibérico de bellota", d:"O presunto dos porcos que comem bolota. Cortado à faca, em fatias finas, com pão.", w:"Mercado de San Miguel (caro) ou um bar de bairro (mais barato)"},
+    {k:"doce", t:"Chocolate con churros", d:"Churros finos (ou <i>porras</i>, grossas) com chocolate denso para molhar. Café da manhã ou fim de noite.", w:"Chocolatería San Ginés (24 h), Valor"},
+    {k:"doce", t:"Torrijas", d:"Fatias de pão embebidas em leite e ovo, fritas, com canela e mel. É o doce da Quaresma: em 2027 ela começa em 10 de fevereiro, bem na sua viagem.", w:"confeitarias de bairro e La Mallorquina (Sol)", s:"Quaresma"},
+    {k:"doce", t:"Napolitana de chocolate", d:"Folhado recheado de chocolate, o café da manhã rápido dos madrilenhos.", w:"La Mallorquina, na Puerta del Sol (balcão, em pé)"},
+    {k:"doce", t:"Rosquillas", d:"Rosquinhas de São Isidro: <i>tontas</i> (simples) e <i>listas</i> (com glacê de limão). Tradição de maio, mas há o ano todo.", w:"El Riojano (Calle Mayor), desde 1855"},
+    {k:"doce", t:"Caramelos de violeta", d:"Balas roxas com sabor de violeta, lembrança clássica de Madri, na caixinha de lata.", w:"La Violeta, Plaza de Canalejas"},
+    {k:"bebida", t:"Caña", d:"O copo pequeno de chope (uns 20 cl). Pede-se <i>una caña</i>, nunca uma cerveja grande; vem com tapa em muitos bares.", w:"qualquer bar"},
+    {k:"bebida", t:"Vermut de grifo", d:"Vermute tirado da torneira, com azeitona e rodela de laranja. Ritual de domingo ao meio-dia.", w:"Casa Camacho (Malasaña), Bodega de la Ardosa"}
+  ],
+  barcelona: [
+    {k:"salgado", t:"Pa amb tomàquet", d:"Pão torrado esfregado com tomate, azeite e sal. Acompanha tudo; peça <i>pa amb tomàquet</i> com qualquer prato.", w:"qualquer bar ou restaurante catalão"},
+    {k:"salgado", t:"Calçots com salsa romesco", d:"Cebolinhas grandes assadas na brasa, comidas com as mãos (dão babador) e molhadas no romesco de amêndoa e pimentão. A temporada é de janeiro a março: fevereiro é o auge.", w:"Can Travi Nou, restaurantes de Gràcia e Horta; a festa é em Valls", s:"janeiro a março"},
+    {k:"salgado", t:"Escalivada", d:"Berinjela, pimentão e cebola assados, desfiados, com azeite. Entrada leve e muito catalã.", w:"Can Culleretes (o restaurante mais antigo da cidade, 1786)"},
+    {k:"salgado", t:"Botifarra amb mongetes", d:"Linguiça catalã grelhada com feijão branco. Prato simples de almoço de domingo.", w:"La Pubilla (Gràcia), Can Vilaró"},
+    {k:"salgado", t:"Bombas de la Barceloneta", d:"Bolinho de batata recheado de carne, frito, com aioli e molho picante. Nasceu no bar La Cova Fumada.", w:"La Cova Fumada (Barceloneta), só almoço"},
+    {k:"salgado", t:"Fideuà", d:"Como uma paella, mas com macarrão fino em vez de arroz, com frutos do mar e aioli.", w:"Can Majó, Barraca (Barceloneta)"},
+    {k:"salgado", t:"Esqueixada de bacallà", d:"Salada de bacalhau cru desfiado com tomate, cebola e azeitonas.", w:"Bar del Pla, El Xampanyet (El Born)"},
+    {k:"salgado", t:"Canelons", d:"Canelones de carne assada com bechamel: prato de Sant Esteve (26 de dezembro) que virou clássico de domingo.", w:"Casa Alfonso, Senyor Parellada"},
+    {k:"salgado", t:"Bikini", d:"O misto-quente catalão (presunto e queijo), às vezes com trufa. Nome vem da sala de festas Bikini.", w:"Bar Mut, Tapas 24"},
+    {k:"doce", t:"Crema catalana", d:"Creme de gema com casquinha de açúcar queimado na hora: a avó do crème brûlée.", w:"qualquer restaurante; a de Can Culleretes é referência"},
+    {k:"doce", t:"Mel i mató", d:"Queijo fresco sem sal com mel por cima. Sobremesa de pastor, leve.", w:"restaurantes tradicionais e La Boqueria"},
+    {k:"doce", t:"Bunyols de Quaresma", d:"Bolinhos fritos com açúcar, vendidos só na Quaresma (a partir de 10 de fevereiro de 2027). Compram-se por dúzia.", w:"Forn Mistral, Pastisseria Escribà", s:"Quaresma"},
+    {k:"doce", t:"Xuixo", d:"Folhado frito recheado de creme e coberto de açúcar, de Girona. Pronuncia-se 'chucho'.", w:"Girona (bate-volta) ou Pastisseria Hofmann"},
+    {k:"doce", t:"Carquinyolis", d:"Biscoitos duros de amêndoa, para molhar no vinho doce ou no café.", w:"Pastisseria La Colmena (Plaça de l'Àngel)"},
+    {k:"doce", t:"Catànies", d:"Amêndoas cobertas de praliné e cacau, da região de Vilafranca.", w:"lojas de doces e La Boqueria"},
+    {k:"bebida", t:"Cava", d:"O espumante catalão, do Penedès. Muito mais barato que champanhe e servido até no café da manhã de domingo.", w:"El Xampanyet (El Born), Can Paixano (Barceloneta)"},
+    {k:"bebida", t:"Vermut", d:"Vermute catalão de Reus, com sifão de soda, azeitonas e batatas chips: <i>fer el vermut</i> ao meio-dia.", w:"Bodega Quimet (Gràcia), Morro Fi"}
+  ],
+  sevilla: [
+    {k:"salgado", t:"Salmorejo", d:"Creme frio de tomate e pão, mais espesso que o gaspacho, com ovo e presunto por cima. Nasceu em Córdoba, mas Sevilla adotou.", w:"Bodega Santa Cruz, El Rinconcillo (1670)"},
+    {k:"salgado", t:"Espinacas con garbanzos", d:"Espinafre com grão-de-bico, cominho e pão frito. Herança árabe e a tapa mais sevilhana que existe.", w:"El Rinconcillo, Bar Alfalfa"},
+    {k:"salgado", t:"Pescaíto frito", d:"Peixinhos fritos em azeite de oliva: cazón en adobo (cação marinado), boquerones, puntillitas. Come-se em cone de papel.", w:"freidurías de Triana e El Arenal; Freiduría Puerta de la Carne"},
+    {k:"salgado", t:"Montadito de pringá", d:"Pãozinho com o que sobra do cozido (carne, toucinho, chouriço) desfiado e prensado. Pequeno e viciante.", w:"Bodeguita Romero, Casa Morales"},
+    {k:"salgado", t:"Carrillada", d:"Bochecha de porco cozida devagar no vinho até desmanchar. Tapa de inverno.", w:"Bar Eslava, Casa Morales"},
+    {k:"salgado", t:"Solomillo al whisky", d:"Filé de porco com molho de alho, limão e uísque. Invenção sevilhana, servido com batatas.", w:"Bar Los Coloniales, Bodega Dos de Mayo"},
+    {k:"salgado", t:"Huevos a la flamenca", d:"Ovos assados em molho de tomate com ervilhas, chouriço e presunto, no prato de barro.", w:"Casa Morales, Bar Las Teresas (Santa Cruz)"},
+    {k:"salgado", t:"Tortilla de camarones", d:"Panqueca fina e crocante de camarõezinhos com grão-de-bico, típica de Cádiz.", w:"Cádiz (bate-volta) ou La Brunilda"},
+    {k:"salgado", t:"Jamón de Jabugo", d:"Presunto ibérico da serra de Huelva, a 100 km. Peça <i>una ración</i> com pão.", w:"Casa Morales, Mercado de Triana"},
+    {k:"doce", t:"Torrijas", d:"O doce da Quaresma e da Semana Santa: pão embebido em leite ou vinho, frito, com mel. Em fevereiro de 2027 já estão nas vitrines.", w:"Confitería La Campana (1885), bares de Santa Cruz", s:"Quaresma"},
+    {k:"doce", t:"Yemas de San Leandro", d:"Docinhos de gema e açúcar feitos pelas freiras agostinianas desde o século XVI, vendidos por um torno giratório, sem ver quem vende.", w:"Convento de San Leandro, Plaza de San Ildefonso"},
+    {k:"doce", t:"Pestiños", d:"Massa frita com mel e gergelim, de origem árabe. Tradição de Semana Santa e Natal.", w:"La Campana, conventos de clausura (Santa Inés, Santa Paula)"},
+    {k:"doce", t:"Tocino de cielo", d:"Pudim denso só de gema e açúcar, inventado em Jerez pelas freiras que recebiam as gemas das vinícolas (as claras clarificavam o vinho).", w:"Jerez (bate-volta) e confeitarias de Sevilla"},
+    {k:"doce", t:"Mermelada de naranja amarga", d:"Geleia feita com as laranjas das ruas de Sevilla, amargas demais para comer. As freiras de Santa Paula fazem a mais famosa.", w:"Convento de Santa Paula"},
+    {k:"doce", t:"Polvorones e mantecados de Estepa", d:"Biscoitos que se desmancham, de banha e amêndoa. São de Natal, mas sobram até fevereiro.", w:"qualquer supermercado ou confeitaria"},
+    {k:"bebida", t:"Cruzcampo", d:"A cerveja de Sevilla, em copos pequenos e muito gelada. Pede-se <i>una caña</i> ou <i>un botellín</i>.", w:"qualquer bar"},
+    {k:"bebida", t:"Manzanilla e fino", d:"Vinhos secos de Jerez e Sanlúcar, servidos gelados em copo de catavinos, com azeitonas ou presunto.", w:"Casa Morales, Bodega Díaz-Salazar"},
+    {k:"bebida", t:"Tinto de verano", d:"Vinho tinto com refrigerante de limão e gelo. O que os sevilhanos bebem no calor, em vez de sangria.", w:"qualquer bar"}
+  ],
+  segovia: [
+    {k:"salgado", t:"Cochinillo asado", d:"Leitão de três semanas assado em forno de lenha, pele crocante como vidro. Cortam-no com a borda de um prato.", w:"Mesón de Cándido (Azoguejo), José María (Plaza Mayor); reserve"},
+    {k:"salgado", t:"Judiones de La Granja", d:"Feijões gigantes e macios, cozidos com chouriço, orelha e morcela. Entrada farta de inverno.", w:"restaurantes de La Granja e da Plaza Mayor"},
+    {k:"salgado", t:"Sopa castellana", d:"Sopa de alho, pão, pimentão doce, presunto e ovo. Aquece em qualquer dia de fevereiro.", w:"Mesón de José María, Casa Duque"},
+    {k:"salgado", t:"Cordero lechal asado", d:"Cordeiro de leite assado no forno de lenha, o outro rei das mesas castelhanas.", w:"Casa Duque (1895), La Portada de Mediodía (Torrecaballeros)"},
+    {k:"salgado", t:"Chorizo de Cantimpalos", d:"Chouriço curado com indicação geográfica, da vila vizinha. Compre para levar, em corda.", w:"lojas da Calle Real"},
+    {k:"salgado", t:"Torreznos", d:"Cubos de toucinho fritos até estalar, a tapa que vem com a cerveja em Castela.", w:"bares da Calle Infanta Isabel"},
+    {k:"salgado", t:"Queso de oveja", d:"Queijo de ovelha curado da serra, servido com marmelada.", w:"Mercado de Abastos e lojas da Calle Real"},
+    {k:"doce", t:"Ponche segoviano", d:"Bolo de massapão, creme e pão de ló, com açúcar queimado em xadrez por cima. O doce da cidade desde 1926.", w:"Limón y Menta (Plaza Mayor), El Alcázar (Calle Cervantes)"},
+    {k:"doce", t:"Florones", d:"Frituras finas em forma de flor, polvilhadas de açúcar, feitas no Carnaval e na Semana Santa.", w:"confeitarias tradicionais", s:"Carnaval e Semana Santa"},
+    {k:"doce", t:"Rosquillas de San Frutos", d:"Rosquinhas de anis do padroeiro (outubro), mas vendidas o ano todo.", w:"Limón y Menta"},
+    {k:"doce", t:"Yemas", d:"Docinhos de gema que as confeitarias segovianas fazem como as de Ávila.", w:"Pastelería El Alcázar"},
+    {k:"bebida", t:"Vinho de Ribera del Duero e Rueda", d:"O tinto da Ribera e o branco verdejo de Rueda, as duas denominações vizinhas, saem baratos em qualquer taberna.", w:"tabernas da Plaza Mayor"},
+    {k:"bebida", t:"Café com ponche", d:"O café da tarde segoviano é com uma fatia de ponche, no terraço da Plaza Mayor olhando a catedral.", w:"Limón y Menta"}
+  ]
+};
+
+function foodList(id){ return (typeof FOODS!=="undefined" && FOODS[id]) || []; }
+const FOOD_K = {salgado:["Salgados","h"], doce:["Doces","d"], bebida:["Bebidas","g"]};
+function foodHtml(f){ return `<div class="item"><div class="hd"><span style="font-family:var(--f-display);font-weight:700;font-size:16px">${h(f.t)}</span><div class="meta2"><span class="bk ${FOOD_K[f.k][1]}"><i></i>${f.k}</span>${f.s?`<span class="meta">${h(f.s)}</span>`:""}</div></div><div class="tip">${f.d}</div><p class="small muted" style="margin-top:4px"><b>Onde:</b> ${h(f.w)}</p></div>`; }
+function foodSection(id){ const L=foodList(id); if(!L.length) return ""; return `<div class="sec-h"><h3>O que comer em ${h(DEST[id].name)}</h3></div><p class="small muted" style="padding:0 4px;margin-top:-6px">${L.filter(f=>f.k==="salgado").length} salgados, ${L.filter(f=>f.k==="doce").length} doces e ${L.filter(f=>f.k==="bebida").length} bebidas, com onde provar. Toque numa palavra para traduzir.</p>` + ["salgado","doce","bebida"].map(k=>{ const g=L.filter(f=>f.k===k); return g.length?`<div class="card" style="padding:4px 16px"><div class="eyebrow" style="padding-top:10px">${FOOD_K[k][0]}</div>${g.map(foodHtml).join("")}</div>`:""; }).join(""); }
+/* Sugestão de comida para um dia: um salgado e um doce, variando com o dia */
+function foodOfDay(id, k){ const L=foodList(id); const sal=L.filter(f=>f.k==="salgado"), doc=L.filter(f=>f.k==="doce"); const out=[]; if(sal.length) out.push(sal[k%sal.length]); if(doc.length) out.push(doc[k%doc.length]); return out; }
 function curioList(id){ const d=DEST[id]; if(!d||d.custom) return []; return [...(d.curios||[]).map(t=>({t})), ...((typeof CURIOS!=="undefined" && CURIOS[id])||[])]; }
 function curiosGeneral(id){ return curioList(id).filter(c=>!c.on); }
 function curiosFor(id, title){ if(!title) return []; return curioList(id).filter(c=>c.on && c.on.some(k=>title.includes(k))); }
@@ -3995,6 +4081,7 @@ function viajeSearch(q){
     d.must.forEach(m=>{ if(cityHit || hit(m.t, m.area, m.tip, m.price)) out.push({city:d.name, id, kind:"Imperdível", m}); });
     d.daytrips.forEach(m=>{ if(cityHit || hit(m.t, m.how, m.tip)) out.push({city:d.name, id, kind:"Bate e volta", m}); });
     curioList(id).forEach(c=>{ if(hit(c.t)) out.push({city:d.name, id, kind:"Curiosidade", text:c.t}); });
+    foodList(id).forEach(f=>{ if(cityHit || hit(f.t, f.d, f.w, f.k)) out.push({city:d.name, id, kind:"Comida local", text:`<b>${h(f.t)}</b> (${f.k}). ${f.d} <span class="muted">Onde: ${h(f.w)}</span>`}); });
     if(d.custom && AUTO[id]) (AUTO[id].trips||[]).forEach(tr=>{ if(cityHit || hit(tr.t, tr.desc)) out.push({city:d.name, id, kind:"Bate e volta (automático)", m:{t:tr.t, how:"a partir de "+d.name, link:autoTripLink(d,tr), tip:tr.desc, book:"h", pay:1}}); });
     if(d.custom && AUTO[id]) AUTO[id].items.forEach(it=>{ if(cityHit || hit(it.t, it.desc, it.addr)) out.push({city:d.name, id, kind:"Guia automático", m:{t:it.t, how:it.kind+(it.addr?" · "+it.addr:""), link:autoItemLink(d,it), tip:it.desc, book:"h", pay:1, price:it.price}}); });
     d.transit.forEach(g=>g.o.forEach(o=>{ if(hit(o[0], o[3], g.t)) out.push({city:d.name, id, kind:"Transporte", m:{t:o[0], how:g.t+" · "+o[1], link:o[2], tip:o[3], book:"h", pay:0}}); }));
@@ -4031,6 +4118,7 @@ function renderViaje(){
       <p class="small muted" style="padding:0 4px;margin-top:-6px">O que cada lugar tem: curiosidades, imperdíveis com ingressos, bate-voltas e transporte. Toque numa cidade.</p>
       ${sel.map((id,i)=>{ const d=DEST[id]; const cd=CD[id]; return `<button class="citycard" data-act="vgo" data-s="cidade" data-city="${id}">${PHOTOS_ON?photoEl(WP_CITY[id]||d.name,"",d.name):`<span class="emoji">${h(d.name.charAt(0))}</span>`}<span><b>${h(d.name)}</b><span>${V.days[id]||1} ${V.days[id]===1?"dia":"dias"} · ${fmtDay(cd[0])}${cd[1]>cd[0]?" a "+fmtDay(cd[1]):""}</span><span>${d.must.length} imperdíveis · ${d.daytrips.length} bate-voltas</span></span><span class="chev">›</span></button>`; }).join("")}
       ${sel.filter(id=>!DEST[id].custom).map((id,i)=>sabiasCard(id, 20+i)).join("")}
+      ${(()=>{ const ids=sel.filter(id=>foodList(id).length); if(!ids.length) return ""; const id=ids[todayN()%ids.length]; const f=foodOfDay(id, todayN()); return f.length?`<div class="sabias food"><span class="eyebrow">Para provar · ${h(DEST[id].name)}</span>${f.map(x=>`<p><b>${h(x.t)}</b> <span class="bk ${FOOD_K[x.k][1]}"><i></i>${x.k}</span><br><span class="small">${x.d} <span class="muted">Onde: ${h(x.w)}</span></span></p>`).join("")}</div>`:""; })()}
       <div class="sec-h"><h3>Roteiro dia a dia</h3></div>
       <p class="small muted" style="padding:0 4px;margin-top:-6px">O que fazer em cada dia, com manhã, tarde e noite, trechos de trem e o que reservar antes.</p>
       <button class="menu" data-act="vgo" data-s="roteiro"><span class="ic">${ICON.cal}</span><span><b>Ver o roteiro</b><span>${totalDays} dias · ${sel.length} ${sel.length===1?"cidade":"cidades"} · interesses: ${V.interests.length?V.interests.map(k=>(INTERESES.find(x=>x[0]===k)||[])[1]).filter(Boolean).join(", "):"todos"}</span></span><span class="chev">›</span></button>
@@ -4090,6 +4178,7 @@ function renderViaje(){
       <div class="card tint-c small"><b>Legenda:</b> ${bkTag("s")} ${bkTag("d")} ${bkTag("h")} ${bkTag("g")}</div>
       <div class="card" style="padding:4px 16px">${d.must.slice().sort((a,b)=>"sdhg".indexOf(a.pay?a.book:"g")-"sdhg".indexOf(b.pay?b.book:"g")).map(m=>itemHtml(m,id)).join("")}</div>
       ${sabiasCard(id, 1)}
+      ${foodSection(id)}
       <div class="sec-h"><h3>Bate e volta a partir de ${h(d.name)}</h3></div>
       <div class="card" style="padding:4px 16px">${d.daytrips.map(m=>itemHtml(m,id)).join("")}</div>
       ${sabiasCard(id, 2)}
@@ -4113,7 +4202,8 @@ function renderViaje(){
       buildPlan(id, V.days[id]||1, V.interests, V.ritmo).forEach((day,k)=>{
         day.title = `${fmtDay(CD[id][0]+k)} · ${day.title}`;
         const dayCur = (()=>{ for(const b of (day.blocks||[])){ const cs=curiosFor(id,b.m.t); if(cs.length) return cs[(k+ (day.blocks.indexOf(b)))%cs.length]; } if(day.trip){ const cs=curiosFor(id,day.trip.t); if(cs.length) return cs[0]; } return curioPick(id,1,10+k+i*3)[0]; })();
-        const dayCurHtml = dayCur ? `<p class="curio-in"><b>Curiosidade do dia</b> ${dayCur.t}</p>` : "";
+        const fod = foodOfDay(id, k + i*2);
+        const dayCurHtml = (fod.length ? `<p class="curio-in food"><b>Para comer hoje</b> ${fod.map(f=>`<span class="bk ${FOOD_K[f.k][1]}"><i></i>${f.k}</span> <b style="display:inline;font-size:inherit;letter-spacing:0;text-transform:none;color:inherit">${h(f.t)}</b>: ${h(f.w)}`).join("<br>")}</p>` : "") + (dayCur ? `<p class="curio-in"><b>Curiosidade do dia</b> ${dayCur.t}</p>` : "");
         if(day.kind==="city") parts.push(`<div class="dayc"><h3>${h(day.title)}</h3>${day.blocks.map(b=>`<div class="blk"><span class="sl ${b.slot}">${b.slot==="m"?"Manhã":b.slot==="t"?"Tarde":"Noite"}</span><div><a href="${h(b.m.link)}" target="_blank" rel="noopener">${h(b.m.t)}</a> ${bkTag(b.m.pay?b.m.book:"g")}<div class="meta">${h(b.m.area)}${b.m.price?` · ${h(b.m.price)}`:""}</div></div></div>`).join("")}${dayCurHtml}<button class="btn ghost" style="min-height:38px;padding:6px 12px;align-self:flex-start" data-act="vgo" data-s="cidade" data-city="${id}">Ver tudo sobre ${h(DEST[id].name)} ›</button></div>`);
         else parts.push(`<div class="dayc"><h3>${h(day.title)}</h3><div class="blk"><span class="sl m">Dia</span><div><a href="${h(day.trip.link)}" target="_blank" rel="noopener">${h(day.trip.t)}</a> ${bkTag(day.trip.book)}<div class="meta">${h(day.trip.how)} · ${h(day.trip.price)}</div><p class="small" style="margin-top:6px">${day.trip.tip}</p></div></div>${dayCurHtml}</div>`);
       });
