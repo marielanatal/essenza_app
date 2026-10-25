@@ -4405,7 +4405,18 @@ function esVoice(){ const want=S && S.voice; if(want){ const v=voices.find(v=>v.
 function voiceLabel(v){ const q=/enhanced|premium|aprimorad|mejorad|neural|natural|\(.*(es-ES|España|Espanha).*\)/i.test(v.name+" "+v.voiceURI) ? " · melhor qualidade" : ""; return `${v.name.replace(/\s*\(.*?\)\s*/g," ").trim()} (${v.lang.replace("_","-")})${q}`; }
 function cleanSpeech(t){ return t.replace(/\(.*?\)/g,"").replace(/…/g,"").replace(/\s\/\s/g,", ").trim(); }
 function utter(t, pitch, slow){ const u=new SpeechSynthesisUtterance(cleanSpeech(t)); u.lang="es-ES"; const v=esVoice(); if(v) u.voice=v; u.rate=slow ? Math.max(0.5,S.rate*0.7) : S.rate; if(pitch) u.pitch=pitch; return u; }
-function speak(t, slow){ if(!canSpeak) return; try{ speechSynthesis.cancel(); speechSynthesis.speak(utter(t, 0, slow)); }catch(e){} }
+/* Fala com a voz escolhida; se ela não começar em 1,8 s (acontece no iPhone logo após baixar uma voz), tenta de novo sem fixar a voz. */
+let SPEAK_FAILS=0;
+function speak(t, slow){ if(!canSpeak) return;
+  try{ loadVoices(); speechSynthesis.cancel(); try{ speechSynthesis.resume(); }catch(e){}
+    const u=utter(t, 0, slow); let started=false; u.onstart=()=>{ started=true; SPEAK_FAILS=0; }; u.onerror=()=>{ started=true; };
+    speechSynthesis.speak(u);
+    setTimeout(()=>{ if(started || !speechSynthesis.speaking && !speechSynthesis.pending) return;
+      try{ speechSynthesis.cancel(); }catch(e){}
+      const u2=new SpeechSynthesisUtterance(cleanSpeech(t)); u2.lang="es-ES"; u2.rate=slow ? Math.max(0.5,S.rate*0.7) : S.rate; speechSynthesis.speak(u2);
+      SPEAK_FAILS++; if(SPEAK_FAILS===2 && S.voice){ toast("A voz escolhida não está respondendo. Voltei para a automática."); S.voice=""; save(); }
+    }, 1800);
+  }catch(e){} }
 
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const IS_IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
@@ -5391,7 +5402,7 @@ function openSettings(){
       <p class="hint" id="s-feas">${(()=>{ const f=feasibility(); return f.left===0 ? "Todas as frases do plano já vistas." : f.ok ? `No ritmo: faltam ${f.left} frases e ${f.days} dias; ${S.daily}/dia dá conta.` : `Atenção: faltam ${f.left} frases em ${f.days} dias; precisaria de ${f.need}/dia.`; })()}</p>
     </div>
     <div class="field"><label for="s-voice">Voz do espanhol</label>${canSpeak ? (()=>{ loadVoices(); const L=esVoices(); return `<select id="s-voice"><option value="">Automática (${L[0]?voiceLabel(L[0]).split(" (")[0]:"a do celular"})</option>${L.map(v=>`<option value="${h(v.name)}" ${S.voice===v.name?"selected":""}>${h(voiceLabel(v))}</option>`).join("")}</select><span class="hint">${L.length} ${L.length===1?"voz de espanhol instalada":"vozes de espanhol instaladas"} neste aparelho. ${IS_IOS ? "Para uma voz melhor no iPhone: Ajustes › Acessibilidade › Conteúdo Falado › Vozes › Espanhol › Espanha, baixe uma voz 'Aprimorada' ou 'Premium' (Mónica, Marisol ou Jorge) e volte aqui." : "No Android, em Configurações › Sistema › Idioma › Conversão de texto em voz › Google, instale a voz 'Espanhol (Espanha)' e volte aqui."}</span>`; })() : `<span class="hint">Este navegador não oferece voz.</span>`}</div>
-    <div class="field"><label for="s-rate">Velocidade da voz: <span id="s-rate-v">${S.rate.toFixed(2)}</span>×</label><input type="range" id="s-rate" min="0.6" max="1.1" step="0.05" value="${S.rate}">${canSpeak?`<button class="btn soft" data-act="say" data-say="Hola, ¿qué tal? Me llamo Lucía y vivo en Madrid.">Testar voz</button>`:`<span class="hint">Este navegador não oferece voz.</span>`}<span class="hint">${canSpeak ? (esVoice() ? "Voz em uso: "+h(esVoice().name) : "Nenhuma voz de espanhol instalada; o aparelho usará a voz padrão. No Android, instale 'Espanhol (Espanha)' em Configurações › Idioma › Conversão de texto em voz.") : ""}</span></div>
+    <div class="field"><label for="s-rate">Velocidade da voz: <span id="s-rate-v">${S.rate.toFixed(2)}</span>×</label><input type="range" id="s-rate" min="0.6" max="1.1" step="0.05" value="${S.rate}">${canSpeak?`<button class="btn soft" data-act="say" data-say="Hola, ¿qué tal? Me llamo Lucía y vivo en Madrid.">Testar voz</button><span class="hint">Sem som? Escolha "Automática" acima, confira o botão lateral de silêncio e o volume, feche o app por completo e abra de novo. Depois de baixar uma voz nova, o iPhone às vezes só a usa após reiniciar o aparelho.</span>`:`<span class="hint">Este navegador não oferece voz.</span>`}<span class="hint">${canSpeak ? (esVoice() ? "Voz em uso: "+h(esVoice().name) : "Nenhuma voz de espanhol instalada; o aparelho usará a voz padrão. No Android, instale 'Espanhol (Espanha)' em Configurações › Idioma › Conversão de texto em voz.") : ""}</span></div>
     <div class="field"><label>Microfone (botão Falar)</label>
       ${window.claude ? `<span class="hint">Dentro do Claude o microfone não está disponível. Use o app instalado pelo endereço do GitHub.</span>` :
         `<button class="btn soft" data-act="mictest">${ICON.mic} Testar microfone</button><div id="mic-test-out" class="hint">${SR ? (IS_IOS && STANDALONE ? "Você está no app instalado do iPhone. Se o teste falhar, abra o endereço no Safari: lá o microfone funciona." : "Toque para testar. Vou pedir permissão ao celular na primeira vez.") : "Este navegador não tem reconhecimento de voz. Use Chrome (Android) ou Safari (iPhone)."}</div>`}</div>
