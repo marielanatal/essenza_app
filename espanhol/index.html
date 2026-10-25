@@ -479,6 +479,12 @@ nav.tabs button.on svg{stroke-width:2.4}
 .opt.right{border-color:var(--ok);background:var(--ok-soft)}
 .opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
 .answer{width:100%;border:1.5px solid var(--line);background:var(--surface);border-radius:var(--r-sm);padding:14px;font-size:20px;font-family:var(--f-display)}
+.seq{min-height:54px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;border-bottom:2px dashed var(--line);padding:4px 0 10px;width:100%}
+.seq button{background:var(--cobalt);color:var(--on-cobalt);border:0;border-radius:10px;padding:8px 12px;font-size:17px;font-family:var(--f-display);font-weight:600}
+.bank{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.bank button{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 12px;font-size:17px;font-family:var(--f-display);font-weight:600;color:var(--ink);box-shadow:var(--shadow)}
+.bank button:disabled{opacity:.25;box-shadow:none}
+.card.frame .list .phrase{padding:8px 0}
 .accents{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
 .accents button{width:42px;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:18px}
 .marks{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
@@ -4257,12 +4263,14 @@ function todaySteps(){
   const all=[
     {id:"session", t:"Sessão", d: (nw===0&&due===0) ? "Frases de hoje em dia" : (due===0 && (l.n||0)>=S.daily) ? `Meta feita · extra: ${nw} novas à espera` : `${nw} novas · ${due} revisões · ≈ ${sessionMinutes(nw,due)} min`, done: due===0 && (nw===0 || (l.n||0)>=S.daily), started:(l.n||0)+(l.r||0)>0, act:"session", go:"Começar"},
     {id:"conv", t:"Conversa falada", d:`${WEEKS[curWeek()-1].title}${WEEKS[curWeek()-1].dialogB?` · conversa ${todayConv()==="B"?2:1}`:""} · ≈ 3 min`, done:(l.c||0)>0, act:"conv", which:todayConv(), go:"Conversar"},
+    (todayN()%2===0 ? {id:"build", t:"Montar frases", d:"Coloque as palavras na ordem · 8 frases · ≈ 3 min", done:(l.b||0)>0, act:"build", go:"Montar"}
+                    : {id:"build", t:"Fórmulas", d:"Molde + encaixe: diga a frase inteira · 10 frases · ≈ 3 min", done:(l.b||0)>0, act:"frames", go:"Montar"}),
     MIC ? {id:"eco", t:"Pronúncia no microfone", d:"5 palavras e 7 frases · ≈ 3 min", done:(l.e||0)>0, act:"pron", go:"Falar"}
         : {id:"eco", t:"Eco: repetir imitando", d:"10 frases · ≈ 2 min", done:(l.e||0)>0, act:"eco", go:"Repetir"},
     {id:"quiz", t:"Quiz", d:"10 perguntas, com 'o que responder?' · ≈ 3 min", done:(l.q||0)>=10, act:"quiz", go:"Jogar"},
     {id:"extra", t:"Frases extra", d:`+${S.daily} além da meta · ≈ ${sessionMinutes(S.daily,0)} min`, done:(l.x||0)>0 && (l.n||0)>=S.daily*2, act:"extra", go:"Mais"}
   ];
-  const n = m<=5 ? 1 : m<=10 ? 2 : m<=15 ? 3 : m<=20 ? 4 : 5;
+  const n = m<=5 ? 1 : m<=10 ? 2 : m<=15 ? 4 : m<=20 ? 5 : 6;
   return all.slice(0,n);
 }
 /* Qual conversa do tema de hoje praticar: alterna entre a 1ª e a 2ª conforme a menos feita. */
@@ -4641,7 +4649,7 @@ function renderPlano(){
 function renderTreino(){
   const seen = seenCards().length;
   $("#v-treino").innerHTML = `
-    <div><h2 style="font-size:24px">Treinos livres</h2><p class="muted small" style="margin-top:4px">A rotina de hoje (3 passos) está na aba <b>Hoy</b>${todaySteps().filter(x=>x.done).length===3 ? " e já está feita" : `: ${todaySteps().filter(x=>x.done).length} de 3 feitos`}. Aqui ficam os treinos extras para quando sobrar tempo. Regra de ouro: fale em voz alta antes de ver a resposta.</p></div>
+    <div><h2 style="font-size:24px">Treinos livres</h2><p class="muted small" style="margin-top:4px">A rotina de hoje (${todaySteps().length} passos) está na aba <b>Hoy</b>${todaySteps().every(x=>x.done) ? " e já está feita" : `: ${todaySteps().filter(x=>x.done).length} de ${todaySteps().length} feitos`}. Aqui ficam os treinos extras para quando sobrar tempo. Regra de ouro: fale em voz alta antes de ver a resposta.</p></div>
     <div class="eyebrow" style="margin-top:4px">Falar e ouvir</div>
     <div class="tiles">
       <button class="tile t-r" data-act="pron" ${MIC?"":"disabled"}><span class="ic">${ICON.mic.replace('width="20" height="20"','')}</span><b>Pronúncia</b><span>${MIC?"Repita palavras e frases no microfone e veja o que saiu certo":"Precisa do microfone: use o app instalado"}</span></button>
@@ -4650,6 +4658,11 @@ function renderTreino(){
       <button class="tile t-g" data-act="listen" ${canSpeak?"":"disabled"}><span class="ic">${ICON.ear}</span><b>Escuta</b><span>Ouça e escolha o significado</span></button>
       <button class="tile t-r" data-act="conv" data-pick="1"><span class="ic">${ICON.talk}</span><b>Outras conversas</b><span>Repita os diálogos das semanas anteriores</span></button>
       <button class="tile t-s" data-act="duel"><span class="ic">${ICON.trophy}</span><b>Duelo</b><span>${locals().length>1?"Quiz a dois passando o celular":"Para duas pessoas no mesmo celular"}</span></button>
+    </div>
+    <div class="eyebrow" style="margin-top:4px">Montar frases</div>
+    <div class="tiles">
+      <button class="tile t-c" data-act="build"><span class="ic">${ICON.cards}</span><b>Ordenar palavras</b><span>Coloque as palavras de uma frase na ordem certa</span></button>
+      <button class="tile t-s" data-act="frames"><span class="ic">${ICON.pen}</span><b>Fórmulas</b><span>18 moldes com encaixe: Quiero…, ¿Dónde está…?, ¿Me puede…?</span></button>
     </div>
     <div class="eyebrow" style="margin-top:4px">Reforço</div>
     <div class="tiles">
@@ -4717,7 +4730,7 @@ function translatorHtml(){
   </div>`;
 }
 function renderFrases(){
-  const chips = [["all","Todas"],["kit","Kit de sobrevivência"],["fa","Falsos amigos"],...WEEKS.map(w=>[String(w.n), w.title])];
+  const chips = [["all","Todas"],["formulas","Fórmulas"],["kit","Kit de sobrevivência"],["fa","Falsos amigos"],...WEEKS.map(w=>[String(w.n), w.title])];
   $("#v-frases").innerHTML = `
     <div><h2 style="font-size:24px">Frases e tradutor</h2><p class="muted small" style="margin-top:4px">Tradutor ao vivo, dicionário, kit de sobrevivência e todas as frases do plano.</p></div>
     ${translatorHtml()}
@@ -4730,6 +4743,7 @@ function renderFrases(){
 }
 function renderPhraseList(){
   const q = norm(phraseQuery.trim());
+  if(phraseFilter==="formulas"){ $("#phr-list").innerHTML = framesHtml(phraseQuery.trim()); return; }
   let cs = phraseFilter==="kit" ? SURV_CARDS : CARDS.filter(c => phraseFilter==="all" || (phraseFilter==="fa" ? c.kind==="fa" : (c.kind==="v" && String(c.week)===phraseFilter)));
   if(q && phraseFilter==="all") cs = [...cs, ...SURV_CARDS];
   if(q) cs = cs.filter(c => norm(c.es+" "+c.pt+" "+c.note).includes(q));
@@ -5010,6 +5024,73 @@ function startQuiz(kind, week){
   });
   openDrill({mode:kind, items:shuffle([...qs, ...rep])});
 }
+/* Fórmulas para montar frases: um molde + encaixes. {x} é o encaixe. g = explicação curta de gramática. */
+const FRAMES = [
+  {es:"Quiero {x}", pt:"Quero {x}", g:"<b>Quiero</b> = eu quero. Em espanhol não se repete 'yo' toda hora: o verbo já diz quem fala. Para soar mais educada, <b>Quería…</b> (queria) ou <b>Me gustaría…</b> (gostaria de).",
+   x:[["un café con leche","um café com leite"],["una botella de agua","uma garrafa de água"],["la cuenta, por favor","a conta, por favor"],["dos entradas","dois ingressos"],["una mesa para dos","uma mesa para dois"],["ir a la estación","ir à estação"],["probar el cochinillo","provar o leitão"]]},
+  {es:"Me gustaría {x}", pt:"Gostaria de {x}", g:"<b>Me gustaría</b> + verbo ou coisa. É a forma educada de pedir; funciona em hotel, restaurante e loja.",
+   x:[["reservar una mesa","reservar uma mesa"],["ver el menú","ver o cardápio"],["pagar con tarjeta","pagar com cartão"],["una habitación con vistas","um quarto com vista"],["cambiar la reserva","mudar a reserva"],["algo típico de aquí","algo típico daqui"]]},
+  {es:"¿Dónde está {x}?", pt:"Onde fica {x}?", g:"<b>está</b> (verbo estar) para lugares. No plural: <b>¿Dónde están</b> los taxis? Note o <b>¿</b> no começo da pergunta.",
+   x:[["el baño","o banheiro"],["la salida","a saída"],["la parada del metro","a parada do metrô"],["la estación de tren","a estação de trem"],["la oficina de turismo","o posto de turismo"],["el andén cuatro","a plataforma quatro"],["la consigna","o guarda-volumes"]]},
+  {es:"¿Tiene {x}?", pt:"Tem {x}? (o senhor / a senhora)", g:"<b>Tiene</b> = usted tem, formal, para quem você não conhece. <b>¿Tienes…?</b> com jovens e amigos. Resposta: <i>Sí, tenemos</i> / <i>No, no tenemos</i>.",
+   x:[["una mesa libre","uma mesa livre"],["wifi","wi-fi"],["menú del día","prato do dia"],["algo sin gluten","algo sem glúten"],["cambio","troco"],["habitaciones para esta noche","quartos para esta noite"],["una talla más grande","um tamanho maior"]]},
+  {es:"¿Cuánto cuesta {x}?", pt:"Quanto custa {x}?", g:"Plural: <b>¿Cuánto cuestan</b> las entradas? Também se diz <b>¿Cuánto es?</b> na hora de pagar.",
+   x:[["el billete","a passagem"],["la entrada","o ingresso"],["una noche","uma noite"],["este bolso","esta bolsa"],["el menú del día","o prato do dia"],["ir al aeropuerto en taxi","ir ao aeroporto de táxi"]]},
+  {es:"¿A qué hora {x}?", pt:"A que horas {x}?", g:"Depois de <b>¿A qué hora</b> vem o verbo e o sujeito: <i>sale el tren</i>, <i>abre el museo</i>. Resposta: <i>a las nueve</i>, <i>a las dos y media</i>.",
+   x:[["sale el tren","sai o trem"],["abre el museo","abre o museu"],["cierra la tienda","fecha a loja"],["es el desayuno","é o café da manhã"],["llega el autobús","chega o ônibus"],["empieza el espectáculo","começa o espetáculo"]]},
+  {es:"¿Puedo {x}?", pt:"Posso {x}?", g:"<b>Puedo</b> + verbo no infinitivo (sem conjugar). <i>¿Puedo pagar?</i> Resposta: <i>Claro</i> / <i>Sí, puede</i>.",
+   x:[["pagar con tarjeta","pagar com cartão"],["sentarme aquí","sentar aqui"],["probarlo","experimentar"],["dejar la maleta","deixar a mala"],["entrar con la mochila","entrar com a mochila"],["sacar una foto","tirar uma foto"]]},
+  {es:"¿Me puede {x}, por favor?", pt:"Pode {x}, por favor?", g:"<b>Me puede</b> + verbo: o <b>me</b> (a mim) vem antes do verbo. É o jeito mais útil de pedir qualquer coisa a alguém.",
+   x:[["ayudar","me ajudar"],["traer la cuenta","trazer a conta"],["repetir","repetir"],["hablar más despacio","falar mais devagar"],["llamar un taxi","chamar um táxi"],["decir dónde está el baño","dizer onde fica o banheiro"],["escribirlo","escrever isso"]]},
+  {es:"Necesito {x}", pt:"Preciso de {x}", g:"<b>Necesito</b> vai direto ao objeto, sem 'de': <i>necesito un médico</i>. Para urgência, diga primeiro <b>Perdone</b> ou <b>Por favor</b>.",
+   x:[["un médico","um médico"],["una farmacia","uma farmácia"],["ayuda","ajuda"],["un adaptador","um adaptador"],["cambiar dinero","trocar dinheiro"],["un taxi al aeropuerto","um táxi para o aeroporto"],["cargar el móvil","carregar o celular"]]},
+  {es:"Voy a {x}", pt:"Vou {x}", g:"<b>Voy a</b> + lugar ou verbo. <b>a + el = al</b>: <i>voy al centro</i>. Para o futuro próximo: <i>voy a cenar</i> (vou jantar).",
+   x:[["la playa","à praia"],["Sevilla","a Sevilla"],["la estación de autobuses","à rodoviária"],["cenar","jantar"],["tomar el metro","pegar o metrô"],["al museo del Prado","ao museu do Prado"]]},
+  {es:"Para mí, {x}", pt:"Para mim, {x}", g:"No bar e no restaurante é assim que se pede: <b>Para mí</b> + o que você quer. Para a outra pessoa: <i>Para él / para ella…</i>",
+   x:[["una caña","um chope pequeno"],["el menú del día","o prato do dia"],["la paella","a paella"],["agua sin gas","água sem gás"],["un cortado","um café com um pouco de leite"],["lo mismo","o mesmo"]]},
+  {es:"¿Hay {x} cerca?", pt:"Tem {x} aqui perto?", g:"<b>Hay</b> = há, existe. Não muda no plural: <i>¿Hay cajeros?</i> Diferente de <b>está</b>, que é para um lugar específico.",
+   x:[["un cajero","um caixa eletrônico"],["una farmacia","uma farmácia"],["un supermercado","um supermercado"],["un restaurante bueno","um restaurante bom"],["una parada de taxis","um ponto de táxi"],["un baño público","um banheiro público"]]},
+  {es:"Estoy buscando {x}", pt:"Estou procurando {x}", g:"<b>Estoy buscando</b> (estar + -ando), igual ao português. Sem 'por': <i>busco la plaza</i>, não 'busco por'.",
+   x:[["la Plaza Mayor","a Plaza Mayor"],["mi hotel","meu hotel"],["la calle Sierpes","a rua Sierpes"],["un sitio para comer","um lugar para comer"],["la parada del autobús 11","a parada do ônibus 11"],["una tienda de recuerdos","uma loja de lembranças"]]},
+  {es:"Perdone, no entiendo {x}", pt:"Desculpe, não entendo {x}", g:"<b>Perdone</b> abre qualquer frase com desconhecidos. <b>No entiendo</b> = não entendo; e <b>¿Puede repetir?</b> salva o dia.",
+   x:[["esta palabra","esta palavra"],["el cartel","a placa"],["lo que dice","o que o senhor diz"],["el menú","o cardápio"],["muy bien el español","muito bem o espanhol"]]},
+  {es:"¿Cómo se dice {x} en español?", pt:"Como se diz {x} em espanhol?", g:"A pergunta que ensina sozinha. <b>Se dice</b> = se diz. Também: <i>¿Qué significa…?</i> (o que significa).",
+   x:[["'obrigada'","'obrigada'"],["'guardanapo'","'guardanapo'"],["'troco'","'troco'"],["'sacola'","'sacola'"],["'fila'","'fila'"],["esto","isto (apontando)"]]},
+  {es:"Somos {x}", pt:"Somos {x}", g:"<b>Somos</b> (ser) para quem você é. Na entrada do restaurante: <i>Somos dos</i>. Nacionalidade sem maiúscula: <i>brasileños</i>.",
+   x:[["dos","dois"],["cuatro","quatro"],["brasileños","brasileiros"],["vegetarianos","vegetarianos"],["de São Paulo","de São Paulo"],["un grupo de seis","um grupo de seis"]]},
+  {es:"Está {x}", pt:"Está {x}", g:"<b>Está</b> (estar) para estado do momento: <i>está cerrado</i>, <i>está rico</i>. <b>Es</b> (ser) para o que é fixo: <i>es caro</i>, <i>es grande</i>.",
+   x:[["muy rico","muito gostoso"],["frío","frio"],["cerrado","fechado"],["lejos","longe"],["incluido","incluído"],["ocupado","ocupado"]]},
+  {es:"Perdone, ¿{x}?", pt:"Desculpe, {x}?", g:"Pergunta direta depois de <b>Perdone</b>. Em espanhol a entonação sobe no fim; o <b>¿</b> marca onde a pergunta começa.",
+   x:[["habla portugués","o senhor fala português"],["es aquí la cola","a fila é aqui"],["este tren va a Toledo","este trem vai a Toledo"],["está libre","está livre"],["puedo pasar","posso passar"],["me cobra","pode me cobrar"]]}
+];
+
+/* Montar frases: ordenar as palavras de uma frase já vista, com 2 ou 3 palavras a mais para confundir */
+const tokES = t => t.replace(/[¿¡?!.,;:…«»"]/g,"").split(/\s+/).filter(Boolean);
+function startBuild(){
+  let pool = seenCards(); if(pool.length<8) pool = unlockedCards();
+  pool = pool.filter(c=>!/[\/…()]/.test(c.es) && tokES(c.es).length>=3 && tokES(c.es).length<=9);
+  if(pool.length<4){ toast("Veja mais frases na sessão primeiro."); return; }
+  const items = shuffle(pool).slice(0,8).map(c=>{
+    const target = tokES(c.es); const low = new Set(target.map(w=>norm(w)));
+    const others = shuffle(pool.filter(x=>x.id!==c.id && Math.abs(x.week-c.week)<=2).flatMap(x=>tokES(x.es))).filter(w=>!low.has(norm(w)) && w.length>1);
+    const extra=[]; for(const w of others){ if(extra.length>=(target.length>=6?3:2)) break; if(!extra.some(e=>norm(e)===norm(w))) extra.push(w); }
+    return {t:"build", c, target, bank:shuffle([...target, ...extra]), seq:[], res:null};
+  });
+  openDrill({mode:"build", items});
+}
+/* Fórmulas: molde + encaixe → diga a frase inteira */
+function startFrames(n){
+  const items = shuffle(FRAMES.flatMap(fr=>fr.x.map(x=>({fr,x})))).slice(0,n||10).map(({fr,x})=>({t:"frame", fr, es:fr.es.replace("{x}",x[0]), pt:fr.pt.replace("{x}",x[1]), txt:fr.es.replace("{x}",x[0])}));
+  openDrill({mode:"frames", items});
+}
+function framesHtml(q){
+  const n = q ? norm(q) : "";
+  const list = FRAMES.filter(fr => !n || norm(fr.es+" "+fr.pt+" "+fr.x.map(x=>x.join(" ")).join(" ")).includes(n));
+  return `<div class="card tint-s small"><b>Fórmulas para montar frases.</b> Cada molde tem um encaixe: troque o que vai no lugar de <b>…</b> e você fala qualquer coisa. Toque numa palavra para traduzir; ouça e repita em voz alta.</div>
+    <div class="row" style="gap:8px"><button class="btn saff" style="flex:1" data-act="frames">Treinar fórmulas</button><button class="btn soft" style="flex:1" data-act="build">Montar frases</button></div>
+    ${list.map(fr=>`<div class="card frame"><div class="es" style="font-size:22px">${W(fr.es.replace("{x}","…"))}</div><div class="pt">${h(fr.pt.replace("{x}","…"))}</div><p class="small" style="margin-top:8px;background:var(--paper);border-radius:10px;padding:8px 10px">${fr.g}</p>
+      <div class="list">${fr.x.map(x=>`<div class="phrase"><div class="txt"><div class="es" style="font-size:16px">${W(fr.es.replace("{x}",x[0]))}</div><div class="pt small">${h(fr.pt.replace("{x}",x[1]))}</div></div>${sayBtn(fr.es.replace("{x}",x[0]))}</div>`).join("")}</div></div>`).join("")}`;
+}
 function startWrite(){
   let pool = seenCards(); if(pool.length<6) pool = unlockedCards();
   pool = pool.filter(c=>!/[\/…,]/.test(c.es) && c.es.length<=36);
@@ -5070,7 +5151,8 @@ function startFalsos(){
 
 /* Guarda um item para a rodada de correção do fim (uma cópia limpa, sem repetir o mesmo). */
 function miss(it){ if(!D || D.fixing || D.mode==="duel") return; const key = it.c ? it.c.id : (it.line ? it.line[1] : null); if(key && D.misses.some(m=>(m.c?m.c.id:(m.line?m.line[1]:null))===key)) return;
-  const cp = Object.assign({}, it, {picked:null, msg:null, heard:null, hinted:false, played:false, answer:null, listening:false, fix:true});
+  const cp = Object.assign({}, it, {picked:null, msg:null, heard:null, hinted:false, played:false, answer:null, listening:false, seq:[], res:null, fix:true});
+  if(cp.t==="build") cp.bank=shuffle(cp.bank);
   if(cp.t==="test") cp.dir="pt"; if(cp.t==="mc") cp.opts=shuffle(cp.opts); D.misses.push(cp); }
 function drawDrill(){
   const el = $("#drill");
@@ -5082,7 +5164,7 @@ function drawDrill(){
   let stage = "", actions = "";
   if(it.t==="fixintro"){
     const n=it.list.length; tone("ok");
-    stage = `<div class="flash" style="align-items:stretch;text-align:left"><span class="kind" style="text-align:center">Correção · ${n} ${n===1?"item":"itens"}</span><div class="big" style="text-align:center;font-size:24px">Vamos rever o que não saiu</div><p class="muted small" style="text-align:center">Ouça cada uma, repita em voz alta e depois pratique de novo.</p><div class="list">${it.list.map(m=>{ const es=m.c?(m.t==="mc"&&m.dir==="reply"?m.c.ans:m.c.es):m.line[1]; const pt=m.c?(m.t==="mc"&&m.dir==="reply"?m.c.ansPt:m.c.pt):m.line[2]; return `<div class="phrase"><div class="txt"><div class="es">${W(es)}</div><div class="pt">${h(pt)}</div></div>${sayBtn(es)}</div>`; }).join("")}</div></div>`;
+    stage = `<div class="flash" style="align-items:stretch;text-align:left"><span class="kind" style="text-align:center">Correção · ${n} ${n===1?"item":"itens"}</span><div class="big" style="text-align:center;font-size:24px">Vamos rever o que não saiu</div><p class="muted small" style="text-align:center">Ouça cada uma, repita em voz alta e depois pratique de novo.</p><div class="list">${it.list.map(m=>{ const es=m.es||(m.c?(m.t==="mc"&&m.dir==="reply"?m.c.ans:m.c.es):(m.line?m.line[1]:"")); const pt=m.pt||(m.c?(m.t==="mc"&&m.dir==="reply"?m.c.ansPt:m.c.pt):(m.line?m.line[2]:"")); return `<div class="phrase"><div class="txt"><div class="es">${W(es)}</div><div class="pt">${h(pt)}</div></div>${sayBtn(es)}</div>`; }).join("")}</div></div>`;
     actions = `<div class="actions"><button class="btn wide" data-act="next">Praticar a correção</button></div>`;
   } else if(it.t==="learn"){
     if(!it.played){ it.played=true; speak(c.es); }
@@ -5139,6 +5221,18 @@ function drawDrill(){
       : `<span class="kind">${fx}${it.dir==="es"?"O que significa?":"Como se diz em espanhol?"}</span><div class="big ${it.dir==="pt"?"pt":""}">${h(it.dir==="es"?c.es:c.pt)}</div>${it.dir==="es"?sayBtn(c.es):""}`;
     stage = `${it.who?`<div class="ctx">Respondendo: <b>${h(it.who.name)}</b></div>`:""}<div class="flash">${prompt}</div><div class="opts">${it.opts.map((o,k)=>{ let cls=""; if(it.picked!==null){ if(o===c[it.field]) cls=" right"; else if(k===it.picked) cls=" wrong"; } return `<button class="opt${cls}" data-act="pick" data-k="${k}" ${it.picked!==null?"disabled":""}>${h(o)}</button>`; }).join("")}</div>${it.msg ? `<div class="verdict ${it.msg.ok?"ok":"mid"}">${h(it.msg.es)} <span class="muted" style="font-weight:400">${h(it.msg.pt)}</span></div>`:""}${it.picked!==null && c.note ? `<div class="note">${h(c.note)}</div>`:""}`;
     actions = it.picked!==null ? `<div class="actions"><button class="btn wide" data-act="next">Próxima</button></div>` : "";
+  } else if(it.t==="build"){
+    const res=it.res;
+    stage = `<div class="flash"><span class="kind">${it.fix?"Correção · ":""}Monte a frase em espanhol</span><div class="big pt">${h(c.pt)}</div>
+      ${res ? `<div class="verdict ${res.ok?"ok":"bad"}">${res.ok?"¡Perfecto! Ordem certa.":"A ordem certa é:"} <span style="font-family:var(--f-display)">${W(c.es)}</span></div>${sayRow(c.es)}${c.note?`<div class="note">${h(c.note)}</div>`:""}`
+        : `<div class="seq" id="seq">${it.seq.length ? it.seq.map((bi,k)=>`<button data-act="bdrop" data-k="${k}">${h(it.bank[bi])}</button>`).join("") : `<span class="muted small" style="align-self:center">Toque nas palavras na ordem certa</span>`}</div>
+           <div class="bank">${it.bank.map((w,bi)=>`<button data-act="bpick" data-bi="${bi}" ${it.seq.includes(bi)?"disabled":""}>${h(w)}</button>`).join("")}</div>
+           <p class="small muted">${it.bank.length-it.target.length} ${it.bank.length-it.target.length===1?"palavra sobra":"palavras sobram"}. Toque numa palavra da frase para tirar.</p>`}</div>`;
+    actions = res ? `<div class="actions"><button class="btn wide" data-act="next">Próxima</button></div>` : `<div class="actions"><button class="btn wide" data-act="bcheck" ${it.seq.length?"":"disabled"}>Conferir</button></div>`;
+  } else if(it.t==="frame"){
+    stage = `<div class="ctx">Fórmula: <b>${h(it.fr.es.replace("{x}","…"))}</b> (${h(it.fr.pt.replace("{x}","…"))})</div><div class="flash"><span class="kind">${it.fix?"Correção · ":""}Diga a frase inteira em espanhol</span><div class="big pt">${h(it.pt)}</div>${heardHtml(it)}${D.revealed?`<hr><div class="ans">${W(it.es)}</div>${sayRow(it.es)}<p class="small" style="text-align:left;background:var(--paper);border-radius:10px;padding:8px 10px">${it.fr.g}</p>`:""}</div>`;
+    actions = D.revealed ? (it.heard && it.heard.score>=.8 || it.fix ? `<div class="actions"><button class="btn wide" data-act="next">Próxima</button></div>` : `<div class="actions duo"><button class="btn soft" data-act="convbad">Não saiu</button><button class="btn wide" data-act="framegood">Saiu bem</button></div>`)
+      : `<div class="actions${MIC?" duo":""}">${MIC?micBtn(it):""}<button class="btn wide" data-act="reveal">Já falei: ver a frase</button></div>`;
   } else if(it.t==="write"){
     const res = it.answer;
     stage = `<div class="flash"><span class="kind">${it.fix?"Correção · ":""}Escreva em espanhol</span><div class="big pt">${h(c.pt)}</div>
@@ -5151,14 +5245,16 @@ function drawDrill(){
 }
 function drawDone(){
   if(D.mode==="duel") return drawDuelDone();
-  if(!D.logged){ D.logged=true; const lg=logToday(); if(D.mode==="conv"){ lg.c=(lg.c||0)+1; S.conv=S.conv||{}; S.conv[D.week+D.which]=(S.conv[D.week+D.which]||0)+1; save(); } if(D.mode==="eco"||D.mode==="sons"||D.mode==="pron"){ lg.e=(lg.e||0)+1; save(); } }
-  const good = D.mode==="session" || D.mode==="conv" || D.mode==="eco" || D.mode==="sons" || D.score>=D.total*0.8;
+  if(!D.logged){ D.logged=true; const lg=logToday(); if(D.mode==="build"||D.mode==="frames"){ lg.b=(lg.b||0)+1; save(); } if(D.mode==="conv"){ lg.c=(lg.c||0)+1; S.conv=S.conv||{}; S.conv[D.week+D.which]=(S.conv[D.week+D.which]||0)+1; save(); } if(D.mode==="eco"||D.mode==="sons"||D.mode==="pron"){ lg.e=(lg.e||0)+1; save(); } }
+  const good = D.mode==="session" || D.mode==="conv" || D.mode==="eco" || D.mode==="sons" || D.score>=D.total*0.7;
   const pr = good ? rnd(PRAISE) : rnd(CHEER);
   confetti_if(good); tone("done");
   const M = {
     session:["¡Olé!","Sessão concluída!",`${D.fixed ? `${D.fixed} ${D.fixed===1?"frase revista":"frases revistas"} na correção; elas voltam amanhã. ` : ""}Agora pratique a conversa de hoje. Sequência: ${streak()} ${streak()===1?"dia":"dias"}.`],
     conv:["¡Genial!","Conversa completa!", D.fixed ? `${D.fixed} ${D.fixed===1?"fala revista":"falas revistas"} na correção. Amanhã vem ${D.week && WEEKS[D.week-1].dialogB?"a outra conversa deste tema":"a conversa do próximo tema"}.` : "Tudo de primeira. Se quiser, troque de papel e faça a outra pessoa."],
     eco:["¡Bien!","Eco concluído","Quanto mais você repete em voz alta, mais natural fica."],
+    build:["¡Muy bien!",`${D.score} de ${D.total} na ordem certa`,`${D.fixed ? `${D.fixed} ${D.fixed===1?"frase revista":"frases revistas"} na correção. ` : ""}Montar a frase é o passo entre decorar e falar: amanhã vêm outras.`],
+    frames:["¡Eso es!",`${D.score} de ${D.total} fórmulas`,`${D.fixed ? `${D.fixed} ${D.fixed===1?"revista":"revistas"} na correção. ` : ""}Com 18 moldes e o encaixe certo você diz quase tudo que precisa numa viagem.`],
     pron:["¡Qué bien suena!","Pronúncia treinada",`${D.firstTry} de ${D.total} entendidas de primeira. As que falharam voltam amanhã.`],
     sons:["¡Perfecto!","Sons revisados","Volte aqui sempre que algum som travar."]
   }[D.mode];
@@ -5301,7 +5397,7 @@ document.addEventListener("click", e=>{
     case "recvinv": { const d=parseInvite(($("#s-inv")||{}).value); if(!d){ toast("Não reconheci esse link. Cole o link inteiro."); break; } if(receiveScore(d)){ renderAll(); openPasajeros(); toast(`Placar de ${d.name} atualizado.`); } break; }
     case "addprofile": { const id=addProfile(($("#s-newp")||{}).value); if(!id){ toast("Digite um nome"); break; } openPasajeros(); toast("Passageiro adicionado. Toque em Usar para trocar."); break; }
     case "duel": startDuel(); break;
-    case "again": { const m=D.mode, wk=D.week, me=D.me, wh=D.which; closeDrill(); if(m==="write") startWrite(); else if(m==="falsos") startFalsos(); else if(m==="conv") startConv(wk,me,wh); else if(m==="duel") startDuel(); else if(m==="eco") startEco(); else if(m==="pron") startPron(); else if(m==="sons") startSons(); else startQuiz(m); break; }
+    case "again": { const m=D.mode, wk=D.week, me=D.me, wh=D.which; closeDrill(); if(m==="build"){ startBuild(); break; } if(m==="frames"){ startFrames(10); break; } if(m==="write") startWrite(); else if(m==="falsos") startFalsos(); else if(m==="conv") startConv(wk,me,wh); else if(m==="duel") startDuel(); else if(m==="eco") startEco(); else if(m==="pron") startPron(); else if(m==="sons") startSons(); else startQuiz(m); break; }
     case "conv": { if(el.dataset.pick){ pickConv(); break; } const wk = el.dataset.week ? +el.dataset.week : null; const wh=el.dataset.which||"A"; if(D) closeDrill(); startConv(wk, null, wh); break; }
     case "convswap": { const wk=D.week, me=D.me, wh=D.which||"A"; const lines = wh==="B" ? WEEKS[wk-1].dialogB : WEEKS[wk-1].dialog; const other=[...new Set(lines.map(l=>l[0]))].find(x=>x!==me); closeDrill(); startConv(wk, other, wh); break; }
     case "eco": startEco(); break;
@@ -5330,7 +5426,7 @@ document.addEventListener("click", e=>{
           return;
         }
         it.heard={text:alts[0], score:Math.max(...alts.map(a=>similarity(a,target)))}; tone(it.heard.score>=.5?"ok":"bad"); if(it.heard.score>=.8) buzz(15);
-        if(it.t==="mine" && it.heard.score<.5) miss(it);
+        if((it.t==="mine"||it.t==="frame") && it.heard.score<.5) miss(it);
         D.revealed=true; logToday().s++; save(); drawDrill(); speak(target);
       }).catch(code=>{
         it.listening=false;
@@ -5369,7 +5465,9 @@ document.addEventListener("click", e=>{
     case "learned": { const c=D.items[D.i].c; if(!S.cards[c.id]){ S.cards[c.id]={b:0,d:todayN()}; logToday().n++; save(); } D.i++; drawDrill(); break; }
     case "hint": { const it=D.items[D.i]; it.hinted=true; miss(it); drawDrill(); speak(it.line[1]); break; }
     case "convbad": { const it=D.items[D.i]; miss(it); tone("bad"); D.revealed=false; D.i++; drawDrill(); break; }
+    case "again_build": startBuild(); break;
     case "reveal": { const it=D.items[D.i]; const first=!D.revealed; D.revealed=true;
+      if(it.t==="frame"){ if(first && !it.heard){ logToday().s++; save(); } if(it.heard && it.heard.score<.5) miss(it); drawDrill(); speak(it.es); break; }
       if(it.t==="mine"){ if(first && !it.heard){ logToday().s++; save(); } if(it.heard && it.heard.score<.5) miss(it); drawDrill(); speak(it.line[1]); }
       else { drawDrill(); if(it.dir==="pt") speak(it.c.es); } break; }
     case "grade": {
@@ -5388,6 +5486,12 @@ document.addEventListener("click", e=>{
       if(D.mode!=="duel"){ logToday().q++; save(); } drawDrill(); if(it.dir==="pt") speak(it.c.es); else if(it.dir==="reply") speak(it.c.ans); break; }
     case "next": D.revealed=false; D.i++; drawDrill(); break;
     case "check": checkWrite(); break;
+    case "bpick": { const it=D.items[D.i]; const bi=+el.dataset.bi; if(it.seq.includes(bi)) break; it.seq.push(bi); drawDrill(); break; }
+    case "bdrop": { const it=D.items[D.i]; it.seq.splice(+el.dataset.k,1); drawDrill(); break; }
+    case "bcheck": { const it=D.items[D.i]; const got=it.seq.map(bi=>it.bank[bi]).join(" "); const ok = norm(got)===norm(it.target.join(" ")); it.res={ok}; tone(ok?"ok":"bad"); if(ok){ buzz(15); if(!it.fix) D.score++; } else { miss(it); if(S.cards[it.c.id]) S.cards[it.c.id].d=todayN(); } logToday().q++; save(); drawDrill(); speak(it.c.es); break; }
+    case "framegood": { const it=D.items[D.i]; if(!it.fix) D.score++; D.revealed=false; D.i++; drawDrill(); break; }
+    case "build": startBuild(); break;
+    case "frames": startFrames(10); break;
     case "acc": { const a=$("#ans"); if(a){ const s=a.selectionStart??a.value.length, en=a.selectionEnd??a.value.length; a.value=a.value.slice(0,s)+el.dataset.a+a.value.slice(en); a.focus(); a.setSelectionRange(s+1,s+1); } break; }
     case "settings": openSettings(); break;
     case "closesheet": $("#sheet").hidden=true; break;
