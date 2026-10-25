@@ -3285,6 +3285,728 @@ const FOODS = {
   ]
 };
 
+/* Pacotes adicionais de cidades. Mesmo formato de DEST; são fundidos em DEST, LEGS, WP_CITY, WP_PLACE, CURIOS e FOODS. */
+const DEST2 = {
+toledo: {
+  name:"Toledo", emoji:"🏰", region:"Castela-La Mancha · 33 min de Madri", cityMax:2,
+  stay:{min:1, ideal:1, text:"Vale 1 dia inteiro; com pernoite você vê a cidade vazia à noite e o Mirador del Valle iluminado. 2 dias só se quiser todos os museus com calma."},
+  curios:[
+    "Toledo foi a capital da Espanha até 1561 e é a 'cidade das três culturas': igrejas, sinagogas e mesquita a poucos minutos uma da outra.",
+    "O pintor <b>El Greco</b> viveu aqui 37 anos; sua obra-prima, <i>O enterro do Conde de Orgaz</i>, está numa igrejinha, a de Santo Tomé.",
+    "As espadas de Toledo eram as melhores da Europa; hoje as lojas vendem réplicas e o <b>damasquinado</b>, aço com fios de ouro.",
+    "O <b>mazapán</b> (massapão) nasceu nos conventos da cidade no século XIII, dizem que numa época de fome, com amêndoa e açúcar que sobravam.",
+    "A cidade velha fica num morro cercado pelo rio Tejo em três lados; por isso há escadas rolantes públicas para subir.",
+    "Em fevereiro faz de 2 a 13 °C e as ruas estreitas ficam vazias: a melhor época para andar sem multidão."
+  ],
+  must:[
+    {t:"Catedral Primada", area:"centro", slot:"m", tags:["historia","arte"], pay:1, book:"d", price:"~12,50 € com áudio-guia", link:"https://www.catedralprimada.es", tip:"Uma das grandes catedrais góticas da Europa, com o Transparente barroco e a sacristia cheia de El Grecos. Compre online para pular a fila; permite 2 h."},
+    {t:"Santo Tomé: O enterro do Conde de Orgaz", area:"judiaria", slot:"m", tags:["arte"], pay:1, book:"h", price:"~4 €", link:"https://www.santotome.org", tip:"A igreja só existe para esse quadro de El Greco. Vá cedo: o espaço é pequeno e enche com excursões."},
+    {t:"Sinagogas de Santa María la Blanca e del Tránsito", area:"judiaria", slot:"t", tags:["historia"], pay:1, book:"h", price:"~4 € e ~3 € (Tránsito grátis sáb à tarde e dom)", link:"https://www.cultura.gob.es/msefardi", tip:"A Blanca, do século XII, parece uma mesquita; a del Tránsito tem o Museu Sefardita. Ficam a 3 minutos uma da outra."},
+    {t:"Monasterio de San Juan de los Reyes", area:"judiaria", slot:"t", tags:["historia","arte"], pay:1, book:"h", price:"~4 €", link:"https://www.sanjuandelosreyes.org", tip:"Mosteiro gótico dos Reis Católicos, com claustro cheio de gárgulas. As correntes na fachada eram de cristãos libertados dos mouros."},
+    {t:"Mirador del Valle", area:"outra margem do Tejo", slot:"n", tags:["natureza"], pay:0, book:"g", price:"grátis (táxi ~15 € ida e volta)", link:"https://www.google.com/maps/search/Mirador+del+Valle+Toledo", tip:"A vista clássica da cidade inteira sobre o rio, melhor ao pôr do sol ou iluminada. Dá para ir a pé (35 min, subida) ou de táxi."},
+    {t:"Alcázar e Museo del Ejército", area:"topo da cidade", slot:"m", tags:["historia"], pay:1, book:"h", price:"~5 € (grátis dom)", link:"https://www.museo.ejercito.es", tip:"O fortão no alto da cidade, reconstruído após o cerco de 1936. Museu enorme; vale pela vista e pela história militar da Espanha."},
+    {t:"Museo del Greco", area:"judiaria", slot:"t", tags:["arte"], pay:1, book:"h", price:"~3 € (grátis sáb à tarde e dom)", link:"https://www.cultura.gob.es/mgreco", tip:"Casa-museu com os Apóstolos e a <i>Vista e plano de Toledo</i>. Pequeno e tranquilo."},
+    {t:"Mezquita del Cristo de la Luz", area:"norte da cidade velha", slot:"t", tags:["historia"], pay:1, book:"h", price:"~4 €", link:"https://www.toledomonumental.com", tip:"Mesquita do ano 999, minúscula e intacta, virada igreja. Perto da Puerta del Sol (a de Toledo)."},
+    {t:"Pontes de San Martín e de Alcántara", area:"beira do rio", slot:"t", tags:["natureza","historia"], pay:0, book:"g", price:"grátis", link:"https://www.google.com/maps/search/Puente+de+San+Mart%C3%ADn+Toledo", tip:"Duas pontes medievais sobre o Tejo. A de San Martín tem tirolesa (~10 €) sobre o rio, para quem quiser."},
+    {t:"Mazapán na confeitaria Santo Tomé", area:"Plaza de Zocodover", slot:"t", tags:["comida"], pay:1, book:"h", price:"~3 € a caixinha pequena", link:"https://www.mazapan.com", tip:"A casa de 1856. Peça <i>delicias</i> (recheadas de gema) e a <i>anguila</i>, a enguia de massapão que todos compram de lembrança."},
+    {t:"Zocodover e Calle del Comercio", area:"centro", slot:"n", tags:["comida"], pay:0, book:"g", price:"grátis", link:"https://www.google.com/maps/search/Plaza+de+Zocodover", tip:"A praça principal e a rua de lojas e bares. Tapas de <i>carcamusas</i> (ensopado de porco) nos bares da Calle Alfileritos."}
+  ],
+  daytrips:[
+    {t:"Madrid", how:"Avant até Atocha, 33 min", price:"~14 € cada trecho", book:"s", link:"https://www.renfe.com", tags:["arte","comida"], tip:"Toledo funciona também como base tranquila perto de Madri."},
+    {t:"Consuegra", how:"Ônibus Samar, 1 h", price:"~6 € cada trecho", book:"h", link:"https://www.samar.es", tags:["historia","natureza"], tip:"Os moinhos de vento do Dom Quixote numa colina, com castelo. Poucos ônibus por dia: confira a volta."},
+    {t:"Aranjuez", how:"Trem via Madrid ou ônibus, ~1 h 30", price:"~10 € cada trecho; palácio ~9 €", book:"h", link:"https://www.patrimonionacional.es", tags:["historia","natureza"], tip:"Palácio real e jardins à beira do Tejo. Grátis para ibero-americanos nas últimas horas de alguns dias."}
+  ],
+  transit:[
+    {t:"Madri ↔ Toledo", o:[
+      ["Trem Avant de Atocha","~14 € cada trecho, 33 min","https://www.renfe.com","Compre com antecedência: esgota nos fins de semana. A estação é um palácio neomudéjar; de lá ao centro são 20 min a pé (subida) ou ônibus 5/61/62 (~1,50 €)."],
+      ["Ônibus Alsa de Plaza Elíptica","~6 € cada trecho, 1 h","https://www.alsa.com","Sai a cada meia hora, sem hora marcada. Chega perto das escadas rolantes."]]},
+    {t:"Dentro da cidade", o:[
+      ["A pé e escadas rolantes","grátis","","A cidade é toda subida. As escadas rolantes de Recaredo e do Miradero levam da parte baixa ao centro sem esforço."],
+      ["Pulsera turística","~14 €","https://www.toledomonumental.com","Bracelete que dá entrada a 7 monumentos (Santo Tomé, sinagoga, mesquita, San Juan de los Reyes…). Compensa a partir de 4."],
+      ["Táxi ao Mirador del Valle","~15 € ida e volta","","Peça para esperar 10 minutos no mirante."]]}
+  ],
+  days:[
+    [["m","Catedral Primada"],["m","Santo Tomé: O enterro do Conde de Orgaz"],["t","Sinagogas de Santa María la Blanca e del Tránsito"],["t","Monasterio de San Juan de los Reyes"],["n","Mirador del Valle"]],
+    [["m","Alcázar e Museo del Ejército"],["t","Museo del Greco|Mezquita del Cristo de la Luz"],["t","Mazapán na confeitaria Santo Tomé|Pontes de San Martín e de Alcántara"],["n","Zocodover e Calle del Comercio"]]
+  ]
+},
+cordoba: {
+  name:"Córdoba", emoji:"🕌", region:"Andaluzia · 45 min de Sevilla", cityMax:2,
+  stay:{min:1, ideal:2, text:"Vale 1 dia cheio para a Mesquita e a judiaria; com 2 dias entram Medina Azahara e os pátios. Fica no caminho do AVE entre Madri e Sevilla."},
+  curios:[
+    "No século X Córdoba foi a maior cidade da Europa, com uns 400 mil habitantes, ruas iluminadas e bibliotecas enormes.",
+    "A <b>Mesquita-Catedral</b> tem 856 colunas; no século XVI construíram uma catedral no meio dela. Carlos V teria dito: 'destruíram o que era único para fazer o que há em qualquer lugar'.",
+    "Os <b>pátios</b> floridos ganham um concurso em maio, mas vários abrem o ano inteiro no bairro de San Basilio.",
+    "Nasceram aqui Sêneca, o filósofo romano, Averróis e Maimônides, os dois grandes sábios da Idade Média.",
+    "O <b>salmorejo</b> é daqui: tomate, pão, azeite e alho, mais espesso que gaspacho, com presunto e ovo por cima.",
+    "Fevereiro em Córdoba: 8 a 17 °C, laranjeiras carregadas e as ruas da judiaria sem turistas."
+  ],
+  must:[
+    {t:"Mezquita-Catedral", area:"judiaria", slot:"m", tags:["historia","arte"], pay:1, book:"d", price:"~13 € (grátis seg a sáb das 8h30 às 9h30, sem grupos)", link:"https://mezquita-catedraldecordoba.es", tip:"Entre na primeira hora: de graça e quase vazia. Compre online se for mais tarde. Torre (~3 €) com vista da cidade."},
+    {t:"Judería e Calleja de las Flores", area:"judiaria", slot:"t", tags:["historia"], pay:0, book:"g", price:"grátis", link:"https://www.google.com/maps/search/Calleja+de+las+Flores+C%C3%B3rdoba", tip:"Ruelas brancas com vasos azuis; a Calleja de las Flores enquadra a torre da Mesquita. A Sinagoga (século XIV) é grátis."},
+    {t:"Alcázar de los Reyes Cristianos", area:"ao lado da Mesquita", slot:"t", tags:["historia","natureza"], pay:1, book:"h", price:"~5 €", link:"https://www.cordoba.es", tip:"Jardins com tanques e laranjeiras, mosaicos romanos e torres com vista. Foi sede da Inquisição e onde Colombo falou com os Reis Católicos."},
+    {t:"Puente Romano e Torre de la Calahorra", area:"rio Guadalquivir", slot:"t", tags:["historia","natureza"], pay:0, book:"g", price:"ponte grátis; torre ~4,50 €", link:"https://www.torrecalahorra.es", tip:"Atravesse ao entardecer para ver a Mesquita do outro lado. A torre tem o museu das três culturas."},
+    {t:"Medina Azahara", area:"8 km a oeste", slot:"m", tags:["historia"], pay:1, book:"h", price:"~2 € + ônibus turístico ~9 €", link:"https://www.museosdeandalucia.es/web/conjuntoarqueologicomadinatalzahra", tip:"A cidade-palácio do califa, do ano 936, escavada aos poucos. Ônibus turístico sai da Avenida del Alcázar; confira horários (fecha seg)."},
+    {t:"Palacio de Viana", area:"Santa Marina", slot:"t", tags:["historia","natureza"], pay:1, book:"h", price:"~10 € (só pátios ~7 €)", link:"https://www.palaciodeviana.com", tip:"12 pátios diferentes num só palácio: o jeito de ver os pátios cordobeses fora de maio."},
+    {t:"Patios de San Basilio", area:"San Basilio", slot:"t", tags:["natureza"], pay:1, book:"h", price:"~5 € (passe de 5 pátios)", link:"https://www.patiosdesanbasilio.com", tip:"Pátios particulares abertos o ano todo, a 10 minutos do Alcázar. Os donos contam a história."},
+    {t:"Baños del Alcázar Califal", area:"Campo Santo de los Mártires", slot:"m", tags:["historia"], pay:1, book:"h", price:"~3 €", link:"https://www.cordoba.es", tip:"Banhos árabes do século X, bem conservados, com projeção explicando o ritual."},
+    {t:"Plaza de la Corredera", area:"centro", slot:"n", tags:["comida"], pay:0, book:"g", price:"grátis", link:"https://www.google.com/maps/search/Plaza+de+la+Corredera", tip:"Praça porticada que já foi praça de touros; mercado de manhã e bares à noite."},
+    {t:"Tabernas: salmorejo e flamenquín", area:"centro", slot:"n", tags:["comida"], pay:1, book:"h", price:"~20 € por pessoa", link:"https://www.google.com/maps/search/Taberna+Salinas+C%C3%B3rdoba", tip:"Taberna Salinas (1879), Bodegas Mezquita, Casa Pepe de la Judería. Peça salmorejo, flamenquín, berinjela com mel e rabo de toro."},
+    {t:"Mercado Victoria", area:"Jardines de la Victoria", slot:"n", tags:["comida"], pay:1, book:"h", price:"~15 €", link:"https://www.mercadovictoria.com", tip:"Mercado gastronômico num pavilhão de ferro de 1877. Bom para provar várias coisas num jantar só."}
+  ],
+  daytrips:[
+    {t:"Sevilla", how:"Avant, 45 min", price:"~14 € cada trecho", book:"s", link:"https://www.renfe.com", tags:["arte","comida"], tip:"Tão perto que muita gente faz Córdoba como bate-volta de Sevilla; o contrário também funciona."},
+    {t:"Granada", how:"Trem Avant, 1 h 40", price:"~20 € cada trecho", book:"s", link:"https://www.renfe.com", tags:["historia","arte"], tip:"Só como bate-volta se já tiver ingresso da Alhambra; melhor dormir lá."},
+    {t:"Madrid", how:"AVE, 1 h 45", price:"~30 a 60 €", book:"s", link:"https://www.renfe.com", tags:["arte"], tip:"Córdoba fica no meio do caminho do AVE Madri–Sevilla: dá para parar um dia entre as duas."}
+  ],
+  transit:[
+    {t:"Chegar a Córdoba", o:[
+      ["AVE/Avant de Sevilla (45 min) ou Madri (1 h 45)","~14 € de Sevilla; ~30 a 60 € de Madri","https://www.renfe.com","Também Iryo e Ouigo no trecho de Madri. A estação fica a 20 min a pé da Mesquita ou ônibus 3 (~1,30 €)."],
+      ["Ônibus Alsa","~12 € de Sevilla, 1 h 45","https://www.alsa.com","Mais barato e sem hora marcada; rodoviária ao lado da estação de trem."]]},
+    {t:"Dentro da cidade", o:[
+      ["A pé","grátis","","Tudo do centro histórico fica a 15 minutos da Mesquita. É plano."],
+      ["Táxi","~8 € estação–centro","","Útil com malas: a judiaria é cheia de ruelas sem carro."]]}
+  ],
+  days:[
+    [["m","Mezquita-Catedral"],["t","Judería e Calleja de las Flores"],["t","Alcázar de los Reyes Cristianos"],["n","Tabernas: salmorejo e flamenquín"]],
+    [["m","Medina Azahara|Baños del Alcázar Califal"],["t","Palacio de Viana|Patios de San Basilio"],["t","Puente Romano e Torre de la Calahorra"],["n","Plaza de la Corredera|Mercado Victoria"]]
+  ]
+},
+granada: {
+  name:"Granada", emoji:"🌙", region:"Andaluzia · Alhambra", cityMax:3,
+  stay:{min:2, ideal:2, text:"Vale 2 dias: um para a Alhambra (meio dia inteiro) e o Albaicín, outro para o centro, a Capilla Real e o Sacromonte. 3 dias se quiser Sierra Nevada ou as Alpujarras."},
+  curios:[
+    "A <b>Alhambra</b> esgota semanas antes: os ingressos saem com dia e hora exatos para os Palácios Nazaríes. Reserve assim que tiver a data.",
+    "Granada é a cidade espanhola que ainda serve <b>tapa grátis</b> de verdade: cada bebida vem com um prato, e muda a cada rodada.",
+    "A entrega de Granada em 1492, o fim do último reino muçulmano, aconteceu no mesmo ano em que Colombo partiu: Isabel e Fernando estão enterrados aqui, na Capilla Real.",
+    "O poeta <b>Federico García Lorca</b> nasceu e morreu em Granada; sua casa de verão, a Huerta de San Vicente, fica num parque da cidade.",
+    "Do <b>Mirador de San Nicolás</b> vê-se a Alhambra com a Sierra Nevada branca atrás. Bill Clinton disse que era o pôr do sol mais bonito do mundo.",
+    "Em fevereiro faz de 3 a 14 °C e dá para esquiar na Sierra Nevada de manhã (40 min) e tomar sol na praia à tarde (1 h)."
+  ],
+  must:[
+    {t:"Alhambra e Generalife", area:"colina da Sabika", slot:"m", tags:["historia","arte","natureza"], pay:1, book:"s", price:"~19 €", link:"https://tickets.alhambra-patronato.es", tip:"Só no site oficial, com até 3 meses de antecedência. O horário impresso é o dos Palácios Nazaríes: chegue 30 min antes. Leve o passaporte. Reserve 3 a 4 horas."},
+    {t:"Albaicín e Mirador de San Nicolás", area:"Albaicín", slot:"t", tags:["historia","natureza"], pay:0, book:"g", price:"grátis", link:"https://www.google.com/maps/search/Mirador+de+San+Nicol%C3%A1s", tip:"Suba pelas ruelas brancas do bairro mouro até o mirante, para o pôr do sol. Minibus C31/C32 de Plaza Nueva se cansar."},
+    {t:"Capilla Real e Catedral", area:"centro", slot:"m", tags:["historia","arte"], pay:1, book:"h", price:"~6 € cada", link:"https://capillarealgranada.com", tip:"Os túmulos de Isabel e Fernando, com a coleção de pintura flamenga da rainha. A catedral renascentista ao lado é enorme e clara."},
+    {t:"Carrera del Darro e El Bañuelo", area:"sopé do Albaicín", slot:"t", tags:["historia"], pay:1, book:"h", price:"Bañuelo ~5 € (passe Dobla de Oro)", link:"https://www.alhambra-patronato.es", tip:"A rua mais bonita da cidade, ao longo do rio, com a Alhambra em cima. O Bañuelo são banhos árabes do século XI."},
+    {t:"Sacromonte: cuevas e zambra flamenca", area:"Sacromonte", slot:"n", tags:["musica","historia"], pay:1, book:"d", price:"~25 a 30 €", link:"https://www.cuevaslosTarantos.com", tip:"Flamenco cigano dentro de grutas-casa (Cuevas Los Tarantos, Venta El Gallo). Reserve na véspera. O Museo Cuevas del Sacromonte conta como se vivia nas grutas."},
+    {t:"Tapas grátis: Calle Navas e Plaza Nueva", area:"centro", slot:"n", tags:["comida"], pay:0, book:"g", price:"só a bebida (~2,50 €)", link:"https://www.google.com/maps/search/Calle+Navas+Granada", tip:"Peça uma caña ou um vinho e a tapa vem junto. Bodegas Castañeda, Los Diamantes (frituras), Bar Ávila. Três rodadas viram um jantar."},
+    {t:"Alcaicería e Plaza Bib-Rambla", area:"centro", slot:"t", tags:["historia"], pay:0, book:"g", price:"grátis", link:"https://www.google.com/maps/search/Alcaicer%C3%ADa+Granada", tip:"O antigo bazar da seda, hoje lojas de lembranças e chás; ao lado, a praça das flores e dos churros."},
+    {t:"Paseo de los Tristes", area:"sopé da Alhambra", slot:"t", tags:["natureza"], pay:0, book:"g", price:"grátis", link:"https://www.google.com/maps/search/Paseo+de+los+Tristes", tip:"Terraços com a Alhambra iluminada em cima. Dali sai o caminho (Cuesta del Rey Chico) que sobe à Alhambra a pé."},
+    {t:"Monasterio de la Cartuja", area:"norte", slot:"m", tags:["arte"], pay:1, book:"h", price:"~5 €", link:"https://cartujadegranada.com", tip:"Sacristia barroca delirante, toda em mármore e madeira. Longe do centro: ônibus 8 ou N7."},
+    {t:"Hammam Al Ándalus", area:"Plaza Nueva", slot:"t", tags:["natureza"], pay:1, book:"s", price:"~45 €", link:"https://granada.hammamalandalus.com", tip:"Banhos árabes recriados, com piscinas quentes e chá. Reserve com dias de antecedência; bom para o fim da tarde no frio."},
+    {t:"Huerta de San Vicente (casa de Lorca)", area:"Parque García Lorca", slot:"t", tags:["arte"], pay:1, book:"h", price:"~3 €", link:"https://www.huertadesanvicente.com", tip:"A casa de verão do poeta, com piano e manuscritos. Visita guiada curta."}
+  ],
+  daytrips:[
+    {t:"Sierra Nevada", how:"Ônibus Alsa, 1 h (3 por dia no inverno)", price:"~10 € ida e volta; forfait ~55 €", book:"d", link:"https://www.sierranevada.es", tags:["natureza"], tip:"A estação de esqui mais ao sul da Europa, aberta em fevereiro. Mesmo sem esquiar dá para subir de teleférico e almoçar na neve."},
+    {t:"Las Alpujarras (Pampaneira)", how:"Ônibus Alsa, 1 h 45", price:"~7 € cada trecho", book:"h", link:"https://www.alsa.com", tags:["natureza","comida"], tip:"Vilas brancas de telhado plano penduradas na serra: Pampaneira, Bubión, Capileira. Jamón de Trevélez e plato alpujarreño."},
+    {t:"Córdoba", how:"Trem Avant, 1 h 40", price:"~20 € cada trecho", book:"s", link:"https://www.renfe.com", tags:["historia"], tip:"Mesquita de manhã cedo (grátis até 9h30) e judiaria. Volte à noite."},
+    {t:"Nerja e Frigiliana", how:"Ônibus Alsa, 1 h 45", price:"~10 € cada trecho", book:"h", link:"https://www.alsa.com", tags:["natureza"], tip:"Mar em fevereiro: o Balcón de Europa, a gruta de Nerja e a vila branca de Frigiliana."}
+  ],
+  transit:[
+    {t:"Chegar a Granada", o:[
+      ["AVE de Madri","~40 a 70 €, 3 h 15","https://www.renfe.com","Direto de Atocha. A estação fica a 20 min a pé do centro ou ônibus 4/33."],
+      ["Trem ou ônibus de Sevilla","trem ~30 €, 2 h 40; ônibus Alsa ~25 €, 3 h","https://www.alsa.com","Sem trem rápido. O ônibus sai mais vezes e chega à rodoviária (ônibus 33 ao centro, 15 min)."],
+      ["De Córdoba","Avant ~20 €, 1 h 40","https://www.renfe.com","A melhor combinação: Sevilla → Córdoba → Granada."]]},
+    {t:"Dentro da cidade", o:[
+      ["Minibus C30, C31, C32","~1,40 €","https://www.transportesrober.com","Os micro-ônibus que sobem à Alhambra (C30/C32) e ao Albaicín/Sacromonte (C31/C34) de Plaza Nueva e Plaza Isabel la Católica."],
+      ["A pé","grátis","","O centro é plano; Albaicín e Alhambra são subida. Calçado bom: pedras lisas."],
+      ["Táxi à Alhambra","~8 €","","Vale na ida com horário marcado; a volta pode ser a pé pela Cuesta de Gomérez."]]}
+  ],
+  days:[
+    [["m","Alhambra e Generalife"],["t","Carrera del Darro e El Bañuelo"],["t","Albaicín e Mirador de San Nicolás"],["n","Tapas grátis: Calle Navas e Plaza Nueva"]],
+    [["m","Capilla Real e Catedral"],["t","Alcaicería e Plaza Bib-Rambla"],["t","Paseo de los Tristes|Hammam Al Ándalus"],["n","Sacromonte: cuevas e zambra flamenca"]],
+    [["m","Monasterio de la Cartuja|Huerta de San Vicente (casa de Lorca)"],["t","Hammam Al Ándalus|Paseo de los Tristes"],["n","Tapas grátis: Calle Navas e Plaza Nueva"]]
+  ]
+},
+valencia: {
+  name:"Valencia", emoji:"🥘", region:"Comunidade Valenciana · 1 h 45 de Madri", cityMax:3,
+  stay:{min:2, ideal:2, text:"Vale 2 dias: um para o centro histórico e o Mercado Central, outro para a Cidade das Artes e a praia. Um terceiro para a paella na Albufera."},
+  curios:[
+    "A <b>paella</b> é daqui, e a verdadeira leva frango, coelho e feijão <i>garrofó</i>, não frutos do mar. Come-se ao almoço, nunca à noite.",
+    "O rio Túria foi desviado depois da enchente de 1957 e o leito virou um parque de 9 km que atravessa a cidade.",
+    "A <b>Lonja de la Seda</b>, bolsa de seda gótica de 1482, é Patrimônio da Humanidade; os mercadores negociavam entre colunas que imitam palmeiras.",
+    "A catedral guarda o <b>Santo Cálice</b>, que a tradição diz ser a taça da Última Ceia, reconhecido pelo Vaticano como relíquia.",
+    "As <b>Fallas</b> (15 a 19 de março) queimam esculturas gigantes de papelão; em fevereiro os ateliês já estão a todo vapor e dá para visitar alguns.",
+    "Fevereiro em Valencia: 8 a 17 °C e sol; é a cidade grande mais quente da Espanha no inverno, e as laranjas estão no ponto."
+  ],
+  must:[
+    {t:"Ciutat de les Arts i les Ciències", area:"antigo leito do Túria", slot:"m", tags:["arte","natureza"], pay:1, book:"d", price:"Oceanogràfic ~37 €; Hemisfèric ~9 €; passear por fora grátis", link:"https://www.cac.es", tip:"O complexo futurista de Calatrava. O Oceanogràfic é o maior aquário da Europa (reserve meio dia). Passear entre os prédios e os espelhos d'água não custa nada."},
+    {t:"Mercado Central", area:"centro", slot:"m", tags:["comida","arte"], pay:0, book:"g", price:"grátis", link:"https://www.mercadocentralvalencia.es", tip:"Mercado modernista de 1928, um dos mais bonitos da Europa. Vá de manhã (fecha às 15h, dom fechado): frutas, presunto, horchata e um balcão de tapas, o Central Bar."},
+    {t:"Lonja de la Seda", area:"em frente ao mercado", slot:"m", tags:["historia","arte"], pay:1, book:"h", price:"~2 € (grátis dom)", link:"https://www.valencia.es", tip:"Salão de colunas torcidas e o pátio das laranjeiras. Visita de 30 minutos que vale cada centavo."},
+    {t:"Catedral, Miguelete e Santo Cáliz", area:"Plaza de la Reina", slot:"t", tags:["historia","arte"], pay:1, book:"h", price:"~9 € com áudio-guia; torre ~2,50 €", link:"https://catedraldevalencia.es", tip:"Afrescos renascentistas, a capela do Santo Cálice e 207 degraus do Miguelete para a vista dos telhados azuis."},
+    {t:"Barrio del Carmen e Torres de Serranos", area:"cidade velha", slot:"t", tags:["historia"], pay:1, book:"h", price:"torres ~2 € (grátis dom)", link:"https://www.valencia.es", tip:"Ruas de grafites, praças com bares e a porta medieval da cidade: suba nas Torres de Serranos ao fim da tarde."},
+    {t:"Jardín del Turia de bicicleta", area:"leito do rio", slot:"t", tags:["natureza"], pay:1, book:"h", price:"aluguel ~10 € meio dia", link:"https://www.valenbisi.es", tip:"9 km planos e sem carros, do Bioparc à Cidade das Artes, com o parque Gulliver para crianças no caminho."},
+    {t:"Paella em El Palmar (Albufera)", area:"15 km ao sul", slot:"m", tags:["comida","natureza"], pay:1, book:"d", price:"~20 € por pessoa", link:"https://www.google.com/maps/search/El+Palmar+Valencia", tip:"A lagoa onde o arroz é plantado e a vila dos restaurantes de paella. Ônibus 24/25 (~1,50 €). Reserve a paella (leva 40 min) e termine com passeio de barco ao pôr do sol."},
+    {t:"Playa de la Malvarrosa e Cabanyal", area:"orla", slot:"t", tags:["natureza","comida"], pay:0, book:"g", price:"grátis", link:"https://www.google.com/maps/search/Playa+de+la+Malvarrosa", tip:"Praia urbana larga, calçadão e os restaurantes históricos de arroz (La Pepica, onde Hemingway comia). O Cabanyal, bairro de pescadores, tem fachadas de azulejo."},
+    {t:"Horchata com fartons em Alboraya", area:"Alboraya (metrô 3)", slot:"t", tags:["comida"], pay:1, book:"h", price:"~5 €", link:"https://www.horchateriadaniel.es", tip:"A bebida de chufa (tigernut) gelada, com os pãezinhos doces para molhar. Horchatería Daniel, no vilarejo onde a chufa é plantada; na cidade, Santa Catalina."},
+    {t:"Museo de Bellas Artes", area:"Jardines del Real", slot:"t", tags:["arte"], pay:0, book:"g", price:"grátis", link:"https://museobellasartesvalencia.gva.es", tip:"Goya, Velázquez, El Greco, Sorolla e os primitivos valencianos. Grátis e quase vazio."},
+    {t:"Ruzafa à noite", area:"Ruzafa", slot:"n", tags:["comida"], pay:1, book:"h", price:"~25 € por pessoa", link:"https://www.google.com/maps/search/Ruzafa+Valencia", tip:"O bairro boêmio: bares de tapas, restaurantes modernos e o Mercado de Ruzafa. Agua de Valencia no Café de las Horas, no centro, antes."},
+    {t:"Mercado de Colón", area:"Eixample", slot:"n", tags:["comida","arte"], pay:0, book:"g", price:"grátis", link:"https://www.mercadocolon.es", tip:"Mercado modernista virado praça de cafés e horchaterías. Bonito à noite, iluminado."}
+  ],
+  daytrips:[
+    {t:"Xàtiva", how:"Cercanías C2, 50 min", price:"~5 € cada trecho; castelo ~3 €", book:"h", link:"https://www.renfe.com", tags:["historia","natureza"], tip:"Castelo duplo numa serra sobre a cidade natal dos papas Bórgia. Suba de trenzinho turístico ou a pé (45 min)."},
+    {t:"Sagunto", how:"Cercanías C6, 30 min", price:"~4 € cada trecho", book:"h", link:"https://www.renfe.com", tags:["historia"], tip:"Teatro romano e castelo de 1 km de muralhas, com vista do mar. Meio dia basta."},
+    {t:"Peñíscola", how:"Trem até Benicarló + ônibus, 2 h", price:"~20 € cada trecho", book:"d", link:"https://www.renfe.com", tags:["historia","natureza"], tip:"Vila murada numa rocha no mar, castelo do Papa Luna; foi Meereen em <i>Game of Thrones</i>. Dia longo."}
+  ],
+  transit:[
+    {t:"Chegar a Valencia", o:[
+      ["AVE de Madri","~30 a 60 €, 1 h 45","https://www.renfe.com","Também Iryo e Ouigo (mais baratos). Chega à estação Joaquín Sorolla, a 15 min a pé do centro."],
+      ["Euromed de Barcelona","~30 a 50 €, 2 h 50","https://www.renfe.com","Vai pela costa; sente do lado esquerdo indo para o sul."],
+      ["Aeroporto → centro","metrô linhas 3 e 5, ~5 €, 25 min","https://www.metrovalencia.es","Táxi ~25 €."]]},
+    {t:"Dentro da cidade", o:[
+      ["Metrô e bonde","~1,50 € + cartão (Suma 10 viagens ~8 €)","https://www.metrovalencia.es","O bonde 4/6 vai à praia; o metrô 3 a Alboraya."],
+      ["Bicicleta","Valenbisi ~13 € a semana; aluguéis ~10 € o dia","https://www.valenbisi.es","A cidade é plana e cheia de ciclovias: o jeito valenciano de se mover."],
+      ["Ônibus 24/25 à Albufera","~1,50 €","https://www.emtvalencia.es","Da Plaza del Ayuntamiento ou da orla até El Palmar, 45 min."]]}
+  ],
+  days:[
+    [["m","Mercado Central"],["m","Lonja de la Seda"],["t","Catedral, Miguelete e Santo Cáliz"],["t","Barrio del Carmen e Torres de Serranos"],["n","Ruzafa à noite"]],
+    [["m","Ciutat de les Arts i les Ciències"],["t","Jardín del Turia de bicicleta"],["t","Playa de la Malvarrosa e Cabanyal"],["n","Mercado de Colón"]],
+    [["m","Paella em El Palmar (Albufera)"],["t","Horchata com fartons em Alboraya|Museo de Bellas Artes"],["n","Ruzafa à noite"]]
+  ]
+},
+zaragoza: {
+  name:"Zaragoza", emoji:"⛪", region:"Aragão · 1 h 20 de Madri e de Barcelona", cityMax:2,
+  stay:{min:1, ideal:1, text:"Vale 1 dia cheio: fica exatamente no meio do AVE entre Madri e Barcelona, então é a parada perfeita. 2 dias com Goya, Aljafería e calma no El Tubo."},
+  curios:[
+    "A <b>Basílica del Pilar</b> guarda duas bombas que caíram na Guerra Civil e não explodiram; estão expostas numa coluna, e as marcas no teto também.",
+    "O <b>Pilar</b> é a coluna onde a Virgem teria aparecido ao apóstolo Santiago no ano 40: é o santuário mariano mais antigo do mundo cristão, segundo a tradição.",
+    "<b>Goya</b> nasceu a 40 km, em Fuendetodos, e pintou afrescos na cúpula do Pilar quando jovem.",
+    "A <b>Aljafería</b> foi palácio dos reis muçulmanos de Saraqusta no século XI, depois dos reis cristãos e da Inquisição; hoje é a sede do parlamento aragonês.",
+    "O <b>cierzo</b>, vento frio do vale do Ebro, é famoso: em fevereiro pode ventar forte, com 2 a 13 °C.",
+    "O bairro de bares chama-se <b>El Tubo</b> (o tubo) porque as ruas são tão estreitas que a multidão escorre por elas."
+  ],
+  must:[
+    {t:"Basílica del Pilar", area:"Plaza del Pilar", slot:"m", tags:["historia","arte"], pay:0, book:"g", price:"grátis; torre ~4 €", link:"https://www.basilicadelpilar.es", tip:"Beije o Pilar como os locais (há uma abertura na coluna), veja as bombas e os afrescos de Goya, e suba de elevador na torre para ver o Ebro."},
+    {t:"Catedral del Salvador (La Seo)", area:"Plaza del Pilar", slot:"m", tags:["historia","arte"], pay:1, book:"h", price:"~7 € com o Museu de Tapeçarias", link:"https://www.catedraldezaragoza.es", tip:"Do outro lado da praça, mais antiga e mais bonita por dentro que o Pilar; a parede mudéjar externa é um tapete de azulejo."},
+    {t:"Palacio de la Aljafería", area:"oeste do centro", slot:"m", tags:["historia","arte"], pay:1, book:"h", price:"~5 € (grátis dom)", link:"https://www.cortesaragon.es/aljaferia", tip:"Palácio islâmico do século XI, com pátio de laranjeiras e arcos entrelaçados; inspirou a Alhambra. Confira dias de visita (parlamento em sessão)."},
+    {t:"Museo Goya e Patio de la Infanta", area:"centro", slot:"t", tags:["arte"], pay:1, book:"h", price:"Goya ~6 €; Patio grátis", link:"https://museogoya.fundacionibercaja.es", tip:"Todas as séries de gravuras de Goya e retratos. O Patio de la Infanta, renascentista, fica a 5 minutos e é grátis."},
+    {t:"El Tubo: tapas", area:"centro", slot:"n", tags:["comida"], pay:1, book:"h", price:"~20 € por pessoa", link:"https://www.google.com/maps/search/El+Tubo+Zaragoza", tip:"Ruelas de bares, cada um com sua tapa: champiñón do Casa Lac/El Champi, ternasco, croquetas. Em pé e pulando de bar em bar."},
+    {t:"Caesaraugusta: Foro e Teatro romanos", area:"centro", slot:"t", tags:["historia"], pay:1, book:"h", price:"~7 € os 4 museus romanos", link:"https://www.zaragoza.es/sede/portal/museos", tip:"Zaragoza foi colônia de Augusto (daí o nome). O teatro de 6 mil lugares ficou escondido sob casas até 1972."},
+    {t:"Puente de Piedra e margem do Ebro", area:"rio", slot:"t", tags:["natureza"], pay:0, book:"g", price:"grátis", link:"https://www.google.com/maps/search/Puente+de+Piedra+Zaragoza", tip:"Atravesse a ponte do século XV para ver o Pilar refletido no Ebro ao entardecer, a foto da cidade."},
+    {t:"Mercado Central", area:"centro", slot:"m", tags:["comida"], pay:0, book:"g", price:"grátis", link:"https://www.mercadocentralzaragoza.com", tip:"Mercado de ferro de 1903, restaurado, com balcões de tapas no meio. Bom para provar jamón de Teruel e borrajas."},
+    {t:"Parque Grande e Expo 2008", area:"sul e norte", slot:"t", tags:["natureza"], pay:0, book:"g", price:"grátis", link:"https://www.google.com/maps/search/Parque+Grande+Jos%C3%A9+Antonio+Labordeta", tip:"O parque com escadaria monumental para um passeio tranquilo; no outro extremo, o recinto da Expo 2008 com a Torre del Agua e a ponte-pavilhão de Zaha Hadid."},
+    {t:"Iglesia de San Pablo e Casco mudéjar", area:"San Pablo", slot:"t", tags:["historia"], pay:1, book:"h", price:"~3 €", link:"https://www.google.com/maps/search/Iglesia+de+San+Pablo+Zaragoza", tip:"A torre mudéjar octogonal é Patrimônio da Humanidade. O bairro ('El Gancho') é o mais antigo e multicultural."}
+  ],
+  daytrips:[
+    {t:"Fuendetodos", how:"Ônibus Samar, 1 h", price:"~6 € cada trecho; casa ~3 €", book:"h", link:"https://www.fundacionfuendetodosgoya.org", tags:["arte"], tip:"A casa natal de Goya e o museu de gravuras, numa aldeia de pedra. Poucos ônibus: confira a volta."},
+    {t:"Monasterio de Piedra", how:"Carro, 1 h 30 (ônibus só fim de semana)", price:"~17 €", book:"d", link:"https://monasteriopiedra.com", tags:["natureza"], tip:"Mosteiro cisterciense num parque de cachoeiras e grutas. Em fevereiro, com água de sobra."},
+    {t:"Tarazona e Veruela", how:"Ônibus Therpasa, 1 h 15", price:"~8 € cada trecho", book:"h", link:"https://www.therpasa.es", tags:["historia"], tip:"Cidade mudéjar com catedral restaurada e o mosteiro de Veruela, onde Bécquer escreveu as <i>Cartas desde mi celda</i>."}
+  ],
+  transit:[
+    {t:"Chegar a Zaragoza", o:[
+      ["AVE de Madri ou Barcelona","~25 a 50 €, 1 h 20 a 1 h 30","https://www.renfe.com","Também Iryo e Ouigo. A estação Delicias fica longe do centro: ônibus 34 ou 51 (~1,50 €, 15 min) ou táxi ~10 €."],
+      ["Ônibus Alsa","~15 a 20 €, 3 h 45 de Madri","https://www.alsa.com","Só se o trem estiver caro; a rodoviária é na mesma estação Delicias."]]},
+    {t:"Dentro da cidade", o:[
+      ["A pé","grátis","","O centro histórico (Pilar, Seo, Tubo, mercado) cabe em 15 minutos; a Aljafería fica a 20 min."],
+      ["Bonde (tranvía)","~1,50 €","https://www.tranviasdezaragoza.es","Uma linha só, cruza a cidade de norte a sul pela Gran Vía."]]}
+  ],
+  days:[
+    [["m","Basílica del Pilar"],["m","Catedral del Salvador (La Seo)"],["t","Caesaraugusta: Foro e Teatro romanos|Museo Goya e Patio de la Infanta"],["t","Puente de Piedra e margem do Ebro"],["n","El Tubo: tapas"]],
+    [["m","Palacio de la Aljafería"],["m","Mercado Central"],["t","Iglesia de San Pablo e Casco mudéjar|Parque Grande e Expo 2008"],["n","El Tubo: tapas"]]
+  ]
+},
+salamanca: {
+  name:"Salamanca", emoji:"🎓", region:"Castela e Leão · 1 h 40 de Madri", cityMax:2,
+  stay:{min:1, ideal:2, text:"Vale 1 dia cheio e uma noite: a Plaza Mayor iluminada é o motivo de dormir aqui. 2 dias com Casa Lis, San Esteban e tapas com calma."},
+  curios:[
+    "A <b>Universidade de Salamanca</b> (1218) é a mais antiga da Espanha e uma das quatro mais antigas da Europa, com Bolonha, Oxford e Paris.",
+    "Na fachada da universidade há uma <b>rã</b> escondida sobre uma caveira; achar sem ajuda dá sorte nos exames, dizem os estudantes.",
+    "Na fachada da Catedral Nova há um <b>astronauta</b> esculpido: foi acrescentado numa restauração de 1992 como 'assinatura' dos canteiros.",
+    "A <b>Plaza Mayor</b> (1755) é considerada a mais bonita da Espanha; à noite, iluminada em dourado, vira a sala de estar da cidade.",
+    "A pedra de Villamayor, de que a cidade é feita, fica dourada com o tempo; por isso Salamanca é 'a cidade dourada'.",
+    "Fevereiro em Salamanca: 0 a 11 °C, seco e com sol; é cidade universitária, então os bares estão cheios mesmo no inverno."
+  ],
+  must:[
+    {t:"Plaza Mayor", area:"centro", slot:"m", tags:["historia"], pay:0, book:"g", price:"grátis", link:"https://www.google.com/maps/search/Plaza+Mayor+Salamanca", tip:"Veja de dia e volte à noite, quando acendem as luzes. Os medalhões nos arcos retratam reis e personagens (até Franco, polêmico)."},
+    {t:"Universidade: fachada, a rã e o Cielo de Salamanca", area:"Patio de Escuelas", slot:"m", tags:["historia","arte"], pay:1, book:"h", price:"interior ~10 €; fachada e Cielo grátis", link:"https://www.usal.es", tip:"Procure a rã na fachada plateresca (dica: coluna da direita). Dentro, a biblioteca antiga e a sala de Fray Luis de León. O Cielo de Salamanca é um afresco astronômico do século XV, grátis."},
+    {t:"Catedrais Velha e Nova e torres Ieronimus", area:"centro", slot:"t", tags:["historia","arte"], pay:1, book:"h", price:"~10 € as duas; torres ~4 €", link:"https://catedralsalamanca.org", tip:"Duas catedrais coladas, uma românica (século XII) e uma gótica. Ache o astronauta na Puerta de Ramos e suba as torres para andar pelos terraços."},
+    {t:"Casa de las Conchas", area:"Rúa Mayor", slot:"m", tags:["historia"], pay:0, book:"g", price:"grátis", link:"https://www.google.com/maps/search/Casa+de+las+Conchas", tip:"Palácio coberto de 300 conchas de pedra, hoje biblioteca pública. Do pátio vê-se a Clerecía ao lado (torres ~4 €)."},
+    {t:"Convento de San Esteban", area:"sul do centro", slot:"t", tags:["historia","arte"], pay:1, book:"h", price:"~4 €", link:"https://www.conventosanesteban.es", tip:"Fachada plateresca como um retábulo de pedra e claustro onde Colombo defendeu seu projeto perante os dominicanos."},
+    {t:"Huerto de Calixto y Melibea e Puente Romano", area:"beira do Tormes", slot:"t", tags:["natureza","historia"], pay:0, book:"g", price:"grátis", link:"https://www.google.com/maps/search/Huerto+de+Calixto+y+Melibea", tip:"Jardim da <i>Celestina</i> com vista para a catedral e o rio. Desça até a ponte romana e olhe a cidade de baixo ao pôr do sol."},
+    {t:"Casa Lis (Museu Art Nouveau e Art Déco)", area:"beira do Tormes", slot:"m", tags:["arte"], pay:1, book:"h", price:"~5 € (grátis qui de manhã)", link:"https://www.museocasalis.org", tip:"Palacete de vitrais coloridos com bonecas antigas, vidros Lalique e esculturas. A fachada de vidro vista do rio é a foto."},
+    {t:"Tapas na Calle Van Dyck e Rúa Mayor", area:"Van Dyck / centro", slot:"n", tags:["comida"], pay:1, book:"h", price:"~15 € por pessoa", link:"https://www.google.com/maps/search/Calle+Van+Dyck+Salamanca", tip:"Van Dyck é a rua dos bares de bairro (jamón de Guijuelo, pinchos a 2 €); no centro, El Patio Chico e a Rúa Mayor para hornazo e chanfaina."},
+    {t:"Clerecía e Scala Coeli", area:"ao lado das Conchas", slot:"t", tags:["historia"], pay:1, book:"h", price:"~4 €", link:"https://www.google.com/maps/search/Scala+Coeli+Salamanca", tip:"Suba às torres barrocas da igreja jesuíta: a melhor vista da Plaza Mayor e das catedrais."}
+  ],
+  daytrips:[
+    {t:"Ávila", how:"Trem, 1 h, ou ônibus Avanza, 1 h 15", price:"~10 € cada trecho", book:"h", link:"https://www.renfe.com", tags:["historia"], tip:"A muralha completa fica no caminho entre Salamanca e Madri: dá para parar no meio da viagem."},
+    {t:"La Alberca e Sierra de Francia", how:"Ônibus, 1 h 30", price:"~8 € cada trecho", book:"h", link:"https://www.google.com/maps/search/La+Alberca", tags:["natureza","historia"], tip:"Vila de madeira e pedra entre castanheiros, Patrimônio desde 1940. Melhor com carro para ver também Mogarraz e a Peña de Francia."},
+    {t:"Ciudad Rodrigo", how:"Ônibus, 1 h 15", price:"~8 € cada trecho", book:"h", link:"https://www.google.com/maps/search/Ciudad+Rodrigo", tags:["historia"], tip:"Cidade murada e catedral com marcas de canhão de Wellington; em fevereiro tem o Carnaval del Toro (confira as datas)."}
+  ],
+  transit:[
+    {t:"Chegar a Salamanca", o:[
+      ["Trem Alvia de Madrid Chamartín","~25 €, 1 h 40","https://www.renfe.com","Poucos por dia: compre antes. A estação fica a 20 min a pé do centro ou ônibus 1."],
+      ["Ônibus Avanza de Estación Sur","~20 €, 2 h 30","https://www.avanzabus.com","Sai de hora em hora; chega à rodoviária, 15 min a pé do centro."],
+      ["De Segovia ou Ávila","Avanza, 1 h a 2 h","https://www.avanzabus.com","Segovia → Ávila → Salamanca é uma linha natural de ônibus."]]},
+    {t:"Dentro da cidade", o:[["A pé","grátis","","Tudo fica a 10 minutos da Plaza Mayor; a cidade velha é pequena e plana."]]}
+  ],
+  days:[
+    [["m","Plaza Mayor"],["m","Universidade: fachada, a rã e o Cielo de Salamanca"],["t","Catedrais Velha e Nova e torres Ieronimus"],["t","Huerto de Calixto y Melibea e Puente Romano"],["n","Tapas na Calle Van Dyck e Rúa Mayor"]],
+    [["m","Casa Lis (Museu Art Nouveau e Art Déco)"],["m","Casa de las Conchas"],["t","Convento de San Esteban|Clerecía e Scala Coeli"],["n","Plaza Mayor"]]
+  ]
+},
+avila: {
+  name:"Ávila", emoji:"🧱", region:"Castela e Leão · 1 h 30 de Madri", cityMax:2,
+  stay:{min:1, ideal:1, text:"Vale 1 dia (ou meio, entre Segovia e Salamanca): muralha, catedral, Santa Teresa e um chuletón. Com pernoite, a muralha iluminada vista dos Cuatro Postes."},
+  curios:[
+    "A <b>muralha</b> de Ávila, dos séculos XI a XIV, é a mais completa da Europa: 2,5 km, 88 torres e 9 portas, e dá para caminhar por cima de 1,7 km.",
+    "<b>Santa Teresa de Jesus</b>, mística e doutora da Igreja, nasceu aqui em 1515; a cidade inteira gira em torno dela, até o doce.",
+    "A catedral é uma <b>fortaleza</b>: a abside faz parte da muralha, com ameias; foi a primeira gótica da Espanha.",
+    "A 1.130 m, Ávila é a capital de província mais alta da Espanha; em fevereiro faz de -2 a 9 °C, com neve possível.",
+    "O <b>chuletón</b> de Ávila é um bife de vitela avileña de meio quilo ou mais, na brasa, e vem com as <i>patatas revolconas</i> (purê com páprica e torresmo).",
+    "Diz a lenda que Isabel, a Católica, foi criada em Arévalo e proclamada herdeira nos Toros de Guisando, a 60 km daqui, em 1468."
+  ],
+  must:[
+    {t:"Muralla de Ávila", area:"toda a cidade velha", slot:"m", tags:["historia","natureza"], pay:1, book:"h", price:"~5 € (grátis ter de 14h às 16h)", link:"https://muralladeavila.com", tip:"Entre pela Casa de las Carnicerías ou pela Puerta del Alcázar e caminhe pelo adarve. No inverno fecha às 18h; de noite, veja-a iluminada por fora."},
+    {t:"Catedral del Salvador", area:"dentro da muralha", slot:"m", tags:["historia","arte"], pay:1, book:"h", price:"~7 €", link:"https://catedralavila.es", tip:"Pedra granítica sangrenta (vermelha e branca) por dentro, retábulo de Berruguete e o túmulo de El Tostado. A abside é uma torre da muralha."},
+    {t:"Basílica de San Vicente", area:"fora da muralha, norte", slot:"t", tags:["historia","arte"], pay:1, book:"h", price:"~3 €", link:"https://www.basilicasanvicente.es", tip:"Românica, com o cenotáfio dos mártires esculpido como uma história em quadrinhos do século XII."},
+    {t:"Convento de Santa Teresa e Museu", area:"Plaza de la Santa", slot:"t", tags:["historia"], pay:1, book:"h", price:"igreja grátis; museu ~2 €", link:"https://www.google.com/maps/search/Convento+de+Santa+Teresa+%C3%81vila", tip:"Construído sobre a casa onde ela nasceu. No museu há o dedo da santa, relíquia que Franco guardava na mesa de cabeceira."},
+    {t:"Los Cuatro Postes", area:"outra margem do Adaja", slot:"n", tags:["natureza"], pay:0, book:"g", price:"grátis", link:"https://www.google.com/maps/search/Los+Cuatro+Postes", tip:"O mirante da foto clássica da muralha inteira, 15 min a pé pela ponte. Vá ao pôr do sol e espere acenderem as luzes."},
+    {t:"Monasterio de Santo Tomás", area:"sul, fora da muralha", slot:"m", tags:["historia","arte"], pay:1, book:"h", price:"~4 €", link:"https://www.monasteriosantotomas.com", tip:"Três claustros e o túmulo do príncipe Juan, único filho homem dos Reis Católicos, morto aos 19 anos. Tranquilo e pouco visitado."},
+    {t:"Chuletón de Ávila", area:"restaurantes dentro da muralha", slot:"n", tags:["comida"], pay:1, book:"d", price:"~30 € por pessoa", link:"https://www.google.com/maps/search/El+Almac%C3%A9n+%C3%81vila", tip:"Peça um para dois com patatas revolconas e judías del Barco. El Almacén (vista da muralha), Las Cancelas, La Bruja."},
+    {t:"Plaza del Mercado Chico e Mercado Grande", area:"centro", slot:"t", tags:["comida"], pay:0, book:"g", price:"grátis", link:"https://www.google.com/maps/search/Plaza+del+Mercado+Chico", tip:"A praça porticada da prefeitura, dentro da muralha, e a grande em frente à Puerta del Alcázar, com a loja La Flor de Castilla para as yemas."},
+    {t:"Palacio de los Verdugo e muralha norte", area:"dentro da muralha", slot:"t", tags:["historia"], pay:0, book:"g", price:"grátis", link:"https://www.google.com/maps/search/Palacio+de+los+Verdugo", tip:"Palácios de pedra dos séculos XV e XVI espalhados pelas ruas; o dos Verdugo tem um verraco (escultura de touro) celta na porta."}
+  ],
+  daytrips:[
+    {t:"Segovia", how:"Ônibus Avanza, 1 h", price:"~7 € cada trecho", book:"d", link:"https://www.avanzabus.com", tags:["historia","comida"], tip:"Aqueduto, Alcázar e cochinillo. As duas cidades juntas num dia longo saindo de Madri é possível, mas corrido."},
+    {t:"Salamanca", how:"Trem, 1 h, ou ônibus, 1 h 15", price:"~10 € cada trecho", book:"h", link:"https://www.renfe.com", tags:["historia"], tip:"Plaza Mayor e universidade; durma lá se puder."},
+    {t:"Madrid", how:"Trem, 1 h 30", price:"~12 € cada trecho", book:"d", link:"https://www.renfe.com", tags:["arte"], tip:"Ávila é um bate-volta fácil de Madri, ou a primeira parada a caminho de Salamanca."}
+  ],
+  transit:[
+    {t:"Chegar a Ávila", o:[
+      ["Trem de Madrid Chamartín ou Príncipe Pío","~12 €, 1 h 30","https://www.renfe.com","Regionais frequentes, sem reserva. A estação fica a 15 min a pé da muralha."],
+      ["Ônibus Avanza/Jiménez Dorado de Estación Sur","~10 €, 1 h 15","https://www.avanzabus.com","Chega à rodoviária, 10 min da muralha. Também liga Ávila a Segovia e Salamanca."]]},
+    {t:"Dentro da cidade", o:[["A pé","grátis","","A cidade velha é pequena; os Cuatro Postes ficam a 15 min, descendo e subindo."]]}
+  ],
+  days:[
+    [["m","Muralla de Ávila"],["m","Catedral del Salvador"],["t","Basílica de San Vicente"],["t","Convento de Santa Teresa e Museu"],["n","Los Cuatro Postes"]],
+    [["m","Monasterio de Santo Tomás"],["t","Plaza del Mercado Chico e Mercado Grande|Palacio de los Verdugo e muralha norte"],["n","Chuletón de Ávila"]]
+  ]
+},
+tarragona: {
+  name:"Tarragona", emoji:"🏛️", region:"Catalunha · 1 h de Barcelona", cityMax:2,
+  stay:{min:1, ideal:1, text:"Vale 1 dia: anfiteatro romano de frente para o mar, catedral e a Part Alta. Com 2 dias, o aqueduto e Reus ou um dia de praia."},
+  curios:[
+    "<b>Tarraco</b> foi a capital romana da Hispânia Citerior; Augusto governou o império daqui por dois anos. O conjunto é Patrimônio da Humanidade.",
+    "O <b>anfiteatro</b> fica em cima da praia: os romanos viam gladiadores com o Mediterrâneo de fundo. Ali foi queimado vivo o bispo Fructuoso em 259.",
+    "Tarragona é a capital dos <b>castells</b> (torres humanas): o concurso de castells, a cada dois anos em outubro, lota a praça de touros.",
+    "O molho <b>romesco</b> (pimentão seco, amêndoa, tomate, alho) nasceu entre os pescadores do bairro do Serrallo.",
+    "O licor <b>Chartreuse</b> foi produzido em Tarragona de 1903 a 1989, quando os monges cartuxos foram expulsos da França: há garrafas 'Tarragona' de colecionador.",
+    "Fevereiro em Tarragona: 7 a 15 °C, muito sol e praias vazias para caminhar; o PortAventura só reabre em março."
+  ],
+  must:[
+    {t:"Anfiteatro romano", area:"beira-mar", slot:"m", tags:["historia","natureza"], pay:1, book:"h", price:"~5 € (passe de monumentos ~15 €)", link:"https://www.tarragonaturisme.cat", tip:"O passe cobre anfiteatro, circo, pretório, muralhas e fórum. Comece aqui de manhã, com a luz do mar."},
+    {t:"Circo romano e Pretório", area:"Part Alta", slot:"m", tags:["historia"], pay:1, book:"h", price:"incluído no passe", link:"https://www.tarragonaturisme.cat", tip:"As galerias abobadadas do circo passam sob as casas da cidade; suba à torre do Pretório para ver a cidade e o mar."},
+    {t:"Catedral de Tarragona", area:"Part Alta", slot:"t", tags:["historia","arte"], pay:1, book:"h", price:"~11 €", link:"https://catedraldetarragona.com", tip:"Românico-gótica, no lugar do templo de Augusto; o claustro tem um capitel com a 'procissão dos ratos' enterrando um gato."},
+    {t:"Passeig Arqueològic e muralhas", area:"Part Alta", slot:"t", tags:["historia","natureza"], pay:1, book:"h", price:"incluído no passe", link:"https://www.tarragonaturisme.cat", tip:"Caminho entre as muralhas romanas do século II a.C. (as mais antigas fora da Itália) e as muralhas do século XVIII."},
+    {t:"Balcó del Mediterrani e Rambla Nova", area:"centro", slot:"t", tags:["natureza"], pay:0, book:"g", price:"grátis", link:"https://www.google.com/maps/search/Balc%C3%B3+del+Mediterrani", tip:"Tocar o corrimão de ferro do balcão dá sorte ('tocar ferro'). A Rambla Nova é a avenida de passeio, com o monumento aos castellers."},
+    {t:"Part Alta: praças e tapas", area:"Part Alta", slot:"n", tags:["comida"], pay:0, book:"g", price:"grátis", link:"https://www.google.com/maps/search/Pla%C3%A7a+de+la+Font+Tarragona", tip:"Plaça de la Font (dentro do antigo circo) e Plaça del Fòrum, cheias de terraços. Vermute e tapas ao fim da tarde."},
+    {t:"El Serrallo: peixe e romesco", area:"porto", slot:"n", tags:["comida"], pay:1, book:"d", price:"~30 € por pessoa", link:"https://www.google.com/maps/search/El+Serrallo+Tarragona", tip:"Bairro de pescadores com restaurantes de peixe à beira do porto: romesco, arrossejat e fideus rossos. Reserve no fim de semana."},
+    {t:"Pont del Diable (aqueduto de Les Ferreres)", area:"4 km ao norte", slot:"m", tags:["historia","natureza"], pay:0, book:"g", price:"grátis (ônibus 5 ou 85, ~1,50 €)", link:"https://www.google.com/maps/search/Pont+del+Diable+Tarragona", tip:"Aqueduto romano de 217 m, num parque de pinheiros; dá para andar por cima. Ônibus 5 até Sant Salvador e 10 min a pé."},
+    {t:"Mercat Central", area:"centro", slot:"m", tags:["comida"], pay:0, book:"g", price:"grátis", link:"https://www.mercatsdetarragona.cat", tip:"Mercado modernista restaurado, com um balcão de tapas e produtos do Camp de Tarragona (azeitona arbequina, avelãs de Reus)."},
+    {t:"Platja del Miracle", area:"abaixo do anfiteatro", slot:"t", tags:["natureza"], pay:0, book:"g", price:"grátis", link:"https://www.google.com/maps/search/Platja+del+Miracle", tip:"Praia da cidade, 500 m de areia ao lado do anfiteatro. Em fevereiro, para caminhar e ver o pôr do sol; mergulhar é para corajosos."},
+    {t:"Museu Nacional Arqueològic (Tinglado 4)", area:"porto", slot:"t", tags:["historia","arte"], pay:1, book:"h", price:"~4 €", link:"https://www.mnat.cat", tip:"Mosaicos e esculturas de Tarraco, em exposição provisória no porto enquanto a sede é reformada (confira no site)."}
+  ],
+  daytrips:[
+    {t:"Reus", how:"Trem, 15 min, ou ônibus, 25 min", price:"~3 € cada trecho; Gaudí Centre ~9 €", book:"h", link:"https://www.gaudicentre.cat", tags:["arte","comida"], tip:"Cidade natal de Gaudí (sem obra dele, mas com o Gaudí Centre e 80 prédios modernistas) e capital do vermute: Vermuts Rofes, Museu del Vermut."},
+    {t:"Sitges", how:"Trem regional, 40 min", price:"~5 € cada trecho", book:"h", link:"https://www.renfe.com", tags:["natureza"], tip:"Praias, calçadão e o Carnaval de fevereiro, um dos mais famosos da Espanha. Confira as datas."},
+    {t:"Monestir de Poblet", how:"Trem até L'Espluga + 3 km a pé ou táxi, 1 h 15", price:"~7 € cada trecho; mosteiro ~9 €", book:"h", link:"https://www.poblet.cat", tags:["historia"], tip:"Mosteiro cisterciense Patrimônio da Humanidade, com os túmulos dos reis de Aragão. Vinhos da Conca de Barberà no caminho."},
+    {t:"Barcelona", how:"Trem regional, 1 h 10, ou AVE, 35 min", price:"~8 € regional; ~15 a 30 € AVE", book:"h", link:"https://www.renfe.com", tags:["arte"], tip:"Tarragona funciona como base barata e tranquila a 1 h de Barcelona."}
+  ],
+  transit:[
+    {t:"Chegar a Tarragona", o:[
+      ["Trem regional de Barcelona Sants","~8 €, 1 h 10","https://www.renfe.com","Sem reserva, de hora em hora, e chega à estação do centro, ao lado da praia e 10 min a pé da Part Alta. Melhor opção."],
+      ["AVE até Camp de Tarragona","~15 a 30 €, 35 min","https://www.renfe.com","A estação fica a 10 km da cidade: ônibus Plana (~2,50 €, 20 min) ou táxi ~20 €. Só compensa vindo de Madri ou Zaragoza."],
+      ["Euromed de Valencia","~25 a 40 €, 2 h","https://www.renfe.com","Chega à estação do centro, pela costa."]]},
+    {t:"Dentro da cidade", o:[
+      ["A pé","grátis","","Tudo cabe em 20 minutos; a Part Alta é subida leve."],
+      ["Ônibus EMT","~1,50 €","https://emtanemambtu.cat","Linha 5 ou 85 para o Pont del Diable; 1 ou 3 para o Serrallo."]]}
+  ],
+  days:[
+    [["m","Anfiteatro romano"],["m","Circo romano e Pretório"],["t","Catedral de Tarragona"],["t","Passeig Arqueològic e muralhas|Balcó del Mediterrani e Rambla Nova"],["n","El Serrallo: peixe e romesco"]],
+    [["m","Pont del Diable (aqueduto de Les Ferreres)"],["m","Mercat Central"],["t","Platja del Miracle|Museu Nacional Arqueològic (Tinglado 4)"],["n","Part Alta: praças e tapas"]]
+  ]
+},
+ronda: {
+  name:"Ronda", emoji:"🌉", region:"Andaluzia · serra, 2 h de Sevilla", cityMax:2,
+  stay:{min:1, ideal:1, text:"Vale 1 dia e uma noite: de manhã e à noite, sem as excursões, a ponte sobre o Tajo é só sua. 2 dias com Setenil ou os pueblos blancos."},
+  curios:[
+    "A <b>Puente Nuevo</b> (1793) cruza o desfiladeiro do Tajo a 98 m de altura e levou 42 anos para ser construída. A sala acima do arco já foi prisão.",
+    "A <b>praça de touros</b> de Ronda (1785) é a mais antiga da Espanha e berço das regras da tourada a pé, criadas pela família Romero.",
+    "<b>Hemingway</b> e <b>Orson Welles</b> amavam Ronda; Welles pediu para ter as cinzas enterradas na fazenda do toureiro Antonio Ordóñez, aqui.",
+    "Ronda foi a última cidade muçulmana da região: caiu em 1485, sete anos antes de Granada. Os banhos árabes são os mais bem conservados da Espanha.",
+    "A estrada de Ronda ao mar foi território dos <b>bandoleiros</b> no século XIX, romantizados pelos viajantes ingleses; há um museu deles.",
+    "Fevereiro em Ronda: 5 a 15 °C, ar de serra, amendoeiras em flor no fim do mês e a vista do Tajo limpa."
+  ],
+  must:[
+    {t:"Puente Nuevo e El Tajo", area:"centro", slot:"m", tags:["historia","natureza"], pay:0, book:"g", price:"grátis (centro de interpretação ~2,50 €)", link:"https://www.turismoderonda.es", tip:"Veja a ponte de cima e depois desça pelo caminho de Los Molinos ou pelo Mirador de Aldehuela para vê-la inteira, de baixo."},
+    {t:"Plaza de Toros e Museu", area:"centro", slot:"m", tags:["historia"], pay:1, book:"h", price:"~9 €", link:"https://www.rmcr.org", tip:"Arena de pedra com arcadas de duas alturas, museu de trajes e a Real Maestranza de cavalaria. Entre na arena vazia."},
+    {t:"Casa del Rey Moro e La Mina", area:"La Ciudad", slot:"t", tags:["historia","natureza"], pay:1, book:"h", price:"~10 €", link:"https://www.casadelreymoro.org", tip:"Jardim projetado por Forestier e a Mina: 231 degraus escavados na rocha até o fundo do desfiladeiro, do século XIV. Escorregadio: calçado bom."},
+    {t:"Baños Árabes", area:"bairro de San Miguel", slot:"t", tags:["historia"], pay:1, book:"h", price:"~4 €", link:"https://www.turismoderonda.es", tip:"Banhos do século XIII com as claraboias em estrela intactas. Ficam embaixo, junto à Puente Viejo e ao Arco de Felipe V."},
+    {t:"Palacio de Mondragón", area:"La Ciudad", slot:"t", tags:["historia"], pay:1, book:"h", price:"~4 €", link:"https://www.turismoderonda.es", tip:"Palácio mudéjar com pátios e jardins pendurados sobre o Tajo; hoje museu da cidade."},
+    {t:"Alameda del Tajo e Paseo de los Ingleses", area:"centro", slot:"t", tags:["natureza"], pay:0, book:"g", price:"grátis", link:"https://www.google.com/maps/search/Alameda+del+Tajo", tip:"Parque com mirantes sobre o vale e a serra de Grazalema. Siga o passeio pela borda até o Parador para o pôr do sol."},
+    {t:"Iglesia de Santa María la Mayor", area:"La Ciudad", slot:"t", tags:["historia"], pay:1, book:"h", price:"~5 €", link:"https://www.turismoderonda.es", tip:"Igreja sobre a mesquita (o mihrab ainda aparece) na praça mais bonita da cidade velha, a Duquesa de Parcent."},
+    {t:"Bodega Descalzos Viejos", area:"vale, 2 km", slot:"m", tags:["comida","natureza"], pay:1, book:"s", price:"~25 € com degustação", link:"https://www.descalzosviejos.com", tip:"Vinícola num convento do século XVI com afrescos, abaixo do Tajo. Só com reserva; Ronda tem vinhos de serra surpreendentes."},
+    {t:"Mirador de Aldehuela e caminho de Los Molinos", area:"abaixo da ponte", slot:"m", tags:["natureza"], pay:0, book:"g", price:"grátis", link:"https://www.google.com/maps/search/Mirador+de+Aldehuela", tip:"Trilha de 30 min que desce ao vale para a vista inteira da ponte e das casas penduradas. Volta é subida."},
+    {t:"Tapas na Calle Nueva e Plaza del Socorro", area:"centro", slot:"n", tags:["comida"], pay:1, book:"h", price:"~18 € por pessoa", link:"https://www.google.com/maps/search/Plaza+del+Socorro+Ronda", tip:"Tragatapas, Bar Lechuguita (tapas a 1 €), De Locos Tapas. Peça rabo de toro e queijo payoyo."}
+  ],
+  daytrips:[
+    {t:"Setenil de las Bodegas", how:"Táxi ou carro, 25 min (ônibus escasso)", price:"táxi ~40 € ida e volta", book:"h", link:"https://www.google.com/maps/search/Setenil+de+las+Bodegas", tags:["historia","comida"], tip:"Vila com ruas e bares embaixo de rochas enormes (Calle Cuevas del Sol). Meio dia e um almoço de chacinas."},
+    {t:"Pueblos blancos: Grazalema e Zahara", how:"Carro, 40 min (ônibus 1 por dia)", price:"aluguel de carro ~40 € o dia", book:"h", link:"https://www.google.com/maps/search/Grazalema", tags:["natureza"], tip:"Vilas brancas no parque natural mais chuvoso da Espanha; queijo payoyo e trilhas. Só vale com carro."},
+    {t:"Cueva de la Pileta", how:"Carro ou táxi, 25 min", price:"~10 €, visita guiada", book:"s", link:"https://www.cuevadelapileta.es", tags:["historia","natureza"], tip:"Pinturas rupestres de 20 mil anos, visita com lampião. Reserve: grupos pequenos."},
+    {t:"Málaga", how:"Trem, 1 h 45, ou ônibus, 1 h 45", price:"~12 € cada trecho", book:"h", link:"https://www.renfe.com", tags:["arte","natureza"], tip:"Museu Picasso, Alcazaba e mar. Ronda liga Sevilla à Costa do Sol: dá para seguir viagem."}
+  ],
+  transit:[
+    {t:"Chegar a Ronda", o:[
+      ["Ônibus Damas de Sevilla (Prado de San Sebastián)","~13 €, 1 h 45 a 2 h 30","https://www.damas-sa.es","4 a 6 por dia; compre online na véspera. Não há trem direto de Sevilla."],
+      ["Trem de Málaga ou Córdoba","~12 € de Málaga, 1 h 45; ~25 € de Córdoba, 1 h 45","https://www.renfe.com","A linha Córdoba–Ronda–Algeciras é uma das mais bonitas da Espanha. A estação fica a 15 min a pé da ponte."],
+      ["De Granada","ônibus Alsa, 2 h 30 a 3 h","https://www.alsa.com","Poucos por dia; confira."]]},
+    {t:"Dentro da cidade", o:[["A pé","grátis","","Tudo fica a 15 minutos da ponte. Descer ao vale é trilha; a volta cansa."],["Táxi para Setenil ou a Pileta","~40 € ida e volta","","Combine o preço e a espera antes de sair; ponto na Plaza del Socorro."]]}
+  ],
+  days:[
+    [["m","Puente Nuevo e El Tajo"],["m","Plaza de Toros e Museu"],["t","Casa del Rey Moro e La Mina|Baños Árabes"],["t","Palacio de Mondragón|Iglesia de Santa María la Mayor"],["n","Tapas na Calle Nueva e Plaza del Socorro"]],
+    [["m","Mirador de Aldehuela e caminho de Los Molinos|Bodega Descalzos Viejos"],["t","Alameda del Tajo e Paseo de los Ingleses"],["n","Tapas na Calle Nueva e Plaza del Socorro"]]
+  ]
+}
+};
+
+/* Trechos, fotos, curiosidades e comidas das cidades adicionais (cities2.js). */
+const LEGS2 = {
+ "madrid-toledo":{how:"Avant Atocha → Toledo, 33 min; da estação ao centro, ônibus 5/61/62 ou 20 min a pé", links:[["Renfe","https://www.renfe.com"],["Alsa (ônibus de Plaza Elíptica, 1 h)","https://www.alsa.com"]], tip:"Compre o trem com antecedência; esgota nos fins de semana."},
+ "madrid-cordoba":{how:"AVE Atocha → Córdoba, 1 h 45", links:[["Renfe","https://www.renfe.com"],["Iryo","https://iryo.eu"],["Ouigo","https://www.ouigo.com/es"]], tip:"Córdoba fica na linha Madri–Sevilla: dá para parar um dia."},
+ "cordoba-sevilla":{how:"Avant/AVE Córdoba → Sevilla Santa Justa, 45 min", links:[["Renfe","https://www.renfe.com"]], tip:"Muitos trens por dia; compre uns dias antes."},
+ "cordoba-granada":{how:"Avant Córdoba → Granada, 1 h 40", links:[["Renfe","https://www.renfe.com"]], tip:"Poucos por dia: compre com antecedência."},
+ "sevilla-granada":{how:"Trem (2 h 40) ou ônibus Alsa (3 h) Sevilla → Granada", links:[["Renfe","https://www.renfe.com"],["Alsa","https://www.alsa.com"]], tip:"O ônibus sai mais vezes; o trem é mais confortável. Melhor ainda: passar por Córdoba."},
+ "madrid-granada":{how:"AVE Atocha → Granada, 3 h 15", links:[["Renfe","https://www.renfe.com"]], tip:"Compre 1 mês antes: a diferença é grande."},
+ "granada-valencia":{how:"Ônibus Alsa Granada → Valencia, 7 h, ou trem via Madri", links:[["Alsa","https://www.alsa.com"],["Renfe","https://www.renfe.com"]], tip:"Trecho longo: considere avião (Vueling, 1 h) ou dormir em Madri no caminho."},
+ "sevilla-ronda":{how:"Ônibus Damas Sevilla (Prado de San Sebastián) → Ronda, 1 h 45 a 2 h 30", links:[["Damas","https://www.damas-sa.es"]], tip:"4 a 6 por dia; compre na véspera. Não há trem direto."},
+ "ronda-granada":{how:"Ônibus Alsa Ronda → Granada, 2 h 30 a 3 h", links:[["Alsa","https://www.alsa.com"]], tip:"Poucos por dia; ou trem até Antequera e Avant a Granada."},
+ "ronda-cordoba":{how:"Trem Ronda → Córdoba, 1 h 45 (linha Algeciras–Córdoba)", links:[["Renfe","https://www.renfe.com"]], tip:"Uma das linhas mais bonitas da Espanha, pela serra."},
+ "madrid-valencia":{how:"AVE Atocha → Valencia Joaquín Sorolla, 1 h 45", links:[["Renfe","https://www.renfe.com"],["Iryo","https://iryo.eu"],["Ouigo","https://www.ouigo.com/es"]], tip:"Ouigo e Iryo costumam sair por menos de 20 € comprando antes."},
+ "valencia-barcelona":{how:"Euromed Valencia → Barcelona Sants, 2 h 50 a 3 h 15", links:[["Renfe","https://www.renfe.com"],["Iryo","https://iryo.eu"]], tip:"Pela costa; sente do lado direito indo para o norte para ver o mar."},
+ "valencia-tarragona":{how:"Euromed Valencia → Tarragona (estação do centro), 2 h", links:[["Renfe","https://www.renfe.com"]], tip:"Chega na estação da praia, ao lado do anfiteatro."},
+ "barcelona-tarragona":{how:"Regional Sants → Tarragona, 1 h 10 (ou AVE 35 min até Camp de Tarragona, a 10 km)", links:[["Renfe","https://www.renfe.com"]], tip:"O regional chega ao centro e não precisa de reserva: melhor opção."},
+ "madrid-zaragoza":{how:"AVE Atocha → Zaragoza Delicias, 1 h 20", links:[["Renfe","https://www.renfe.com"],["Iryo","https://iryo.eu"],["Ouigo","https://www.ouigo.com/es"]], tip:"Da estação ao centro, ônibus 34/51 ou táxi ~10 €."},
+ "zaragoza-barcelona":{how:"AVE Zaragoza → Barcelona Sants, 1 h 30", links:[["Renfe","https://www.renfe.com"],["Iryo","https://iryo.eu"],["Ouigo","https://www.ouigo.com/es"]], tip:"Zaragoza é a parada ideal entre Madri e Barcelona."},
+ "zaragoza-valencia":{how:"Trem Zaragoza → Valencia, 4 h, ou ônibus Alsa, 4 h 30", links:[["Renfe","https://www.renfe.com"],["Alsa","https://www.alsa.com"]], tip:"Trecho lento; poucos trens por dia."},
+ "zaragoza-tarragona":{how:"AVE Zaragoza → Camp de Tarragona, 1 h, depois ônibus até a cidade (20 min)", links:[["Renfe","https://www.renfe.com"]], tip:"Confira o horário do ônibus Plana na chegada."},
+ "madrid-salamanca":{how:"Alvia Chamartín → Salamanca, 1 h 40, ou ônibus Avanza, 2 h 30", links:[["Renfe","https://www.renfe.com"],["Avanza","https://www.avanzabus.com"]], tip:"Poucos trens por dia; o ônibus sai de hora em hora."},
+ "madrid-avila":{how:"Trem regional Chamartín/Príncipe Pío → Ávila, 1 h 30", links:[["Renfe","https://www.renfe.com"],["Avanza","https://www.avanzabus.com"]], tip:"Sem reserva; muitos por dia."},
+ "avila-salamanca":{how:"Trem Ávila → Salamanca, 1 h, ou ônibus Avanza, 1 h 15", links:[["Renfe","https://www.renfe.com"],["Avanza","https://www.avanzabus.com"]], tip:"Ávila fica no caminho entre Madri e Salamanca."},
+ "segovia-avila":{how:"Ônibus Avanza Segovia → Ávila, 1 h", links:[["Avanza","https://www.avanzabus.com"]], tip:"Poucos por dia; confira a volta."},
+ "segovia-salamanca":{how:"Ônibus Avanza Segovia → Salamanca, 2 h 30 (ou via Ávila)", links:[["Avanza","https://www.avanzabus.com"]], tip:"Vale parar em Ávila no meio."},
+ "toledo-cordoba":{how:"Avant Toledo → Madrid Atocha (33 min) e AVE Atocha → Córdoba (1 h 45)", links:[["Renfe","https://www.renfe.com"]], tip:"Deixe 40 min entre os trens em Atocha; a troca é na mesma estação."},
+ "toledo-sevilla":{how:"Avant Toledo → Atocha (33 min) e AVE Atocha → Sevilla (2 h 30)", links:[["Renfe","https://www.renfe.com"]], tip:"Compre os dois trechos juntos no site da Renfe para ter conexão garantida."},
+ "toledo-segovia":{how:"Avant Toledo → Atocha, Cercanías até Chamartín e AVE a Segovia; 2 h no total", links:[["Renfe","https://www.renfe.com"]], tip:"Troca de estação em Madri: Cercanías C3/C4 ligam Atocha a Chamartín em 15 min."},
+ "sevilla-cordoba":{how:"Avant/AVE Sevilla Santa Justa → Córdoba, 45 min", links:[["Renfe","https://www.renfe.com"]], tip:"Muitos por dia."},
+ "granada-barcelona":{how:"Voo Granada → Barcelona, 1 h 30 (trem leva 6 h 30)", links:[["Vueling","https://www.vueling.com"],["Renfe","https://www.renfe.com"]], tip:"Compre o voo com antecedência; confira a franquia de bagagem."},
+ "cordoba-valencia":{how:"Trem Córdoba → Valencia, 3 h 30 (direto ou via Madri)", links:[["Renfe","https://www.renfe.com"]], tip:"Há um direto por dia; senão, via Atocha."}
+};
+const WP_CITY2 = {toledo:"Toledo", cordoba:"Mezquita-catedral_de_Córdoba", granada:"Alhambra", valencia:"Ciudad_de_las_Artes_y_las_Ciencias", zaragoza:"Basílica_de_Nuestra_Señora_del_Pilar_de_Zaragoza", salamanca:"Plaza_Mayor_de_Salamanca", avila:"Muralla_de_Ávila", tarragona:"Anfiteatro_de_Tarragona", ronda:"Puente_Nuevo_(Ronda)"};
+const WP_PLACE2 = {
+ "Catedral Primada":"Catedral_de_Santa_María_de_Toledo","Santo Tomé: O enterro do Conde de Orgaz":"El_entierro_del_señor_de_Orgaz","Sinagogas de Santa María la Blanca e del Tránsito":"Sinagoga_de_Santa_María_la_Blanca","Monasterio de San Juan de los Reyes":"Monasterio_de_San_Juan_de_los_Reyes","Mirador del Valle":"Toledo","Alcázar e Museo del Ejército":"Alcázar_de_Toledo","Museo del Greco":"Museo_del_Greco","Mezquita del Cristo de la Luz":"Mezquita_del_Cristo_de_la_Luz","Pontes de San Martín e de Alcántara":"Puente_de_San_Martín_(Toledo)","Mazapán na confeitaria Santo Tomé":"Mazapán_de_Toledo","Zocodover e Calle del Comercio":"Plaza_de_Zocodover","Consuegra":"Molinos_de_Consuegra","Aranjuez":"Palacio_Real_de_Aranjuez",
+ "Mezquita-Catedral":"Mezquita-catedral_de_Córdoba","Judería e Calleja de las Flores":"Calleja_de_las_Flores","Alcázar de los Reyes Cristianos":"Alcázar_de_los_Reyes_Cristianos","Puente Romano e Torre de la Calahorra":"Puente_romano_de_Córdoba","Medina Azahara":"Medina_Azahara","Palacio de Viana":"Palacio_de_Viana_(Córdoba)","Patios de San Basilio":"Patios_de_Córdoba","Baños del Alcázar Califal":"Baños_califales_de_Córdoba","Plaza de la Corredera":"Plaza_de_la_Corredera","Tabernas: salmorejo e flamenquín":"Salmorejo","Mercado Victoria":"Córdoba_(España)",
+ "Alhambra e Generalife":"Alhambra","Albaicín e Mirador de San Nicolás":"Albaicín","Capilla Real e Catedral":"Capilla_Real_de_Granada","Carrera del Darro e El Bañuelo":"Carrera_del_Darro","Sacromonte: cuevas e zambra flamenca":"Sacromonte","Tapas grátis: Calle Navas e Plaza Nueva":"Tapa_(alimento)","Alcaicería e Plaza Bib-Rambla":"Alcaicería_de_Granada","Paseo de los Tristes":"Paseo_de_los_Tristes","Monasterio de la Cartuja":"Monasterio_de_la_Cartuja_(Granada)","Hammam Al Ándalus":"Granada","Huerta de San Vicente (casa de Lorca)":"Huerta_de_San_Vicente","Sierra Nevada":"Sierra_Nevada_(España)","Las Alpujarras (Pampaneira)":"Pampaneira","Nerja e Frigiliana":"Nerja",
+ "Ciutat de les Arts i les Ciències":"Ciudad_de_las_Artes_y_las_Ciencias","Mercado Central":"Mercado_Central_de_Valencia","Lonja de la Seda":"Lonja_de_la_Seda","Catedral, Miguelete e Santo Cáliz":"Catedral_de_Santa_María_de_Valencia","Barrio del Carmen e Torres de Serranos":"Torres_de_Serranos","Jardín del Turia de bicicleta":"Jardín_del_Turia","Paella em El Palmar (Albufera)":"Paella","Playa de la Malvarrosa e Cabanyal":"Playa_de_la_Malvarrosa","Horchata com fartons em Alboraya":"Horchata_de_chufa","Museo de Bellas Artes":"Museo_de_Bellas_Artes_de_Valencia","Ruzafa à noite":"Ruzafa","Mercado de Colón":"Mercado_de_Colón","Xàtiva":"Castillo_de_Játiva","Sagunto":"Teatro_romano_de_Sagunto","Peñíscola":"Peñíscola",
+ "Basílica del Pilar":"Basílica_de_Nuestra_Señora_del_Pilar_de_Zaragoza","Catedral del Salvador (La Seo)":"Catedral_del_Salvador_de_Zaragoza","Palacio de la Aljafería":"Palacio_de_la_Aljafería","Museo Goya e Patio de la Infanta":"Museo_Goya_(Zaragoza)","El Tubo: tapas":"El_Tubo_(Zaragoza)","Caesaraugusta: Foro e Teatro romanos":"Teatro_romano_de_Caesaraugusta","Puente de Piedra e margem do Ebro":"Puente_de_Piedra_(Zaragoza)","Parque Grande e Expo 2008":"Parque_Grande_José_Antonio_Labordeta","Iglesia de San Pablo e Casco mudéjar":"Iglesia_de_San_Pablo_(Zaragoza)","Fuendetodos":"Fuendetodos","Monasterio de Piedra":"Monasterio_de_Piedra","Tarazona e Veruela":"Tarazona",
+ "Plaza Mayor":"Plaza_Mayor_de_Salamanca","Universidade: fachada, a rã e o Cielo de Salamanca":"Universidad_de_Salamanca","Catedrais Velha e Nova e torres Ieronimus":"Catedral_Nueva_de_Salamanca","Casa de las Conchas":"Casa_de_las_Conchas","Convento de San Esteban":"Convento_de_San_Esteban_(Salamanca)","Huerto de Calixto y Melibea e Puente Romano":"Puente_romano_de_Salamanca","Casa Lis (Museu Art Nouveau e Art Déco)":"Casa_Lis","Tapas na Calle Van Dyck e Rúa Mayor":"Hornazo","Clerecía e Scala Coeli":"La_Clerecía","La Alberca e Sierra de Francia":"La_Alberca","Ciudad Rodrigo":"Ciudad_Rodrigo",
+ "Muralla de Ávila":"Muralla_de_Ávila","Catedral del Salvador":"Catedral_de_Ávila","Basílica de San Vicente":"Basílica_de_San_Vicente_(Ávila)","Convento de Santa Teresa e Museu":"Convento_de_Santa_Teresa_(Ávila)","Los Cuatro Postes":"Los_Cuatro_Postes","Monasterio de Santo Tomás":"Real_Monasterio_de_Santo_Tomás","Chuletón de Ávila":"Chuletón","Plaza del Mercado Chico e Mercado Grande":"Plaza_del_Mercado_Chico","Palacio de los Verdugo e muralha norte":"Palacio_de_los_Verdugo",
+ "Anfiteatro romano":"Anfiteatro_de_Tarragona","Circo romano e Pretório":"Circo_romano_de_Tarragona","Catedral de Tarragona":"Catedral_de_Tarragona","Passeig Arqueològic e muralhas":"Murallas_de_Tarragona","Balcó del Mediterrani e Rambla Nova":"Balcón_del_Mediterráneo","Part Alta: praças e tapas":"Tarragona","El Serrallo: peixe e romesco":"Salsa_romesco","Pont del Diable (aqueduto de Les Ferreres)":"Acueducto_de_les_Ferreres","Mercat Central":"Tarragona","Platja del Miracle":"Tarragona","Museu Nacional Arqueològic (Tinglado 4)":"Museo_Nacional_Arqueológico_de_Tarragona","Reus":"Reus","Monestir de Poblet":"Monasterio_de_Poblet",
+ "Sevilla":"Plaza_de_España_(Sevilla)","Granada":"Alhambra","Córdoba":"Mezquita-catedral_de_Córdoba","Salamanca":"Plaza_Mayor_de_Salamanca","Barcelona":"Templo_Expiatorio_de_la_Sagrada_Familia",
+ "Puente Nuevo e El Tajo":"Puente_Nuevo_(Ronda)","Plaza de Toros e Museu":"Plaza_de_toros_de_Ronda","Casa del Rey Moro e La Mina":"Casa_del_Rey_Moro","Baños Árabes":"Baños_árabes_de_Ronda","Palacio de Mondragón":"Palacio_de_Mondragón","Alameda del Tajo e Paseo de los Ingleses":"Alameda_del_Tajo","Iglesia de Santa María la Mayor":"Iglesia_de_Santa_María_la_Mayor_(Ronda)","Bodega Descalzos Viejos":"Ronda","Mirador de Aldehuela e caminho de Los Molinos":"Tajo_de_Ronda","Tapas na Calle Nueva e Plaza del Socorro":"Ronda","Setenil de las Bodegas":"Setenil_de_las_Bodegas","Pueblos blancos: Grazalema e Zahara":"Grazalema","Cueva de la Pileta":"Cueva_de_la_Pileta","Málaga":"Alcazaba_de_Málaga"
+};
+const CURIOS2 = {
+  toledo: [
+    {on:["Catedral Primada"], k:"arte", t:"O Transparente da catedral é um buraco aberto na abóbada em 1732 para a luz cair sobre o altar: parece uma explosão barroca de mármore e anjos."},
+    {on:["Santo Tomé"], k:"arte", t:"No <i>Enterro do Conde de Orgaz</i>, El Greco pintou a si mesmo (o homem que olha para você) e o filho, o menino com o lenço, com a data de nascimento dele no bolso."},
+    {on:["Sinagogas"], k:"história", t:"A Sinagoga del Tránsito foi paga por Samuel ha-Leví, tesoureiro de Pedro I, em 1357; o rei depois o mandou prender e executar para ficar com a fortuna."},
+    {on:["San Juan de los Reyes"], k:"história", t:"O mosteiro ia ser o panteão dos Reis Católicos, mas a conquista de Granada mudou o plano: foram enterrados lá. As correntes na fachada são de prisioneiros cristãos libertados em Málaga."},
+    {on:["Alcázar"], k:"história", t:"No cerco de 1936, o coronel Moscardó recusou render o Alcázar mesmo quando ameaçaram fuzilar seu filho ao telefone; o episódio virou mito da propaganda franquista."},
+    {on:["Mazapán"], k:"comida", t:"O mazapán de Toledo tem indicação geográfica: só amêndoa (mínimo 50%) e açúcar. As freiras de San Clemente fazem o mais tradicional, vendido pelo torno."},
+    {on:["Cristo de la Luz"], k:"história", t:"Diz a lenda que o cavalo de Afonso VI se ajoelhou diante da mesquita em 1085 e ali acharam uma lâmpada acesa há séculos: daí 'Cristo de la Luz'."},
+    {on:["Consuegra"], k:"cinema", t:"Os doze moinhos de Consuegra têm nomes do Quixote (Sancho, Bolero, Rucio); em outubro há a Festa do Açafrão, a especiaria que a região produz."},
+    {k:"história", t:"Toledo tem 100 mil pessoas, mas a cidade velha, nos fins de semana, recebe mais visitantes que isso: vá nos dias de semana."},
+    {k:"idioma", t:"O 'toledano' é o castelhano considerado modelo desde a Idade Média: a Escola de Tradutores de Toledo verteu para o latim e o castelhano a ciência árabe e grega."},
+    {k:"comida", t:"As <i>carcamusas</i>, ensopado de porco com tomate e ervilha, nasceram no Bar Ludeña, na praça da Magdalena, onde ainda se come."},
+    {k:"fevereiro", t:"Fevereiro em Toledo: 2 a 13 °C, dias claros e a cidade só sua; o Mirador del Valle ao pôr do sol, por volta das 18h30, é o melhor momento."}
+  ],
+  cordoba: [
+    {on:["Mezquita"], k:"história", t:"O mihrab da Mesquita aponta para o sul, não para Meca, seguindo a orientação da mesquita de Damasco: a dinastia omíada queria lembrar a cidade de origem."},
+    {on:["Mezquita"], k:"arte", t:"Os arcos de duas cores, vermelhos e brancos, alternam tijolo e pedra; a ideia veio dos aquedutos romanos, como o de Mérida."},
+    {on:["Judería"], k:"história", t:"Maimônides, o maior filósofo judeu medieval, nasceu nesta judiaria em 1138; a estátua dele na praça de Tiberíades tem o sapato polido pelos turistas que o esfregam para ter sorte."},
+    {on:["Alcázar"], k:"história", t:"Colombo apresentou seu plano de viagem aos Reis Católicos neste Alcázar, em 1486; esperou seis anos pelo sim."},
+    {on:["Puente Romano"], k:"cinema", t:"A Ponte Romana e a Torre de la Calahorra foram a Ponte Longa de Volantis em <i>Game of Thrones</i>."},
+    {on:["Medina Azahara"], k:"história", t:"Medina Azahara foi construída em 936 pelo califa Abderramão III, dizem que em homenagem à favorita Azahara, e destruída 70 anos depois numa guerra civil. Só 10% está escavado."},
+    {on:["Viana"], k:"natureza", t:"O Palacio de Viana foi casa de uma família por cinco séculos; cada pátio tem um estilo, e a marquesa só o abriu ao público em 1980."},
+    {on:["Patios"], k:"festas", t:"O Festival dos Pátios, em maio, é Patrimônio Imaterial da Humanidade: as casas competem com gerânios pendurados em latas pintadas de azul."},
+    {on:["Baños"], k:"história", t:"Os banhos califais ficavam ligados ao palácio dos califas: ir ao banho era ato político, onde se negociava com o soberano."},
+    {on:["Tabernas"], k:"comida", t:"O <i>flamenquín</i> é um rolinho de lombo de porco enrolado em presunto, empanado e frito; o nome vem dos 'flamengos' da corte de Carlos V, loiros como o empanado."},
+    {k:"comida", t:"Os vinhos de Montilla-Moriles, ao sul de Córdoba, são como os de Jerez, mas sem fortificar: o <i>fino</i> acompanha o salmorejo em qualquer taberna."},
+    {k:"história", t:"Sêneca, o filósofo e tutor de Nero, nasceu em Córdoba no ano 4 a.C.; a cidade era então a capital da Hispânia Bética."},
+    {k:"idioma", t:"'Córdoba' leva acento no 'ó' e a sílaba forte é a primeira: CÓR-do-ba, não Cor-DÓ-ba como se diz em português."},
+    {k:"fevereiro", t:"Fevereiro é a melhor época para Córdoba: no verão a cidade passa de 40 °C e é a mais quente da Europa."}
+  ],
+  granada: [
+    {on:["Alhambra"], k:"história", t:"A Alhambra esteve abandonada no século XIX; o escritor americano Washington Irving morou nas ruínas em 1829 e seus <i>Contos da Alhambra</i> a tornaram famosa de novo."},
+    {on:["Alhambra"], k:"arte", t:"Nas paredes dos Palácios Nazaríes a frase <i>wa la ghalib illa Allah</i> ('não há vencedor senão Deus') está escrita milhares de vezes, o lema da dinastia."},
+    {on:["Alhambra"], k:"história", t:"O Pátio dos Leões tem 124 colunas e uma fonte que era um relógio de água: cada leão jorrava na sua hora."},
+    {on:["Albaicín"], k:"história", t:"As casas do Albaicín com jardim e muro chamam-se <i>cármenes</i>, de 'karm', vinha em árabe. Algumas abrem como restaurante com vista para a Alhambra."},
+    {on:["Capilla Real"], k:"história", t:"Isabel pediu para ser enterrada em Granada, a conquista de que mais se orgulhava. Os túmulos de mármore estão em cima; os caixões de chumbo, simples, na cripta embaixo."},
+    {on:["Darro"], k:"história", t:"O rio Darro corre debaixo do centro: foi coberto no século XIX para abrir a Plaza Nueva. A Carrera del Darro é o trecho que sobrou a céu aberto."},
+    {on:["Sacromonte"], k:"música", t:"A zambra é o flamenco dos ciganos do Sacromonte, dançado nas grutas, com origem nas festas de casamento mouriscas."},
+    {on:["Tapas"], k:"comida", t:"A tradição da tapa grátis vem do século XIX, quando os bares cobriam o copo com um prato de comida para espantar moscas. Granada e Jaén são as cidades que mantiveram o costume."},
+    {on:["Alcaicería"], k:"história", t:"A Alcaicería original, o bazar da seda do reino nazarí, queimou em 1843; a atual é uma reconstrução romântica, mas ainda vende tecidos e cerâmica de Fajalauza."},
+    {on:["Cartuja"], k:"arte", t:"A sacristia da Cartuja (1764) foi chamada de 'a Alhambra cristã': estuque branco, mármores e madeiras de ébano e tartaruga."},
+    {on:["Sierra Nevada"], k:"natureza", t:"O Mulhacén (3.479 m), na Sierra Nevada, é o pico mais alto da península Ibérica; o último rei nazarí teria sido enterrado lá."},
+    {on:["Alpujarras"], k:"comida", t:"O jamón de Trevélez cura a 1.500 m de altitude, na aldeia mais alta da Espanha; o <i>plato alpujarreño</i> junta batatas, ovo, chouriço, morcela e presunto."},
+    {on:["Lorca"], k:"arte", t:"Lorca foi fuzilado em agosto de 1936 perto de Granada; o corpo nunca foi encontrado. Sua casa de verão guarda o piano onde compunha."},
+    {k:"idioma", t:"'Granada' em espanhol é também a fruta romã, que aparece no brasão da cidade e no escudo da Espanha."},
+    {k:"história", t:"A universidade (1531) tem 60 mil alunos: um quarto da cidade. Por isso há tanta tapa barata e tanta vida noturna."},
+    {k:"fevereiro", t:"Fevereiro em Granada: 3 a 14 °C, Sierra Nevada branca e a Alhambra com muito menos gente que na primavera. Os ingressos, mesmo assim, esgotam."}
+  ],
+  valencia: [
+    {on:["Ciutat"], k:"arte", t:"O Hemisfèric tem a forma de um olho que 'pisca' com um espelho d'água; o Palau de les Arts, de Calatrava, custou quatro vezes o orçamento e virou símbolo tanto da cidade quanto do excesso."},
+    {on:["Mercado Central"], k:"comida", t:"O Mercado Central tem 1.200 barracas e foi o primeiro mercado do mundo a vender online, em 1996."},
+    {on:["Lonja"], k:"história", t:"No Consulado del Mar, na Lonja, nasceu uma das primeiras bolsas de comércio da Europa; no teto, uma inscrição avisa aos mercadores para não cometer usura."},
+    {on:["Catedral"], k:"história", t:"O Santo Cálice é uma taça de ágata do século I; dois papas celebraram missa com ele. O Miguelete, o campanário, leva o nome do sino Miquelet, batizado no dia de São Miguel."},
+    {on:["Carmen"], k:"história", t:"As Torres de Serranos serviram de prisão de nobres e, na Guerra Civil, guardaram as obras do Prado trazidas de Madri para protegê-las dos bombardeios."},
+    {on:["Turia"], k:"natureza", t:"O Gulliver do Jardín del Turia é um escorregador gigante em forma do personagem deitado, preso pelos liliputianos; adultos também descem."},
+    {on:["Paella"], k:"comida", t:"A paella valenciana autêntica leva frango, coelho, feijão verde, garrofó, tomate, azeite, açafrão e água da Albufera; caracóis e alecrim são opcionais. Chouriço, nunca."},
+    {on:["Malvarrosa"], k:"arte", t:"O pintor Sorolla pintou a Malvarrosa dezenas de vezes: as crianças e os bois puxando barcos. A praia tem 1 km de largura de areia."},
+    {on:["Horchata"], k:"comida", t:"A chufa (tigernut) é um tubérculo plantado só em Alboraya e vizinhanças; a horchata é servida gelada e os fartons foram inventados para ser molhados nela."},
+    {on:["Bellas Artes"], k:"arte", t:"O Museu de Belas Artes tem um autorretrato de Velázquez e a maior coleção de primitivos valencianos, com fundos dourados."},
+    {on:["Ruzafa"], k:"bairros", t:"Ruzafa (de 'ar-rusafa', jardim em árabe) era um bairro operário; hoje é o mais badalado, com o Mercado de Ruzafa e dezenas de restaurantes."},
+    {on:["Xàtiva"], k:"história", t:"Em Xàtiva, o retrato de Felipe V no museu está pendurado de cabeça para baixo desde 1940, em protesto por ele ter incendiado a cidade em 1707."},
+    {on:["Sagunto"], k:"história", t:"O cerco de Sagunto por Aníbal, em 219 a.C., começou a Segunda Guerra Púnica: os habitantes preferiram queimar a cidade a se render."},
+    {k:"idioma", t:"Valencia tem duas línguas: o valenciano (variante do catalão) e o espanhol. Placas em valenciano: 'carrer' é rua, 'plaça' é praça, 'eixida' é saída."},
+    {k:"costumes", t:"A <i>mascletà</i>, explosão de fogos de artifício ao meio-dia, acontece todo dia de 1 a 19 de março na Plaza del Ayuntamiento; em fevereiro já se ouvem ensaios nos bairros."},
+    {k:"fevereiro", t:"Fevereiro em Valencia: 8 a 17 °C com sol; é a época da laranja, e os bares vendem suco espremido na hora por 2 €."}
+  ],
+  zaragoza: [
+    {on:["Pilar"], k:"história", t:"A festa do Pilar, em 12 de outubro, enche a praça com uma pirâmide de flores de 15 m oferecida à Virgem; é também o Dia da Hispanidade."},
+    {on:["Pilar"], k:"arte", t:"Goya pintou a cúpula <i>Regina Martyrum</i> em 1781, mas o conselho da basílica a achou feia e 'mal acabada'; ele saiu ofendido e nunca mais trabalhou para o Pilar."},
+    {on:["La Seo"], k:"arte", t:"La Seo guarda uma das maiores coleções de tapeçarias flamengas do mundo: 60 peças dos séculos XV a XVII."},
+    {on:["Aljafería"], k:"história", t:"A Aljafería inspirou a ópera <i>Il Trovatore</i> de Verdi, ambientada na torre do Trovador, a parte mais antiga do palácio."},
+    {on:["Goya"], k:"arte", t:"Goya nasceu em Fuendetodos em 1746 e se formou em Zaragoza; as quatro séries de gravuras (Caprichos, Desastres, Tauromaquia, Disparates) estão completas no museu."},
+    {on:["Tubo"], k:"comida", t:"No El Tubo, o champiñón do bar El Champi vem com um camarão espetado e molho de alho; o Casa Lac, de 1825, é o restaurante com licença mais antiga da Espanha."},
+    {on:["Caesaraugusta"], k:"história", t:"Caesaraugusta é a única cidade fundada por Augusto que manteve o nome do imperador: Zaragoza vem de 'Cesaraugusta', via árabe 'Saraqusta'."},
+    {on:["Puente de Piedra"], k:"história", t:"Na Puente de Piedra há quatro leões de bronze, símbolo da cidade; uma enchente do Ebro em 1643 derrubou dois arcos, reconstruídos depois."},
+    {on:["Mercado Central"], k:"história", t:"O Mercado Central ocupa o lugar do mercado medieval onde Fernando, o Católico, foi proclamado rei de Aragão em 1479."},
+    {on:["San Pablo"], k:"arte", t:"O mudéjar aragonês, dos mouros que ficaram sob domínio cristão, é Patrimônio da Humanidade: torres de tijolo e azulejo verde e branco que parecem minaretes."},
+    {on:["Fuendetodos"], k:"arte", t:"A casa onde Goya nasceu é de pedra, com dois cômodos; o pai era dourador. Ali se entende por que ele pintava os camponeses com tanta verdade."},
+    {on:["Piedra"], k:"natureza", t:"Os monges do Monasterio de Piedra fizeram, em 1534, o primeiro chocolate da Europa: o cacau trazido do México por um frade foi preparado na cozinha do mosteiro."},
+    {k:"idioma", t:"Os zaragozanos chamam a si mesmos de <i>maños</i>, e <i>maño/maña</i> é também um modo carinhoso de chamar alguém, como 'meu bem'."},
+    {k:"comida", t:"As <i>frutas de Aragón</i> são frutas cristalizadas cobertas de chocolate; o <i>guirlache</i> é um torrone de amêndoa caramelizada com anis."},
+    {k:"fevereiro", t:"Fevereiro em Zaragoza: 2 a 13 °C e o cierzo, vento seco do noroeste, que derruba a sensação térmica. Cachecol e gorro."},
+    {k:"história", t:"Os Sítios de Zaragoza (1808-1809) foram dois cercos de Napoleão; a cidade resistiu casa a casa, e Agustina de Aragón disparou um canhão sozinha, virando heroína nacional."}
+  ],
+  salamanca: [
+    {on:["Plaza Mayor"], k:"história", t:"A Plaza Mayor foi praça de touros até 1863: as touradas eram vistas das sacadas, alugadas por família."},
+    {on:["Universidade"], k:"história", t:"Na universidade ensinou Fray Luis de León, preso 5 anos pela Inquisição; ao voltar à aula, começou: 'Como dizíamos ontem…'."},
+    {on:["Universidade"], k:"história", t:"As paredes da cidade têm 'vítores', inscrições vermelhas em sangue de touro e óxido que celebravam os novos doutores, desde o século XV."},
+    {on:["Catedrais"], k:"arte", t:"Ao lado do astronauta, na Puerta de Ramos, há um dragão (ou lince) tomando sorvete; os canteiros de 1992 assinaram assim a restauração."},
+    {on:["Conchas"], k:"história", t:"Dizem que debaixo de uma das conchas há uma moeda de ouro; a Universidade pediu a casa aos donos em troca de 'uma onça de ouro por concha'."},
+    {on:["San Esteban"], k:"história", t:"Em San Esteban os frades dominicanos ouviram Colombo em 1486 e o apoiaram ante os Reis Católicos; o claustro é chamado 'dos Reis'."},
+    {on:["Calixto"], k:"arte", t:"<i>La Celestina</i> (1499), de Fernando de Rojas, aluno de Salamanca, passa-se neste jardim: o encontro de Calixto e Melibea."},
+    {on:["Casa Lis"], k:"arte", t:"A Casa Lis foi casa de um curtidor de couro em 1905; a coleção de 400 bonecas de porcelana assusta algumas pessoas e encanta outras."},
+    {on:["Van Dyck"], k:"comida", t:"O <i>hornazo</i> é a empanada de lombo, chouriço e ovo cozido que os estudantes comiam no Lunes de Aguas, segunda-feira depois da Páscoa, quando as prostitutas voltavam à cidade após a Quaresma."},
+    {on:["Clerecía"], k:"arte", t:"A Clerecía foi o Colégio Real dos jesuítas, um dos maiores da Espanha; as torres barrocas têm 63 m."},
+    {on:["Ávila"], k:"história", t:"Ávila é parada natural entre Salamanca e Madri: a muralha fica a 15 minutos da estação."},
+    {on:["La Alberca"], k:"costumes", t:"Em La Alberca um porco (o <i>marrano de San Antón</i>) anda solto pela vila de junho a janeiro, alimentado pelos vizinhos, e é sorteado no dia de Santo Antão."},
+    {k:"idioma", t:"A Universidade de Salamanca é a referência do espanhol como língua estrangeira: seus exames de espanhol (DELE) são os mais reconhecidos no mundo."},
+    {k:"comida", t:"O jamón ibérico de Guijuelo, a 50 km, é um dos quatro com denominação de origem na Espanha; os porcos pastam nas dehesas de azinheiras."},
+    {k:"história", t:"Em 1218 Salamanca já era universidade; Colombo consultou seus astrônomos, e dali saíram as primeiras leis internacionais (Francisco de Vitória) e a gramática de Nebrija."},
+    {k:"fevereiro", t:"Fevereiro em Salamanca: 0 a 11 °C, seco; a Plaza Mayor iluminada nas noites frias e limpas é a imagem para guardar."}
+  ],
+  avila: [
+    {on:["Muralla"], k:"história", t:"A muralha foi erguida depois da reconquista de 1085 por Raimundo de Borgonha, dizem que em nove anos, usando pedras de túmulos e verracos celtas."},
+    {on:["Catedral"], k:"arte", t:"A pedra <i>sangrante</i> da catedral, granito com veios de ferro, parece manchada de sangue por dentro; não é pintura."},
+    {on:["San Vicente"], k:"história", t:"Diz a lenda que um judeu que zombou dos mártires Vicente, Sabina e Cristeta foi atacado por uma serpente, converteu-se e construiu a basílica."},
+    {on:["Santa Teresa"], k:"história", t:"Teresa, aos 7 anos, fugiu de casa com o irmão para ser martirizada pelos mouros; um tio os encontrou nos Cuatro Postes e os levou de volta."},
+    {on:["Cuatro Postes"], k:"história", t:"Os Cuatro Postes marcam o lugar da lenda de Teresa criança; é também onde a procissão de São Segundo parava, desde o século XVI."},
+    {on:["Santo Tomás"], k:"história", t:"O príncipe Juan, herdeiro dos Reis Católicos, morreu em 1497 aos 19 anos, recém-casado; com ele, a coroa passaria a Joana, a Louca, e aos Habsburgo."},
+    {on:["Chuletón"], k:"comida", t:"A vaca avileña-negra ibérica pasta na serra de Gredos; o chuletón de Ávila tem indicação geográfica e se pede ao ponto, com sal grosso."},
+    {on:["Mercado"], k:"comida", t:"As yemas de Santa Teresa foram criadas em 1860 pela confeitaria La Flor de Castilla, que as vende até hoje na Plaza de Santa Teresa."},
+    {on:["Verdugo"], k:"história", t:"Os verracos são esculturas de touros e porcos dos vetões, povo celta de antes dos romanos; há 400 na província e um na porta deste palácio."},
+    {on:["Segovia"], k:"transporte", t:"Segovia e Ávila ficam a 65 km; o ônibus entre as duas passa pela serra e, em fevereiro, costuma ter neve nas bordas da estrada."},
+    {k:"idioma", t:"Em espanhol, 'Ávila' tem acento no 'Á' e é oxítona na primeira sílaba: Á-vi-la."},
+    {k:"história", t:"Ávila é 'a cidade dos cantos e dos santos': cantos pelas pedras da muralha, santos por Teresa, João da Cruz e Pedro de Alcântara."},
+    {k:"fevereiro", t:"Fevereiro em Ávila: -2 a 9 °C, a cidade mais fria do roteiro; a muralha com neve e o sol de inverno rendem as fotos mais bonitas."}
+  ],
+  tarragona: [
+    {on:["Anfiteatro"], k:"história", t:"No anfiteatro, em 259, o bispo Fructuoso e dois diáconos foram queimados; depois construíram uma basílica dentro da arena, cujas ruínas ainda estão lá."},
+    {on:["Circo"], k:"história", t:"O circo de Tarraco tinha 325 m e cabiam 30 mil pessoas para corridas de bigas; a Plaça de la Font fica literalmente na pista."},
+    {on:["Catedral"], k:"arte", t:"A catedral foi começada românica e terminada gótica, 170 anos depois; a rosácea tem 11 m de diâmetro."},
+    {on:["Passeig"], k:"história", t:"As muralhas romanas de Tarraco, com 3,5 km originais, são as mais antigas construções romanas fora da Itália; as pedras ciclópicas da base são do século III a.C."},
+    {on:["Balcó"], k:"costumes", t:"'Tocar ferro' no corrimão do Balcó del Mediterrani dá sorte; os tarraconenses fazem isso sem pensar ao passar."},
+    {on:["Serrallo"], k:"comida", t:"O romesco do Serrallo vira também um ensopado de peixe (<i>romesco de peix</i>); em fevereiro há a 'romescada', jornadas gastronômicas do bairro."},
+    {on:["Pont del Diable"], k:"história", t:"Diz a lenda que o diabo construiu o aqueduto numa noite em troca da alma de quem bebesse primeiro; a moça deu água a um burro."},
+    {on:["Reus"], k:"comida", t:"Reus foi a segunda cidade da Catalunha no século XIX pela aguardente; o vermute de Reus tem receita de 1892 e é servido com olivas e um sifão de soda."},
+    {on:["Poblet"], k:"história", t:"Em Poblet estão enterrados oito reis de Aragão; os túmulos foram destruídos em 1835 e refeitos em 1946 pelo escultor Frederic Marès."},
+    {on:["Sitges"], k:"festas", t:"O Carnaval de Sitges tem o desfile 'Rua de la Disbauxa' no domingo e o 'Rua de l'Extermini' na terça; cem mil pessoas numa vila de 30 mil."},
+    {k:"idioma", t:"Em Tarragona o catalão é a língua da rua mais que em Barcelona; 'bon dia' e 'bona tarda' são o cumprimento, mas todo mundo responde em espanhol."},
+    {k:"natureza", t:"A Costa Daurada ('dourada'), de Tarragona a Salou, tem praias largas e rasas, de areia fina quase branca."},
+    {k:"fevereiro", t:"Fevereiro em Tarragona: 7 a 15 °C e o maior número de dias de sol da Catalunha; a cidade está vazia e os preços de hotel, no chão."}
+  ],
+  ronda: [
+    {on:["Puente Nuevo"], k:"história", t:"A primeira Puente Nuevo, de 1735, desabou em 1741 matando 50 pessoas; a atual, de 1793, é a terceira ponte sobre o Tajo, com a Vieja e a Árabe embaixo."},
+    {on:["Puente Nuevo"], k:"cinema", t:"Hemingway descreveu em <i>Por quem os sinos dobram</i> prisioneiros atirados de um penhasco; os rondenhos juram que é o Tajo, embora ele nunca tenha dito."},
+    {on:["Plaza de Toros"], k:"história", t:"Pedro Romero, de Ronda, matou 5.600 touros sem ser ferido e criou o estilo clássico a pé; a Goyesca de setembro veste os toureiros à moda de Goya."},
+    {on:["Rey Moro"], k:"história", t:"A Mina do Rey Moro servia para buscar água no rio durante cercos: escravos cristãos subiam os 231 degraus com odres nas costas."},
+    {on:["Baños"], k:"história", t:"Os banhos árabes de Ronda eram movidos por uma noria (roda d'água) puxada por um burro, cujo caminho ainda se vê."},
+    {on:["Mondragón"], k:"história", t:"O Palacio de Mondragón foi residência do rei mouro Abomelic e, depois de 1485, dos Reis Católicos quando visitavam Ronda."},
+    {on:["Alameda"], k:"história", t:"A Alameda del Tajo foi paga, em 1806, com as multas dos que diziam palavrões e blasfemavam: está escrito numa placa."},
+    {on:["Descalzos"], k:"comida", t:"Ronda tem denominação de origem de vinho desde 2000, com uvas Petit Verdot e Syrah a 700 m de altitude; há 20 vinícolas na serra."},
+    {on:["Setenil"], k:"história", t:"O nome Setenil vem de <i>septem nihil</i>, 'sete vezes nada': os cristãos precisaram de sete cercos para tomar a vila."},
+    {on:["Pileta"], k:"história", t:"Na Cueva de la Pileta há um peixe pintado de 1,5 m, de 20 mil anos, e marcas que podem ser o calendário mais antigo da humanidade."},
+    {on:["Málaga"], k:"transporte", t:"A linha de trem Ronda–Málaga atravessa o desfiladeiro dos Gaitanes, onde fica o Caminito del Rey, a passarela pendurada no penhasco."},
+    {k:"comida", t:"O queijo <i>payoyo</i>, de cabra da serra de Grazalema, ganhou prêmios mundiais; vem em tapas com mel ou geleia."},
+    {k:"história", t:"Ronda é uma das cidades mais antigas da Espanha: celtas, fenícios, romanos (Arunda) e árabes; a cidade velha chama-se simplesmente 'La Ciudad'."},
+    {k:"fevereiro", t:"Fevereiro em Ronda: 5 a 15 °C, ar de serra e amendoeiras em flor no vale do Guadalevín no fim do mês."}
+  ]
+};
+const FOODS2 = {
+  toledo: [
+    {k:"salgado", t:"Carcamusas", d:"Ensopado de porco com tomate, ervilha e um toque picante, servido em prato de barro com pão. Nasceu no Bar Ludeña.", w:"Bar Ludeña (Plaza de la Magdalena), Alfileritos 24"},
+    {k:"salgado", t:"Perdiz a la toledana", d:"Perdiz estufada em vinho e vinagre com cebola e louro, o prato de caça da região.", w:"Adolfo, Casa Aurelio"},
+    {k:"salgado", t:"Cochifrito", d:"Cordeiro ou cabrito em pedaços, cozido e depois frito com alho e páprica.", w:"restaurantes da Calle Comercio"},
+    {k:"salgado", t:"Migas manchegas", d:"Pão esmigalhado frito com alho, chouriço, toucinho e uva: prato de pastor.", w:"La Abadía, Casa Aurelio"},
+    {k:"salgado", t:"Queso manchego", d:"Queijo de ovelha curado de La Mancha; peça semicurado para começar.", w:"qualquer bar; Mercado de San Agustín"},
+    {k:"salgado", t:"Venado e jabalí", d:"Veado e javali dos Montes de Toledo, em estufado ou grelhados.", w:"La Perdiz, El Trébol"},
+    {k:"doce", t:"Mazapán", d:"Amêndoa moída e açúcar, assado por fora. Em formas de frutas, 'delicias' recheadas de gema ou a 'anguila' de Natal.", w:"Santo Tomé (1856), convento de San Clemente (pelo torno)"},
+    {k:"doce", t:"Marquesas de Sonseca", d:"Bolinhos quadrados de amêndoa, macios, de uma vila vizinha.", w:"confeitarias da Calle Comercio"},
+    {k:"doce", t:"Bollos de aceite", d:"Pãezinhos doces de azeite e anis, para o café da manhã.", w:"padarias do centro"},
+    {k:"bebida", t:"Vinho de La Mancha e Méntrida", d:"Tintos jovens e baratos da maior região vinícola do mundo.", w:"qualquer taberna"},
+    {k:"bebida", t:"Anís e licor de mazapán", d:"Digestivos locais; o licor de massapão é doce e vendido em garrafinhas de lembrança.", w:"lojas da Plaza de Zocodover"}
+  ],
+  cordoba: [
+    {k:"salgado", t:"Salmorejo cordobés", d:"Creme frio e espesso de tomate, pão, azeite e alho, com ovo picado e presunto. O prato da cidade.", w:"Taberna Salinas, Bodegas Mezquita, La Fragua"},
+    {k:"salgado", t:"Flamenquín", d:"Rolinho de lombo com presunto, empanado e frito, servido com batatas e maionese.", w:"Bar Santos (junto à Mesquita), Casa Pepe"},
+    {k:"salgado", t:"Rabo de toro", d:"Rabada cozida horas no vinho até soltar do osso, com batatas fritas. Vem da tradição das touradas.", w:"Taberna Salinas, El Caballo Rojo"},
+    {k:"salgado", t:"Berenjenas con miel", d:"Berinjela frita em palitos crocantes regada com mel de cana.", w:"Bodegas Mezquita, Taberna Luque"},
+    {k:"salgado", t:"Mazamorra", d:"A irmã branca do salmorejo: amêndoa, pão, alho e azeite, de origem árabe.", w:"Bodegas Campos, tabernas da judiaria"},
+    {k:"salgado", t:"Caracoles", d:"Caracóis em caldo picante, bebido direto do copo. Temporada de primavera, mas alguns bares servem no inverno.", w:"bares de bairro", s:"primavera"},
+    {k:"salgado", t:"Tortilla do Bar Santos", d:"Omelete de batata de 20 cm de altura, cortada em fatias grossas, comida em pé olhando a Mesquita.", w:"Bar Santos, Calle Magistral González Francés"},
+    {k:"doce", t:"Pastel cordobés", d:"Folhado redondo recheado de cabelo de anjo (doce de abóbora), com açúcar e canela.", w:"Confitería Serrano, Pastelería Roldán"},
+    {k:"doce", t:"Alfajores de Córdoba", d:"Doce árabe de amêndoa, mel e especiarias, enrolado.", w:"conventos de clausura, Mercado Victoria"},
+    {k:"doce", t:"Pestiños", d:"Massa frita com mel e gergelim, de Natal e Semana Santa.", w:"confeitarias da judiaria"},
+    {k:"doce", t:"Arroz con leche", d:"Arroz-doce com canela, cremoso, sobremesa de todas as tabernas.", w:"Taberna Salinas"},
+    {k:"bebida", t:"Fino de Montilla-Moriles", d:"Vinho branco seco e leve, da região ao sul, parente do de Jerez sem fortificar. Peça gelado com o salmorejo.", w:"Bodegas Mezquita, Taberna Góngora"},
+    {k:"bebida", t:"Pedro Ximénez", d:"Vinho doce escuro de uvas secas ao sol; vai com o pastel cordobés ou sobre sorvete.", w:"Bodegas Campos"}
+  ],
+  granada: [
+    {k:"salgado", t:"Tapas grátis", d:"Cada bebida vem com um prato: paella, croquetes, carne em molho. Peça três rodadas em bares diferentes e jantou.", w:"Bodegas Castañeda, Los Diamantes, Bar Ávila, Calle Navas"},
+    {k:"salgado", t:"Habas con jamón", d:"Favas refogadas com presunto; em Granada vêm às vezes com ovo frito por cima.", w:"Bar Los Diamantes, Casa Enrique"},
+    {k:"salgado", t:"Remojón granadino", d:"Salada de laranja, bacalhau desfiado, azeitonas pretas e cebola. Mourisco e refrescante.", w:"restaurantes do Albaicín"},
+    {k:"salgado", t:"Plato alpujarreño", d:"Batatas 'a lo pobre' com ovo frito, chouriço, morcela e presunto de Trevélez. Um prato para dois.", w:"Las Alpujarras ou Restaurante Chikito"},
+    {k:"salgado", t:"Tortilla del Sacromonte", d:"Omelete com miolos e criadilhas (testículos de cordeiro), prato das grutas. Para corajosos.", w:"bares do Sacromonte, Bar Casa Julio"},
+    {k:"salgado", t:"Berenjenas con miel de caña", d:"Berinjela frita com melaço de cana de Motril, a tapa mais pedida.", w:"Los Diamantes, La Trastienda"},
+    {k:"salgado", t:"Jamón de Trevélez", d:"Presunto curado a 1.500 m de altitude, menos salgado que o ibérico.", w:"Mercado de San Agustín, Casa Enrique"},
+    {k:"doce", t:"Piononos de Santa Fe", d:"Rolinhos de massa embebida em calda, com creme queimado em cima; nome em homenagem ao papa Pio IX.", w:"Casa Ysla (Santa Fe), López-Mezquita (Reyes Católicos)"},
+    {k:"doce", t:"Pestiños e roscos de anís", d:"Frituras de mel e anis, da Semana Santa, mas vendidas o ano todo nos conventos.", w:"Convento de San Bernardo, Comendadoras de Santiago"},
+    {k:"doce", t:"Soplillos alpujarreños", d:"Merengues de amêndoa e limão, leves como ar, das Alpujarras.", w:"López-Mezquita, Las Alpujarras"},
+    {k:"doce", t:"Cuajada de Carnaval", d:"Pudim de amêndoa, pão e canela que as freiras fazem no Carnaval (fevereiro).", w:"Convento de Zafra, Comendadoras", s:"Carnaval"},
+    {k:"doce", t:"Chocolate con churros na Bib-Rambla", d:"Os churros grossos de Granada, nas chocolaterias da praça, de manhã ou de madrugada.", w:"Café Fútbol, Alhambra (Plaza Bib-Rambla)"},
+    {k:"bebida", t:"Cerveza Alhambra", d:"A cerveja de Granada; a Reserva 1925, em garrafa verde sem rótulo, é a mais pedida.", w:"qualquer bar"},
+    {k:"bebida", t:"Vino de la Costa e Contraviesa", d:"Tintos rústicos da serra entre Granada e o mar, servidos em copo pequeno com a tapa.", w:"Bodegas Castañeda, Casa de Vinos La Brujidera"},
+    {k:"bebida", t:"Chá marroquino", d:"Chá de menta com doces árabes nas teterías da Calderería Nueva, a rua 'marroquina' do Albaicín.", w:"Tetería Kasbah, As-Sirat"}
+  ],
+  valencia: [
+    {k:"salgado", t:"Paella valenciana", d:"Frango, coelho, feijão verde, garrofó e açafrão, no fogo de lenha de laranjeira. Só ao almoço; o <i>socarrat</i> (crosta do fundo) é a parte disputada.", w:"El Palmar (Albufera), Casa Carmela (Malvarrosa), La Riuà"},
+    {k:"salgado", t:"Arroz a banda", d:"Arroz de caldo de peixe, servido com aioli; o peixe vem 'à parte'.", w:"La Pepica, restaurantes do Cabanyal"},
+    {k:"salgado", t:"Fideuà", d:"Macarrão fino no lugar do arroz, com frutos do mar, de Gandia.", w:"Casa Carmela, L'Estimat"},
+    {k:"salgado", t:"Esgarraet", d:"Pimentão assado com bacalhau desfiado e azeite, tapa fria.", w:"Central Bar (Mercado Central), Casa Montaña"},
+    {k:"salgado", t:"All i pebre", d:"Ensopado de enguia da Albufera com alho, páprica e batata.", w:"El Palmar"},
+    {k:"salgado", t:"Titaina", d:"Refogado de atum, pimentão e tomate do Cabanyal, para o pão.", w:"Casa Montaña, bares do Cabanyal"},
+    {k:"salgado", t:"Bocadillo de la abuela e esmorzaret", d:"O 'almoçinho' das 10h: sanduíche grande com molho de amendoim, cerveja e café. Ritual valenciano.", w:"bares de bairro; Bar Ricardo"},
+    {k:"salgado", t:"Clóchinas", d:"Mexilhões pequenos da baía, só de maio a agosto, no vapor com limão.", w:"bares da Malvarrosa", s:"maio a agosto"},
+    {k:"doce", t:"Horchata com fartons", d:"Leite de chufa gelado com os pãezinhos doces alongados para molhar.", w:"Horchatería Daniel (Alboraya), Santa Catalina (centro)"},
+    {k:"doce", t:"Buñuelos de calabaza", d:"Bolinhos de abóbora fritos com açúcar, nas ruas durante as Fallas (março); algumas casas têm o ano todo.", w:"Horchatería El Siglo, barracas de rua", s:"Fallas"},
+    {k:"doce", t:"Coca de llanda", d:"Bolo caseiro de azeite e limão, assado em tabuleiro, o lanche das avós.", w:"padarias e Mercado Central"},
+    {k:"doce", t:"Turrón de Xixona", d:"O torrone de amêndoa e mel da província de Alicante, mole (Xixona) ou duro (Alicante).", w:"Mercado Central, Turrones Ramos"},
+    {k:"doce", t:"Arnadí", d:"Doce de abóbora e amêndoa, árabe, de Xàtiva, com formato de montinho.", w:"Xàtiva (bate-volta)"},
+    {k:"bebida", t:"Agua de Valencia", d:"Cava, suco de laranja, vodka e gin numa jarra. Inventada em 1959 no Café Madrid.", w:"Café de las Horas, Café Madrid"},
+    {k:"bebida", t:"Mistela", d:"Vinho doce de moscatel para acompanhar sobremesa.", w:"restaurantes tradicionais"}
+  ],
+  zaragoza: [
+    {k:"salgado", t:"Ternasco de Aragón", d:"Cordeiro novo assado, com indicação geográfica; peça as 'costillas' na brasa.", w:"Casa Lac, El Cachirulo, Los Victorinos"},
+    {k:"salgado", t:"Borrajas", d:"Borragem (verdura de talo) cozida com batata e azeite; só aqui se come assim.", w:"La Prensa, restaurantes tradicionais"},
+    {k:"salgado", t:"Huevos al salmorejo aragonés", d:"Nada a ver com o de Córdoba: ovos com lombo, chouriço e aspargos num molho de vinho.", w:"Casa Lac, Casa Emilio"},
+    {k:"salgado", t:"Bacalao al ajoarriero", d:"Bacalhau desfiado com alho, pimentão e ovo, prato dos tropeiros.", w:"Casa Juanico, El Fuelle"},
+    {k:"salgado", t:"Migas a la pastora", d:"Migalhas de pão com chouriço, uva e às vezes ovo.", w:"El Fuelle"},
+    {k:"salgado", t:"Champiñón do El Tubo", d:"Cogumelos na chapa com alho e um camarão espetado; a tapa símbolo do bairro.", w:"Bar El Champi, Calle Libertad"},
+    {k:"salgado", t:"Jamón de Teruel", d:"Presunto de porco branco curado na altitude de Teruel, suave.", w:"Mercado Central, Casa Lac"},
+    {k:"salgado", t:"Longaniza de Graus e chireta", d:"Linguiça fresca da montanha e a chireta, tripa recheada de arroz e miúdos.", w:"El Fuelle, Mercado Central"},
+    {k:"doce", t:"Frutas de Aragón", d:"Frutas cristalizadas (pera, laranja, figo) cobertas de chocolate escuro.", w:"Fantoba (1856), Pastelería Tolosana"},
+    {k:"doce", t:"Guirlache", d:"Torrone duro de amêndoa caramelizada com anis.", w:"Fantoba, Tolosana"},
+    {k:"doce", t:"Trenza de Almudévar", d:"Trança folhada com nozes, passas e açúcar, da vila de Almudévar.", w:"Pastelería Tolosana"},
+    {k:"doce", t:"Adoquines del Pilar", d:"Balas enormes em forma de paralelepípedo, lembrança das festas do Pilar.", w:"lojas da Plaza del Pilar"},
+    {k:"bebida", t:"Vinho de Cariñena e Somontano", d:"Tintos de garnacha (Cariñena) e os modernos de Somontano, ao pé dos Pirineus.", w:"La Bodega de Chema, El Tubo"},
+    {k:"bebida", t:"Cerveza Ámbar", d:"A cerveja de Zaragoza, desde 1900; a Ámbar Especial é a clássica.", w:"qualquer bar"}
+  ],
+  salamanca: [
+    {k:"salgado", t:"Hornazo", d:"Empanada de massa dourada recheada de lombo, chouriço e ovo cozido. Comida de piquenique e de estudante.", w:"Panadería Gil, La Tahona de la Abuela"},
+    {k:"salgado", t:"Jamón de Guijuelo", d:"Presunto ibérico de bolota com denominação de origem, a 50 km da cidade.", w:"Mesón Cervantes (Plaza Mayor), Bar Lis"},
+    {k:"salgado", t:"Chanfaina", d:"Arroz com miúdos de cordeiro, chouriço e páprica; prato de matança.", w:"Casa Paca, El Mesón de Gonzalo"},
+    {k:"salgado", t:"Patatas meneás", d:"Purê de batata 'mexido' com páprica e torresmo por cima.", w:"El Patio Chico, Tapas 2.0"},
+    {k:"salgado", t:"Farinato", d:"Embutido de pão, banha, páprica e anis, frito e servido com ovo. Único de Ciudad Rodrigo.", w:"bares da Calle Van Dyck"},
+    {k:"salgado", t:"Lentejas de la Armuña", d:"Lentilhas grandes e cremosas da comarca vizinha, em ensopado.", w:"Casa Paca, restaurantes tradicionais"},
+    {k:"salgado", t:"Pinchos da Van Dyck", d:"Pincho de carne com pão a 2 €: a rua inteira vive disso.", w:"Calle Van Dyck: Bar Trigo, El Minutejo"},
+    {k:"doce", t:"Bollo maimón", d:"Bolo leve e redondo de ovos, em forma de anel, com açúcar.", w:"confeitarias do centro, Pastelería Gil"},
+    {k:"doce", t:"Chochos de yema", d:"Amêndoas cobertas de açúcar e gema, lembrança típica.", w:"Confitería Gil, Santa Clara"},
+    {k:"doce", t:"Obleas", d:"Hóstias doces finas e crocantes, vendidas em pacotes.", w:"La Tahona"},
+    {k:"doce", t:"Perrunillas", d:"Biscoitos de banha e limão, que se desfazem na boca.", w:"conventos (Dueñas), padarias"},
+    {k:"bebida", t:"Vinho da Sierra de Salamanca", d:"Tintos de uva rufete, ácidos e frescos, da Sierra de Francia.", w:"Vinoteca Doctrinos, Bar Lis"},
+    {k:"bebida", t:"Café no Novelty", d:"O café de 1905 da Plaza Mayor, com a estátua de Torrente Ballester sentada na mesa.", w:"Café Novelty, Plaza Mayor"}
+  ],
+  avila: [
+    {k:"salgado", t:"Chuletón de Ávila", d:"Bife de vitela avileña de meio quilo ou mais, na brasa, ao ponto, com sal grosso. Para dividir.", w:"El Almacén, Las Cancelas, La Bruja"},
+    {k:"salgado", t:"Patatas revolconas", d:"Purê de batata com páprica e alho, coberto de torresmo crocante. Acompanha tudo.", w:"qualquer restaurante tradicional"},
+    {k:"salgado", t:"Judías del Barco de Ávila", d:"Feijões brancos grandes, cremosos, em ensopado com chouriço.", w:"Las Cancelas, Mesón del Rastro"},
+    {k:"salgado", t:"Cochinillo e cordero asado", d:"Leitão e cordeiro de forno de lenha, como em Segovia.", w:"El Rastro, Casa Patas"},
+    {k:"salgado", t:"Hornazo abulense", d:"Empanada de chouriço, lombo e ovo, prima da de Salamanca.", w:"padarias do centro"},
+    {k:"salgado", t:"Sopa castellana", d:"Sopa de alho e pão com ovo, no frio de fevereiro.", w:"Mesón del Rastro"},
+    {k:"doce", t:"Yemas de Santa Teresa", d:"Bolinhas de gema e açúcar, polvilhadas. Criadas em 1860 pela Flor de Castilla.", w:"La Flor de Castilla (Plaza de Santa Teresa), conventos"},
+    {k:"doce", t:"Huesos de santo", d:"Rolinhos de massapão recheados de gema, de 1º de novembro, mas vendidos o ano todo.", w:"confeitarias do centro"},
+    {k:"doce", t:"Empiñonados", d:"Bolinhos de massapão cobertos de pinhões.", w:"Pastelería La Flor de Castilla"},
+    {k:"doce", t:"Mantecados abulenses", d:"Biscoitos de banha que se desmancham, de Natal.", w:"conventos de clausura"},
+    {k:"bebida", t:"Vinho de Cebreros", d:"Tintos de garnacha das encostas de Gredos, denominação recente.", w:"restaurantes dentro da muralha"},
+    {k:"bebida", t:"Café com yema", d:"O lanche abulense: café e uma yema na Plaza de Santa Teresa.", w:"La Flor de Castilla"}
+  ],
+  tarragona: [
+    {k:"salgado", t:"Romesco", d:"Molho de pimentão seco (nyora), amêndoa, avelã, tomate e alho; nasceu no Serrallo e vai com peixe, calçots e tudo.", w:"El Serrallo: El Pòsit, Barquet"},
+    {k:"salgado", t:"Arrossejat", d:"Arroz dourado na frigideira antes de cozer em caldo de peixe, prato de pescador.", w:"Barquet, L'Ancora"},
+    {k:"salgado", t:"Fideus rossos", d:"Macarrão fino torrado em caldo de peixe, com aioli.", w:"restaurantes do Serrallo"},
+    {k:"salgado", t:"Calçots", d:"Cebolinhas na brasa com romesco, de janeiro a março; a capital é Valls, a 20 km.", w:"Masia Bou (Valls), restaurantes da Part Alta", s:"janeiro a março"},
+    {k:"salgado", t:"Coca de recapte", d:"Pizza plana catalã com escalivada e arenque ou linguiça.", w:"padarias e bares da Part Alta"},
+    {k:"salgado", t:"Olives arbequines e avellanes de Reus", d:"Azeitonas pequenas e avelãs da região, com denominação de origem, para beliscar.", w:"Mercat Central"},
+    {k:"salgado", t:"Xató", d:"Salada de escarola com bacalhau, atum e romesco, do litoral entre Tarragona e Sitges.", w:"Sitges (bate-volta), Casa Nico"},
+    {k:"doce", t:"Menjar blanc", d:"Pudim branco de amêndoa, de origem medieval, típico de Reus.", w:"Reus (bate-volta), pastelarias de Tarragona"},
+    {k:"doce", t:"Crema catalana", d:"Creme com açúcar queimado na hora.", w:"qualquer restaurante"},
+    {k:"doce", t:"Bunyols de Quaresma", d:"Bolinhos fritos com açúcar, da Quaresma (a partir de 10 de fevereiro de 2027).", w:"Pastisseria Conde, forns da Part Alta", s:"Quaresma"},
+    {k:"doce", t:"Coca de Tarragona", d:"Coca doce de folhado com pinhões e açúcar.", w:"forns do centro"},
+    {k:"bebida", t:"Vermut de Reus", d:"Vermute de ervas servido com soda, azeitona e batata chips; o 'fer el vermut' de domingo.", w:"Vermuts Rofes (Reus), El Cortijo (Tarragona)"},
+    {k:"bebida", t:"Vinhos do Priorat e Montsant", d:"Tintos potentes de ardósia das serras vizinhas, entre os melhores da Espanha.", w:"Bodega El Cortijo, vinotecas da Part Alta"},
+    {k:"bebida", t:"Chartreuse", d:"O licor verde dos monges cartuxos, fabricado em Tarragona por 86 anos; a garrafa 'Tarragona' antiga é relíquia.", w:"bares antigos da Part Alta (pergunte)"}
+  ],
+  ronda: [
+    {k:"salgado", t:"Rabo de toro", d:"Rabada em molho de vinho, horas no fogo, prato da cidade das touradas.", w:"Tragatapas, Casa María, Pedro Romero"},
+    {k:"salgado", t:"Sopa rondeña", d:"Sopa de pão, alho, tomate e ovo escalfado, às vezes com aspargos selvagens.", w:"Casa María, Mesón El Sacristán"},
+    {k:"salgado", t:"Conejo a la rondeña", d:"Coelho em molho de vinho, alho e ervas da serra.", w:"restaurantes da Calle Nueva"},
+    {k:"salgado", t:"Chacinas de la serranía", d:"Chouriço, lombo e morcela curados na serra de Ronda e Grazalema.", w:"Bar Lechuguita, mercados de Setenil"},
+    {k:"salgado", t:"Queso payoyo", d:"Queijo de cabra payoya da serra de Grazalema, premiado, curado ou semicurado.", w:"Tragatapas, Bar Lechuguita"},
+    {k:"salgado", t:"Migas serranas", d:"Pão esmigalhado com chouriço, pimentão e às vezes uva ou melão.", w:"ventas da estrada de Grazalema"},
+    {k:"salgado", t:"Salmorejo com presunto", d:"A versão rondenha do creme frio, com jamón da serra.", w:"De Locos Tapas, Tragatapas"},
+    {k:"doce", t:"Yemas del Tajo", d:"Docinhos de gema envoltos em açúcar, a lembrança clássica de Ronda.", w:"Confitería Las Campanas, Pastelería Daver"},
+    {k:"doce", t:"Mantecados e polvorones", d:"Biscoitos de banha e amêndoa da Andaluzia, de Natal, mas vendidos até fevereiro.", w:"confeitarias da Calle Espinel"},
+    {k:"doce", t:"Pestiños rondeños", d:"Fritura de mel e anis dos conventos.", w:"Convento de las Madres Carmelitas (pelo torno)"},
+    {k:"doce", t:"Tocino de cielo", d:"Pudim denso de gema.", w:"restaurantes tradicionais"},
+    {k:"bebida", t:"Vinho de Ronda", d:"Tintos de serra, de uvas Syrah, Petit Verdot e Tempranillo, em 20 vinícolas pequenas.", w:"Descalzos Viejos, Entrevinos (loja), Tragatapas"},
+    {k:"bebida", t:"Anís de Ojén", d:"Licor de anis da serra vizinha, doce, que Hemingway bebia.", w:"bares antigos da Plaza del Socorro"}
+  ]
+};
+
+Object.assign(DEST, DEST2); Object.assign(LEGS, LEGS2); Object.assign(WP_CITY, WP_CITY2); Object.assign(WP_PLACE, WP_PLACE2); Object.assign(CURIOS, CURIOS2); Object.assign(FOODS, FOODS2);
+function packNames(){ return Object.keys(DEST).filter(k=>!DEST[k].custom).map(k=>DEST[k].name); }
 function foodList(id){ return (typeof FOODS!=="undefined" && FOODS[id]) || []; }
 const FOOD_K = {salgado:["Salgados","h"], doce:["Doces","d"], bebida:["Bebidas","g"]};
 function foodHtml(f){ return `<div class="item"><div class="hd"><span style="font-family:var(--f-display);font-weight:700;font-size:16px">${h(f.t)}</span><div class="meta2"><span class="bk ${FOOD_K[f.k][1]}"><i></i>${f.k}</span>${f.s?`<span class="meta">${h(f.s)}</span>`:""}</div></div><div class="tip">${f.d}</div><p class="small muted" style="margin-top:4px"><b>Onde:</b> ${h(f.w)}</p></div>`; }
@@ -4070,7 +4792,9 @@ const KIND_IC={video:"▶",podcast:"♪",site:"↗"};
 function linksHtml(n){ const ls=WEEK_LINKS[n]||[]; if(!ls.length) return ""; return `<div class="links">${ls.map(([k,t,u])=>`<a class="lnk" href="${h(u)}" target="_blank" rel="noopener"><span class="ic ${k}">${KIND_IC[k]}</span><span><span class="k">${KIND_PT[k]}</span><b>${h(t)}</b></span><span class="go">abrir</span></a>`).join("")}</div>`; }
 function bkTag(k){ const b=BOOK[k]||BOOK.h; return `<span class="bk ${b[1]}"><i></i>${b[0]}</span>`; }
 function itemHtml(m, id){ const wp=WP_PLACE[m.t]; const thumb = PHOTOS_ON && wp ? photoEl(wp,"sq",m.t) : ""; const cs = typeof id==="string" ? curiosFor(id, m.t) : [];
-  return `<div class="item${thumb?" with-thumb":""}">${thumb}<div><div class="hd"><a href="${h(m.link)}" target="_blank" rel="noopener">${h(m.t)}</a><div class="meta2">${bkTag(m.pay===0 ? "g" : (m.book||"h"))}<span class="meta">${h(m.area||m.how||"")}${m.price?` · ${h(m.price)}`:""}</span></div></div><div class="tip">${m.tip}</div>${cs.map(c=>`<p class="curio-in"><b>Curiosidade</b> ${c.t}</p>`).join("")}</div></div>`; }
+  const pack = Object.keys(DEST).find(k=>!DEST[k].custom && k!==id && norm(DEST[k].name)===norm(m.t.replace(/\s*\(.*?\)\s*$/,"").replace(/ e .*$/,"")));
+  const packLink = pack ? `<p class="small" style="margin-top:4px"><a href="#" data-act="vgo" data-s="cidade" data-city="${pack}" style="color:var(--cobalt);font-weight:700;text-decoration:none">Ver o guia completo de ${h(DEST[pack].name)} ›</a>${V.dests.includes(pack)?"":` · <a href="#" data-act="vaddnamed" data-name="${h(DEST[pack].name)}" style="color:var(--cobalt);font-weight:700;text-decoration:none">pôr na rota</a>`}</p>` : "";
+  return `<div class="item${thumb?" with-thumb":""}">${thumb}<div><div class="hd"><a href="${h(m.link)}" target="_blank" rel="noopener">${h(m.t)}</a><div class="meta2">${bkTag(m.pay===0 ? "g" : (m.book||"h"))}<span class="meta">${h(m.area||m.how||"")}${m.price?` · ${h(m.price)}`:""}</span></div></div><div class="tip">${m.tip}</div>${cs.map(c=>`<p class="curio-in"><b>Curiosidade</b> ${c.t}</p>`).join("")}${packLink}</div></div>`; }
 let viajeQ = "";
 function viajeSearch(q){
   const n = norm(q.trim()); if(n.length<2) return [];
@@ -4123,7 +4847,7 @@ function renderViaje(){
       <p class="small muted" style="padding:0 4px;margin-top:-6px">O que fazer em cada dia, com manhã, tarde e noite, trechos de trem e o que reservar antes.</p>
       <button class="menu" data-act="vgo" data-s="roteiro"><span class="ic">${ICON.cal}</span><span><b>Ver o roteiro</b><span>${totalDays} dias · ${sel.length} ${sel.length===1?"cidade":"cidades"} · interesses: ${V.interests.length?V.interests.map(k=>(INTERESES.find(x=>x[0]===k)||[])[1]).filter(Boolean).join(", "):"todos"}</span></span><span class="chev">›</span></button>
       <button class="menu" data-act="gokit" style="margin-top:8px"><span class="ic" style="background:var(--bad-soft);color:var(--bad)">${ICON.sos}</span><span><b>Kit de sobrevivência</b><span>${SURV_CARDS.length} frases por situação, telefones, embaixada, dinheiro. Offline.</span></span><span class="chev">›</span></button>
-      <div class="card tint-g small"><b>Outras cidades?</b> Adicione em Sua rota. Toda cidade nova ganha um guia automático (Wikipédia + Wikivoyage) na hora; Madrid, Barcelona, Sevilla e Segovia têm pacote completo. Me peça o pacote das que você incluir.</div>`;
+      <div class="card tint-g small"><b>Outras cidades?</b> Adicione em Sua rota. Toda cidade nova ganha um guia automático (Wikipédia + Wikivoyage) na hora; ${packNames().length} cidades têm pacote completo (${packNames().join(", ")}). Me peça o pacote das que faltarem.</div>`;
   }
   else if(V.screen==="rota"){
     const selOpt = cur => Object.keys(DEST).map(id=>`<option value="${id}" ${id===cur?"selected":""}>${h(DEST[id].name)}</option>`).join("");
@@ -4140,7 +4864,7 @@ function renderViaje(){
         <div><b>Cidades no meio do caminho</b><p class="small muted">Toque para incluir ou tirar. Chegada e volta ficam fixas nas pontas.</p></div>
         <div class="row" style="gap:8px">${middles.length ? middles.map(id=>`<button class="ichip${V.dests.includes(id)?" on":""}" data-act="vdest" data-id="${id}">${V.dests.includes(id)?"✓ ":"+ "}${h(DEST[id].name)}${DEST[id].custom?` <span class="x" style="display:inline-grid;width:18px;height:18px;border-radius:50%;font-size:11px;margin-left:4px;vertical-align:middle" data-act="vdelcustom" data-id="${id}" aria-label="remover">✕</span>`:""}</button>`).join("") : `<span class="small muted">Todas as cidades já estão na rota.</span>`}</div>
         <div class="row" style="gap:6px"><input id="v-newcity" maxlength="24" placeholder="Outra cidade (ex.: Toledo, Granada)" style="flex:1;min-width:0;border:0;background:var(--surface);border-radius:10px;padding:10px 12px;font-size:15px"><button class="btn" data-act="vaddcity">Adicionar</button></div>
-        <p class="small muted">Cidades adicionadas entram na rota com dias e datas. Guia completo (imperdíveis, transporte) só para Madrid, Barcelona e Sevilla por enquanto; peça e eu acrescento.</p>
+        <p class="small muted">Cidades adicionadas entram na rota com dias e datas. Guia completo (imperdíveis, ingressos, transporte, comidas, curiosidades) para ${packNames().length} cidades: ${packNames().join(", ")}. As outras ganham guia automático (Wikipédia + Wikivoyage).</p>
       </div>
       <div><div class="eyebrow" style="margin-bottom:4px">Dias em cada cidade</div>
       ${sel.map((id,i)=>{ const cd=CD[id]; const role = id===arr ? "a" : (id===dep && dep!==arr ? "d" : ""); const canMove = role==="";
@@ -4157,7 +4881,7 @@ function renderViaje(){
       ${(()=>{ const a=AUTO[id]; if(!a){ autoGuide(id).then(()=>{ if(V.screen==="cidade" && V.city===id) renderViaje(); }); return `<div class="verd"><b>Montando um guia automático…</b> Busco o resumo da cidade na Wikipédia e os lugares no Wikivoyage. Leva alguns segundos e precisa de internet na primeira vez.</div>`; }
         const see=a.items.filter(x=>x.kind==="ver"||x.kind==="fazer"), eat=a.items.filter(x=>x.kind==="comer"||x.kind==="beber"), buy=a.items.filter(x=>x.kind==="comprar");
         return `${a.about?`<div class="sec-h"><h3>Sobre ${h(d.name)}</h3></div><div class="card"><p>${h(a.about)}</p><p class="small muted" style="margin-top:8px"><a href="${h(a.aboutUrl)}" target="_blank" rel="noopener" style="color:var(--cobalt);font-weight:700;text-decoration:none">Wikipédia ↗</a></p></div>`:""}
-        <div class="verd"><b>Guia automático.</b> ${a.items.length ? `${a.items.length} lugares do Wikivoyage (textos em ${a.src==="es"?"espanhol":"inglês"}, licença CC BY-SA; toque numa palavra para traduzir). Não tem a curadoria dos pacotes de Madrid, Sevilla, Barcelona e Segovia: me peça o pacote completo desta cidade.` : `Não achei ${h(d.name)} no Wikivoyage${a.err?" (sem conexão?)":""}. Use os atalhos abaixo e me peça o pacote completo.`}</div>
+        <div class="verd"><b>Guia automático.</b> ${a.items.length ? `${a.items.length} lugares do Wikivoyage (textos em ${a.src==="es"?"espanhol":"inglês"}, licença CC BY-SA; toque numa palavra para traduzir). Não tem a curadoria dos pacotes das ${packNames().length} cidades principais: me peça o pacote completo desta cidade.` : `Não achei ${h(d.name)} no Wikivoyage${a.err?" (sem conexão?)":""}. Use os atalhos abaixo e me peça o pacote completo.`}</div>
         ${see.length?`<div class="sec-h"><h3>Ver e fazer</h3></div><div class="card" style="padding:4px 16px">${see.slice(0,14).map(it=>autoItemHtml(d,it)).join("")}</div>`:""}
         ${eat.length?`<div class="sec-h"><h3>Comer e beber</h3></div><div class="card" style="padding:4px 16px">${eat.slice(0,8).map(it=>autoItemHtml(d,it)).join("")}</div>`:""}
         ${buy.length?`<div class="sec-h"><h3>Comprar</h3></div><div class="card" style="padding:4px 16px">${buy.slice(0,5).map(it=>autoItemHtml(d,it)).join("")}</div>`:""}
