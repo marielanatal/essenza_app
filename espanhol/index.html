@@ -4316,7 +4316,10 @@ function checkBadges(){
 /* Sons curtos (WebAudio) e vibração */
 let AC=null;
 const SND={ok:[[660,0,.12],[880,.1,.2]], bad:[[196,0,.22]], done:[[523,0,.14],[659,.12,.14],[784,.24,.14],[1047,.36,.4]]};
-function tone(k){ if(!S.sound || !SND[k]) return; try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==="suspended") AC.resume(); const t0=AC.currentTime+0.01;
+let TONE_END=0;
+/* Depois do som, suspende o AudioContext: no iPhone, com ele ativo a fala seguinte pode sair na voz comum. */
+function toneDone(ms){ TONE_END=Date.now()+ms; setTimeout(()=>{ try{ if(AC && AC.state==="running" && Date.now()>=TONE_END-30) AC.suspend(); }catch(e){} }, ms+40); }
+function tone(k){ if(!S.sound || !SND[k]) return; try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==="suspended") AC.resume(); const t0=AC.currentTime+0.01; toneDone(Math.round(Math.max(...SND[k].map(([f,dt,dur])=>dt+dur))*1000)+60);
   SND[k].forEach(([f,dt,dur])=>{ const o=AC.createOscillator(), g=AC.createGain(); o.type="sine"; o.frequency.value=f; g.gain.setValueAtTime(0.0001,t0+dt); g.gain.exponentialRampToValueAtTime(0.16,t0+dt+0.015); g.gain.exponentialRampToValueAtTime(0.0001,t0+dt+dur); o.connect(g).connect(AC.destination); o.start(t0+dt); o.stop(t0+dt+dur+0.05); }); }catch(e){} }
 function buzz(ms){ if(!S.sound) return; try{ if(navigator.vibrate) navigator.vibrate(ms); }catch(e){} }
 function confetti(){
@@ -4435,8 +4438,9 @@ function speak(t, slow){ if(!canSpeak) return;
         SPEAK_FAILS++; if(SPEAK_FAILS===2 && S.voice && S.voice!=="system"){ toast("A voz escolhida não está respondendo. Voltei para a padrão do iPhone."); S.voice=IS_IOS?"system":""; save(); }
       }, 3000); }
     };
-    // no iPhone, falar logo depois de cancelar costuma cair na voz comum: dá uma pausa curta
-    if(busy) setTimeout(go, 180); else go();
+    // no iPhone, falar logo depois de cancelar ou de um som costuma cair na voz comum: dá uma pausa curta
+    const wait = Math.max(busy?180:0, TONE_END+140-Date.now());
+    if(wait>0) setTimeout(go, wait); else go();
   }catch(e){} }
 
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
