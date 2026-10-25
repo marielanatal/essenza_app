@@ -4416,9 +4416,9 @@ function voiceLabel(v){ const q=isGoodVoice(v) ? (/premium/i.test(v.name+" "+v.v
 function cleanSpeech(t){ return t.replace(/\(.*?\)/g,"").replace(/…/g,"").replace(/\s\/\s/g,", ").trim(); }
 function utter(t, pitch, slow){ const u=new SpeechSynthesisUtterance(cleanSpeech(t)); u.lang="es-ES"; const v=esVoice(); if(v) u.voice=v; u.rate=slow ? Math.max(0.5,S.rate*0.7) : S.rate; if(pitch) u.pitch=pitch; return u; }
 /* Fala com a voz escolhida; se ela não começar em 1,8 s (acontece no iPhone logo após baixar uma voz), tenta de novo sem fixar a voz. */
-let SPEAK_FAILS=0, SPEAK_SEQ=0, SPEAK_WARM=false;
+let SPEAK_FAILS=0, SPEAK_SEQ=0, SPEAK_WARM=false, SPEAK_LAST=0, MIC_END=0;
 /* Primeira fala da sessão no iPhone sai na voz comum (a aprimorada ainda não carregou): fala uma sílaba muda antes. */
-function warmVoice(){ if(SPEAK_WARM || !canSpeak) return; SPEAK_WARM=true; try{ const w=new SpeechSynthesisUtterance("a"); w.lang="es-ES"; w.volume=0; w.rate=1.5; const v=esVoice(); if(v) w.voice=v; speechSynthesis.speak(w); }catch(e){} }
+function warmVoice(force){ if((SPEAK_WARM && !force) || !canSpeak) return; SPEAK_WARM=true; try{ const w=new SpeechSynthesisUtterance("a"); w.lang="es-ES"; w.volume=0; w.rate=1.5; const v=esVoice(); if(v) w.voice=v; speechSynthesis.speak(w); }catch(e){} }
 try{ document.addEventListener("pointerdown", ()=>warmVoice(), {once:true, passive:true}); }catch(e){}
 function speak(t, slow){ if(!canSpeak) return;
   const seq=++SPEAK_SEQ;
@@ -4427,7 +4427,9 @@ function speak(t, slow){ if(!canSpeak) return;
     if(busy){ try{ speechSynthesis.cancel(); }catch(e){} }
     try{ speechSynthesis.resume(); }catch(e){}
     const go=()=>{ if(seq!==SPEAK_SEQ) return;
-      if(!SPEAK_WARM) warmVoice();
+      // sem falar há mais de 45 s (ou depois do microfone), a voz aprimorada descarrega: reaquece antes
+      if(!SPEAK_WARM || Date.now()-SPEAK_LAST>45000 || MIC_END>SPEAK_LAST) warmVoice(true);
+      SPEAK_LAST=Date.now();
       const u=utter(t, 0, slow); let started=false;
       u.onstart=()=>{ started=true; SPEAK_FAILS=0; LAST_VOICE = u.voice ? voiceLabel(u.voice) : "a voz padrão do iPhone para espanhol (a marcada em Ajustes › Vozes)"; voiceNow(); };
       u.onerror=()=>{ started=true; };
@@ -4439,7 +4441,7 @@ function speak(t, slow){ if(!canSpeak) return;
       }, 3000); }
     };
     // no iPhone, falar logo depois de cancelar ou de um som costuma cair na voz comum: dá uma pausa curta
-    const wait = Math.max(busy?180:0, TONE_END+140-Date.now());
+    const wait = Math.max(busy?180:0, TONE_END+140-Date.now(), MIC_END+450-Date.now());
     if(wait>0) setTimeout(go, wait); else go();
   }catch(e){} }
 
@@ -4453,8 +4455,8 @@ let REC=null;
 function hear(onPartial, maxMs){
   return new Promise((res,rej)=>{
     let done=false, best="", alts=[], r=null, tSilence=null, restarting=false; const t0=Date.now(); const limit=maxMs||20000;
-    const finish = v => { if(done) return; done=true; clearTimeout(tAll); clearTimeout(tSilence); try{ if(r) r.abort(); }catch(e){} REC=null; res(v); };
-    const fail = c => { if(done) return; done=true; clearTimeout(tAll); clearTimeout(tSilence); REC=null; rej(c); };
+    const finish = v => { if(done) return; done=true; clearTimeout(tAll); clearTimeout(tSilence); try{ if(r) r.abort(); }catch(e){} REC=null; MIC_END=Date.now(); res(v); };
+    const fail = c => { if(done) return; done=true; clearTimeout(tAll); clearTimeout(tSilence); REC=null; MIC_END=Date.now(); rej(c); };
     const armSilence = () => { clearTimeout(tSilence); tSilence=setTimeout(()=>{ try{ r.stop(); }catch(e){} setTimeout(()=>finish({alts: alts.length?alts:(best?[best]:[]), partial:true}), 600); }, 2500); };
     const timeLeft = () => Date.now()-t0 < limit-2500;
     const start = () => {
@@ -5658,7 +5660,7 @@ setTimeout(()=>{ if(!PR.onboarded && $("#sheet").hidden) openOnboarding(); }, 40
   } else toast("Esse link de backup não é válido."); return; }
   const d=parseInvite(location.hash); if(d && receiveScore(d)){ try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} renderAll(); setTimeout(()=>{ toast(`Placar de ${d.name} recebido. Agora mande o seu!`); if(PR.onboarded) openPasajeros(); }, 600); } })();
 /* Atualização automática: quando sai versão nova, o app baixa e recarrega sozinho (fora de um treino). */
-const APP_VERSION = "2026.10.25-2255";
+const APP_VERSION = "2026.10.25-2320";
 let pendingReload = false;
 function maybeReload(){ if(!pendingReload) return; if(D || !$("#drill").hidden){ return; } pendingReload=false; toast("Atualizando o app…"); setTimeout(()=>location.reload(), 600); }
 if("serviceWorker" in navigator && !window.claude && location.protocol==="https:"){
