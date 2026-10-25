@@ -3230,12 +3230,23 @@ function wvListings(wikitext){
     re.lastIndex=i; }
   const seen=new Set(); return out.filter(x=>{ const k=norm(x.t); if(seen.has(k)) return false; seen.add(k); return true; });
 }
+/* Cidades vizinhas da seção "Go next" (en) / "Siguiente destino" ou "Alrededores" (es) do Wikivoyage */
+function wvGoNext(wikitext){
+  const m=wikitext.match(/^==+\s*(Go next|Siguiente destino|Próximo destino|Alrededores|Cerca|Nearby)\s*==+\s*$/im); if(!m) return [];
+  const start=m.index+m[0].length; const rest=wikitext.slice(start); const end=rest.search(/^==[^=]/m); const sec=end<0?rest:rest.slice(0,end);
+  const out=[]; sec.split("\n").forEach(line=>{ if(!/^\*/.test(line)) return; const lk=line.match(/\[\[([^\]|#]+)(?:#[^\]|]*)?(?:\|([^\]]*))?\]\]/); if(!lk) return;
+    const page=lk[1].trim(); const t=wvClean(lk[2]||page).replace(/\s*\(.*?\)\s*$/,"").trim(); if(!t) return;
+    const desc=wvClean(line.replace(/^\*+\s*/,"").replace(lk[0],"")).replace(/^[\s–—\-:,.]+/,"").trim();
+    if(/\b(region|región|regi[oó]n page|provincia|province|comarca|comunidad)\b/i.test(desc) && desc.length<40) return;
+    out.push({t, page, desc:desc.slice(0,220)}); });
+  const seen=new Set(); return out.filter(x=>{ const k=norm(x.t); if(seen.has(k)) return false; seen.add(k); return true; }).slice(0,8);
+}
 async function autoGuide(id){
   const d=DEST[id]; if(!d||!d.custom) return null;
   if(AUTO[id] && AUTO[id].t > Date.now()-30*864e5) return AUTO[id];
   if(AUTO_PENDING[id]) return AUTO_PENDING[id];
   AUTO_PENDING[id]=(async()=>{
-    const out={t:Date.now(), about:"", aboutUrl:"", items:[], src:"", err:""};
+    const out={t:Date.now(), about:"", aboutUrl:"", items:[], trips:[], src:"", err:""};
     const name=d.name;
     try{ const sr=await wpJson("https://pt.wikipedia.org/w/api.php?action=query&list=search&srsearch="+encodeURIComponent(name+" Espanha")+"&srlimit=1&format=json&origin=*");
       const hit=sr&&sr.query&&sr.query.search&&sr.query.search[0];
@@ -3246,13 +3257,17 @@ async function autoGuide(id){
         const hit=sr&&sr.query&&sr.query.search&&sr.query.search[0]; if(!hit) continue;
         const pj=await wpJson(`https://${lang}.wikivoyage.org/w/api.php?action=parse&page=${encodeURIComponent(hit.title)}&prop=wikitext&format=json&origin=*`);
         const wt=pj&&pj.parse&&pj.parse.wikitext&&pj.parse.wikitext["*"]; if(!wt) continue;
-        const items=wvListings(wt); if(items.filter(x=>x.kind==="ver"||x.kind==="fazer").length>=3){ out.items=items.slice(0,60); out.src=lang; out.srcUrl=`https://${lang}.wikivoyage.org/wiki/${encodeURIComponent(hit.title.replace(/ /g,"_"))}`; break; }
+        const items=wvListings(wt); if(items.filter(x=>x.kind==="ver"||x.kind==="fazer").length>=3){ out.items=items.slice(0,60); out.trips=wvGoNext(wt).map(tr=>Object.assign(tr,{lang})); out.src=lang; out.srcUrl=`https://${lang}.wikivoyage.org/wiki/${encodeURIComponent(hit.title.replace(/ /g,"_"))}`; break; }
       }catch(e){ out.err+=lang+": "+(e.message||e)+" "; }
     }
     AUTO[id]=out; autoSave(); delete AUTO_PENDING[id]; return out;
   })();
   return AUTO_PENDING[id];
 }
+function autoTripLink(d, tr){ return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(d.name+", España")}&destination=${encodeURIComponent(tr.t+", España")}&travelmode=transit`; }
+function autoTripHtml(d, tr){ return `<div class="item"><div class="hd"><a href="${h(autoTripLink(d,tr))}" target="_blank" rel="noopener">${h(tr.t)}</a><div class="meta2"><span class="bk h"><i></i>bate-volta</span><span class="meta">rota de transporte público no Google Maps</span></div></div>${tr.desc?`<div class="tip">${h(tr.desc)}</div>`:""}<p class="small" style="margin-top:4px"><a href="https://${h(tr.lang||"en")}.wikivoyage.org/wiki/${encodeURIComponent((tr.page||tr.t).replace(/ /g,"_"))}" target="_blank" rel="noopener" style="color:var(--cobalt);font-weight:700;text-decoration:none">Guia de ${h(tr.t)} no Wikivoyage ↗</a> · <a class="w" href="#" data-act="vaddnamed" data-name="${h(tr.t)}" style="color:var(--cobalt);font-weight:700;text-decoration:none">pôr na rota</a></p></div>`; }
+/* Quantos dias de cidade o guia automático sustenta (3 lugares por dia); os demais viram bate-voltas */
+function autoCityDays(id, days){ const a=AUTO[id]; if(!a) return days; const see=a.items.filter(x=>x.kind==="ver"||x.kind==="fazer").length; const cd=Math.max(1, Math.ceil(see/3)); return a.trips && a.trips.length ? Math.min(days, cd) : days; }
 function autoItemLink(d, it){ return it.url && /^https?:/.test(it.url) ? it.url : "https://www.google.com/maps/search/"+encodeURIComponent(it.t+" "+d.name+" España"); }
 function autoItemHtml(d, it){ return `<div class="item"><div class="hd"><a href="${h(autoItemLink(d,it))}" target="_blank" rel="noopener">${h(it.t)}</a><div class="meta2"><span class="bk ${it.kind==="comer"||it.kind==="beber"?"d":"h"}"><i></i>${h(it.kind)}</span><span class="meta">${h([it.addr, it.hours, it.price].filter(Boolean).join(" · "))}</span></div></div>${it.desc?`<div class="tip">${h(it.desc)}</div>`:""}</div>`; }
 /* Blocos de roteiro para uma cidade sem pacote, a partir do guia automático */
@@ -3980,6 +3995,7 @@ function viajeSearch(q){
     d.must.forEach(m=>{ if(cityHit || hit(m.t, m.area, m.tip, m.price)) out.push({city:d.name, id, kind:"Imperdível", m}); });
     d.daytrips.forEach(m=>{ if(cityHit || hit(m.t, m.how, m.tip)) out.push({city:d.name, id, kind:"Bate e volta", m}); });
     curioList(id).forEach(c=>{ if(hit(c.t)) out.push({city:d.name, id, kind:"Curiosidade", text:c.t}); });
+    if(d.custom && AUTO[id]) (AUTO[id].trips||[]).forEach(tr=>{ if(cityHit || hit(tr.t, tr.desc)) out.push({city:d.name, id, kind:"Bate e volta (automático)", m:{t:tr.t, how:"a partir de "+d.name, link:autoTripLink(d,tr), tip:tr.desc, book:"h", pay:1}}); });
     if(d.custom && AUTO[id]) AUTO[id].items.forEach(it=>{ if(cityHit || hit(it.t, it.desc, it.addr)) out.push({city:d.name, id, kind:"Guia automático", m:{t:it.t, how:it.kind+(it.addr?" · "+it.addr:""), link:autoItemLink(d,it), tip:it.desc, book:"h", pay:1, price:it.price}}); });
     d.transit.forEach(g=>g.o.forEach(o=>{ if(hit(o[0], o[3], g.t)) out.push({city:d.name, id, kind:"Transporte", m:{t:o[0], how:g.t+" · "+o[1], link:o[2], tip:o[3], book:"h", pay:0}}); }));
   });
@@ -4057,6 +4073,7 @@ function renderViaje(){
         ${see.length?`<div class="sec-h"><h3>Ver e fazer</h3></div><div class="card" style="padding:4px 16px">${see.slice(0,14).map(it=>autoItemHtml(d,it)).join("")}</div>`:""}
         ${eat.length?`<div class="sec-h"><h3>Comer e beber</h3></div><div class="card" style="padding:4px 16px">${eat.slice(0,8).map(it=>autoItemHtml(d,it)).join("")}</div>`:""}
         ${buy.length?`<div class="sec-h"><h3>Comprar</h3></div><div class="card" style="padding:4px 16px">${buy.slice(0,5).map(it=>autoItemHtml(d,it)).join("")}</div>`:""}
+        ${(a.trips||[]).length?`<div class="sec-h"><h3>Bate e volta a partir de ${h(d.name)}</h3></div><p class="small muted" style="padding:0 4px;margin-top:-6px">Cidades vizinhas sugeridas pelo Wikivoyage. Se você der mais dias a ${h(d.name)} do que os lugares preenchem, o roteiro usa os dias extras para elas.</p><div class="card" style="padding:4px 16px">${a.trips.map(tr=>autoTripHtml(d,tr)).join("")}</div>`:""}
         <div class="row" style="gap:8px">${a.srcUrl?`<a class="btn soft" href="${h(a.srcUrl)}" target="_blank" rel="noopener">Artigo completo no Wikivoyage ↗</a>`:""}<button class="btn ghost" data-act="autorefresh" data-id="${id}">Atualizar guia</button></div>`; })()}
       <div class="card stack" style="gap:8px"><b>Atalhos</b><a class="btn soft wide" href="https://www.google.com/maps/search/${encodeURIComponent(d.name+" España")}" target="_blank" rel="noopener">Abrir ${h(d.name)} no Google Maps ↗</a><a class="btn ghost wide" href="https://es.wikipedia.org/wiki/${encodeURIComponent(d.name.replace(/ /g,"_"))}" target="_blank" rel="noopener">Ler sobre ${h(d.name)} na Wikipédia ↗</a><a class="btn ghost wide" href="https://www.renfe.com" target="_blank" rel="noopener">Trens para ${h(d.name)} (Renfe) ↗</a></div>
       <div class="citynav"><button data-act="vgo" data-s="cidade" data-city="${prev||""}" ${prev?"":"disabled"}>${prev?"← "+h(DEST[prev].name):"← início"}</button><button data-act="vgo" data-s="cidade" data-city="${next||""}" ${next?"":"disabled"}>${next?h(DEST[next].name)+" →":"fim →"}</button></div>
@@ -4087,7 +4104,11 @@ function renderViaje(){
       if(i===0){ const ap=DEST[id].transit.find(t=>/Aeroporto/i.test(t.t)); if(ap) parts.push(`<div class="leg"><b>${h(fmtDay(CD[id][0]))} · Chegada em ${h(DEST[id].name)}</b><span>Do aeroporto ao centro: ${ap.o.map(o=>`${h(o[0])} (${h(o[1])})`).join(" · ")}</span><span class="muted">Detalhes em Cidades › ${h(DEST[id].name)} › Transporte.</span></div>`); }
       if(i>0){ const lg=legFor(sel[i-1],id); if(lg) parts.push(`<div class="leg"><b>${h(fmtDay(CD[id][0]))} · ${h(DEST[sel[i-1]].name)} → ${h(DEST[id].name)}</b><span>${h(lg.how)}</span><span>${lg.links.map(l=>`<a href="${h(l[1])}" target="_blank" rel="noopener">${h(l[0])} ↗</a>`).join("")}</span><span class="muted">${h(lg.tip)}</span></div>`); }
       if(DEST[id].custom){ const dd=DEST[id]; if(!AUTO[id]) autoGuide(id).then(()=>{ if(V.screen==="roteiro") renderViaje(); });
-        for(let k=0;k<(V.days[id]||1);k++){ const bl=autoDayBlocks(id,k);
+        const nd=V.days[id]||1, cdays=autoCityDays(id, nd);
+        const atrips = ((AUTO[id]||{}).trips||[]).filter(tr=>!sel.some(cid=>norm(DEST[cid].name)===norm(tr.t)));
+        for(let k=0;k<nd;k++){ const tr = k>=cdays ? atrips[k-cdays] : null;
+          if(tr){ parts.push(`<div class="dayc"><h3>${h(fmtDay(CD[id][0]+k))} · ${h(dd.name)}, dia ${k+1}: bate-volta a ${h(tr.t)}</h3><div class="blk"><span class="sl m">Dia</span><div><a href="${h(autoTripLink(dd,tr))}" target="_blank" rel="noopener">${h(tr.t)}</a> <span class="bk h"><i></i>bate-volta</span><div class="meta">rota de transporte público no Google Maps</div>${tr.desc?`<p class="small" style="margin-top:6px">${h(tr.desc)}</p>`:""}</div></div><p class="small muted">Sugestão automática do Wikivoyage. Prefere outra? Troque a ordem dos dias ou peça o pacote desta cidade.</p></div>`); continue; }
+          const bl=autoDayBlocks(id,k);
           parts.push(`<div class="dayc"><h3>${h(fmtDay(CD[id][0]+k))} · ${h(dd.name)}, dia ${k+1}</h3>${bl.length ? bl.map(b=>`<div class="blk"><span class="sl ${b.slot}">${b.slot==="m"?"Manhã":b.slot==="t"?"Tarde":"Noite"}</span><div><a href="${h(autoItemLink(dd,b.it))}" target="_blank" rel="noopener">${h(b.it.t)}</a><div class="meta">${h([b.it.addr,b.it.price].filter(Boolean).join(" · ")||"guia automático (Wikivoyage)")}</div></div></div>`).join("")+`<p class="small muted">Sugestão automática, sem curadoria. Toque em "Ver tudo" para a lista completa.</p>` : `<p class="small muted">${AUTO[id] ? `Sem lugares no Wikivoyage para ${h(dd.name)}: dia livre. Use a busca ou o Google Maps.` : "Montando sugestões automáticas…"}</p>`}<button class="btn ghost" style="min-height:38px;padding:6px 12px;align-self:flex-start" data-act="vgo" data-s="cidade" data-city="${id}">Ver tudo sobre ${h(dd.name)} ›</button></div>`); } }
       buildPlan(id, V.days[id]||1, V.interests, V.ritmo).forEach((day,k)=>{
         day.title = `${fmtDay(CD[id][0]+k)} · ${day.title}`;
@@ -4454,6 +4475,7 @@ document.addEventListener("click", e=>{
     case "vritmo": V.ritmo=el.dataset.k; saveProfiles(); renderViaje(); break;
     case "vmove": { const id=el.dataset.id; if(id===arrivalId()||id===V.dep) break; const i=V.dests.indexOf(id), j=i+(+el.dataset.d); const lo=1, hi=(V.dep!==arrivalId() && V.dests.includes(V.dep)) ? V.dests.length-2 : V.dests.length-1; if(j<lo||j>hi) break; moveDest(id, +el.dataset.d); saveProfiles(); renderViaje(); break; }
     case "vclear": viajeQ=""; renderViaje(); break;
+    case "vaddnamed": { e.preventDefault(); const id=addCustomCity(el.dataset.name); if(!id) break; if(!V.dests.includes(id)) toggleMiddle(id); saveProfiles(); toast(`${DEST[id].name} entrou na rota. Ajuste os dias em Sua rota.`); vgo("rota"); break; }
     case "autorefresh": { const id=el.dataset.id; delete AUTO[id]; autoSave(); toast("Atualizando guia…"); autoGuide(id).then(a=>{ renderViaje(); toast(a && a.items.length ? `${a.items.length} lugares encontrados.` : "Não encontrei nada novo."); }); break; }
     case "gokit": phraseFilter="kit"; phraseQuery=""; renderFrases(); showTab("frases"); setTimeout(()=>{ const el=$("#kq"); if(el) el.scrollIntoView({block:"start",behavior:"smooth"}); }, 50); break;
     case "trdir": { TR.dir=el.dataset.k; try{ localStorage.setItem("rumbo-trdir",TR.dir); }catch(e){} renderFrases(); break; }
@@ -4586,7 +4608,7 @@ setTimeout(()=>{ if(!PR.onboarded && $("#sheet").hidden) openOnboarding(); }, 40
   } else toast("Esse link de backup não é válido."); return; }
   const d=parseInvite(location.hash); if(d && receiveScore(d)){ try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} renderAll(); setTimeout(()=>{ toast(`Placar de ${d.name} recebido. Agora mande o seu!`); if(PR.onboarded) openPasajeros(); }, 600); } })();
 /* Atualização automática: quando sai versão nova, o app baixa e recarrega sozinho (fora de um treino). */
-const APP_VERSION = "2026.10.25-1729";
+const APP_VERSION = "2026.10.25-1732";
 let pendingReload = false;
 function maybeReload(){ if(!pendingReload) return; if(D || !$("#drill").hidden){ return; } pendingReload=false; toast("Atualizando o app…"); setTimeout(()=>location.reload(), 600); }
 if("serviceWorker" in navigator && !window.claude && location.protocol==="https:"){
