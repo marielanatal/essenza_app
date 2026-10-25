@@ -4406,7 +4406,7 @@ function esVoice(){ const want=S && S.voice; if(want){ const v=voices.find(v=>v.
   const L=esVoices(); return L.find(v=>/^es[-_]ES/i.test(v.lang) && isGoodVoice(v)) || L.find(v=>/^es[-_]ES/i.test(v.lang)) || L[0]; }
 let LAST_VOICE="";
 /* A voz se apresenta: nome, qualidade e país, em espanhol */
-function voiceIntro(v){ if(!v) return "Hola, soy la voz automática del sistema. Me llamo Lucía y vivo en Madrid."; const name=v.name.replace(/\s*\(.*?\)\s*/g," ").trim(); const q=isGoodVoice(v)?"la voz mejorada":"la voz normal"; const c=/ES/i.test(v.lang)?"de España":/MX/i.test(v.lang)?"de México":/AR/i.test(v.lang)?"de Argentina":/US/i.test(v.lang)?"de Estados Unidos":"en español"; return `Hola, soy ${name}, ${q} ${c}. Me llamo Lucía y vivo en Madrid.`; }
+function voiceIntro(v){ if(!v) return "Hola, soy la voz automática del sistema. Me llamo Lucía y vivo en Madrid."; const name=v.name.replace(/\s*\(.*?\)\s*/g," ").trim(); const q=isGoodVoice(v)?"la voz mejorada":"la voz normal"; const c=/[-_]ES$/i.test(v.lang)?"de España":/[-_]MX$/i.test(v.lang)?"de México":/[-_]AR$/i.test(v.lang)?"de Argentina":/[-_]US$/i.test(v.lang)?"de Estados Unidos":/[-_]CO$/i.test(v.lang)?"de Colombia":/[-_]CL$/i.test(v.lang)?"de Chile":"en español"; return `Hola, soy ${name}, ${q} ${c}. Me llamo Lucía y vivo en Madrid.`; }
 function voiceNow(){ const el=$("#s-voice-now"); if(el) el.textContent = LAST_VOICE ? `Falou agora com: ${LAST_VOICE}` : ""; }
 function voiceLabel(v){ const q=isGoodVoice(v) ? (/premium/i.test(v.name+" "+v.voiceURI) ? " · premium" : " · aprimorada") : " · comum"; return `${v.name.replace(/\s*\(.*?\)\s*/g," ").trim()} (${v.lang.replace("_","-")})${q}`; }
 function cleanSpeech(t){ return t.replace(/\(.*?\)/g,"").replace(/…/g,"").replace(/\s\/\s/g,", ").trim(); }
@@ -5638,7 +5638,7 @@ setTimeout(()=>{ if(!PR.onboarded && $("#sheet").hidden) openOnboarding(); }, 40
   } else toast("Esse link de backup não é válido."); return; }
   const d=parseInvite(location.hash); if(d && receiveScore(d)){ try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} renderAll(); setTimeout(()=>{ toast(`Placar de ${d.name} recebido. Agora mande o seu!`); if(PR.onboarded) openPasajeros(); }, 600); } })();
 /* Atualização automática: quando sai versão nova, o app baixa e recarrega sozinho (fora de um treino). */
-const APP_VERSION = "2026.10.25-2133";
+const APP_VERSION = "2026.10.25-2134";
 let pendingReload = false;
 function maybeReload(){ if(!pendingReload) return; if(D || !$("#drill").hidden){ return; } pendingReload=false; toast("Atualizando o app…"); setTimeout(()=>location.reload(), 600); }
 if("serviceWorker" in navigator && !window.claude && location.protocol==="https:"){
