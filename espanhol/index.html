@@ -487,6 +487,12 @@ nav.tabs button.on svg{stroke-width:2.4}
 .bank button{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 12px;font-size:17px;font-family:var(--f-display);font-weight:600;color:var(--ink);box-shadow:var(--shadow)}
 .bank button:disabled{opacity:.25;box-shadow:none}
 .card.frame .list .phrase{padding:8px 0}
+.blanks{display:flex;flex-wrap:wrap;gap:6px 8px;justify-content:center;align-items:flex-end;width:100%}
+.bwrap{display:inline-flex;align-items:flex-end;gap:1px}
+.bp{font-family:var(--f-display);font-weight:600;font-size:18px;color:var(--muted);padding-bottom:4px}
+.bw{border:0;border-bottom:2px solid var(--cobalt);background:var(--cobalt-soft);border-radius:8px 8px 0 0;min-height:36px;padding:4px 8px;font-family:var(--f-display);font-weight:600;font-size:18px;color:var(--cobalt);line-height:1.2}
+.bw.on{background:transparent;border-bottom-color:transparent;color:var(--ink)}
+.bw.pre{background:transparent;border-bottom-color:var(--line);color:var(--muted)}
 .accents{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
 .accents button{width:42px;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:18px}
 .marks{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
@@ -4408,25 +4414,32 @@ let REC=null;
    onPartial recebe o texto parcial enquanto a pessoa fala. */
 function hear(onPartial, maxMs){
   return new Promise((res,rej)=>{
-    let done=false, best="", alts=[];
-    const finish = v => { if(done) return; done=true; clearTimeout(tAll); clearTimeout(tSilence); try{ r.abort(); }catch(e){} REC=null; res(v); };
+    let done=false, best="", alts=[], r=null, tSilence=null, restarting=false; const t0=Date.now(); const limit=maxMs||20000;
+    const finish = v => { if(done) return; done=true; clearTimeout(tAll); clearTimeout(tSilence); try{ if(r) r.abort(); }catch(e){} REC=null; res(v); };
     const fail = c => { if(done) return; done=true; clearTimeout(tAll); clearTimeout(tSilence); REC=null; rej(c); };
-    let r; try{ r=new SR(); }catch(e){ return rej("start"); }
-    REC=r; r.lang="es-ES"; r.interimResults=true; r.maxAlternatives=3; r.continuous=false;
-    let tSilence=null;
-    const armSilence = () => { clearTimeout(tSilence); tSilence=setTimeout(()=>{ try{ r.stop(); }catch(e){} setTimeout(()=>finish({alts: alts.length?alts:(best?[best]:[]), partial:true}), 600); }, 1800); };
-    r.onresult=e=>{
-      let txt=""; for(let i=0;i<e.results.length;i++){ txt += e.results[i][0].transcript+" "; }
-      best=txt.trim(); if(onPartial && best) onPartial(best);
-      const last=e.results[e.results.length-1];
-      if(last.isFinal){ alts=Array.from(last).map(a=>a.transcript.trim()).filter(Boolean); if(!alts.length && best) alts=[best]; finish({alts, partial:false}); }
-      else armSilence();
+    const armSilence = () => { clearTimeout(tSilence); tSilence=setTimeout(()=>{ try{ r.stop(); }catch(e){} setTimeout(()=>finish({alts: alts.length?alts:(best?[best]:[]), partial:true}), 600); }, 2500); };
+    const timeLeft = () => Date.now()-t0 < limit-2500;
+    const start = () => {
+      try{ r=new SR(); }catch(e){ return fail("start"); }
+      REC=r; r.lang="es-ES"; r.interimResults=true; r.maxAlternatives=3; r.continuous=false;
+      r.onresult=e=>{
+        let txt=""; for(let i=0;i<e.results.length;i++){ txt += e.results[i][0].transcript+" "; }
+        best=txt.trim(); if(onPartial && best) onPartial(best);
+        const last=e.results[e.results.length-1];
+        if(last.isFinal){ alts=Array.from(last).map(a=>a.transcript.trim()).filter(Boolean); if(!alts.length && best) alts=[best]; finish({alts, partial:false}); }
+        else armSilence();
+      };
+      r.onerror=e=>{ if(done) return;
+        if(e.error==="no-speech" && !best && !r.userStop && timeLeft()){ restarting=true; setTimeout(()=>{ if(!done) start(); }, 120); return; }
+        if(e.error==="no-speech" || e.error==="aborted"){ finish({alts: best?[best]:[], partial:true}); } else fail(e.error||"error"); };
+      r.onend=()=>{ if(done) return; if(restarting){ restarting=false; return; }
+        if(!best && !r.userStop && timeLeft()){ start(); return; }
+        finish({alts: alts.length?alts:(best?[best]:[]), partial:true}); };
+      r.onaudiostart=()=>{ if(onPartial) onPartial(""); };
+      try{ speechSynthesis.cancel(); r.start(); }catch(e){ fail("start"); }
     };
-    r.onerror=e=>{ if(e.error==="no-speech" || e.error==="aborted"){ finish({alts: best?[best]:[], partial:true}); } else fail(e.error||"error"); };
-    r.onend=()=>{ finish({alts: alts.length?alts:(best?[best]:[]), partial:true}); };
-    r.onaudiostart=()=>{ if(onPartial) onPartial(""); };
-    const tAll=setTimeout(()=>{ try{ r.stop(); }catch(e){} setTimeout(()=>finish({alts: best?[best]:[], partial:true, timeout:true}), 800); }, maxMs||9000);
-    try{ speechSynthesis.cancel(); r.start(); }catch(e){ fail("start"); }
+    const tAll=setTimeout(()=>{ try{ if(r) r.stop(); }catch(e){} setTimeout(()=>finish({alts: best?[best]:[], partial:true, timeout:true}), 800); }, limit);
+    start();
   });
 }
 function micHint(code){
@@ -4989,6 +5002,15 @@ function closeDrill(){ hideDict(); D = null; setTimeout(maybeReload, 300); $("#d
 function convPos(it){ const L=D.items.filter(x=>!x.fix && (x.t==="mine"||x.t==="theirs")); return `${L.indexOf(it)+1} de ${L.length}`; }
 function convLog(it){ if(it.fix){ return it.prev?`<div class="ctx">${h(it.prev[0])}: “${h(it.prev[1])}”</div>`:""; } const L=D.items.filter(x=>!x.fix && (x.t==="mine"||x.t==="theirs")); const i=L.indexOf(it); const prev=L.slice(Math.max(0,i-3), i); if(!prev.length) return "";
   return `<div class="dlg convlog">${prev.map(x=>`<div class="msg${x.t==="mine"?" r":""}"><div class="bub"><div class="who">${h(x.line[0])}</div><div class="es">${h(x.line[1])}</div></div></div>`).join("")}</div>`; }
+/* Lacunas: cada palavra da frase em espanhol vira um botão; tocar mostra a palavra e a pronuncia.
+   pre = palavras já visíveis (ex.: o molde da fórmula). */
+function blanksHtml(it, es, pre){
+  const toks = es.split(/\s+/).filter(Boolean); it.hints = it.hints || []; const preSet = new Set((pre||[]).map(w=>norm(w.replace(/[¿¡?!.,;:…]/g,""))));
+  const core = w => w.replace(/[¿¡?!.,;:…]/g,"");
+  return `<div class="blanks">${toks.map((w,i)=>{ const on = it.hints.includes(i); const isPre = !on && preSet.has(norm(core(w))); const lead=(w.match(/^[¿¡]+/)||[""])[0], trail=(w.match(/[?!.,;:…]+$/)||[""])[0];
+    return `<span class="bwrap">${lead?`<span class="bp">${h(lead)}</span>`:""}<button class="bw${on?" on":isPre?" pre":""}" data-act="bw" data-i="${i}" aria-label="${on||isPre?h(core(w)):"palavra "+(i+1)}" style="min-width:${Math.max(30, core(w).length*11)}px">${on||isPre?h(core(w)):""}</button>${trail?`<span class="bp">${h(trail)}</span>`:""}</span>`; }).join("")}</div>
+  <p class="small muted">Toque numa lacuna para ver e ouvir a palavra. Sem pressa: toque em ${MIC?"Falar":"Já falei"} só quando estiver pronta.</p>`;
+}
 function drillTop(){ const pct = D.items.length ? Math.round(100*D.i/D.items.length) : 100;
   return `<div class="top"><button class="x" data-act="closedrill" aria-label="Fechar">${ICON.x}</button><div class="meter"><span style="width:${pct}%"></span></div><span class="count">${Math.min(D.i+1,D.items.length)}/${D.items.length}</span></div>`; }
 
@@ -5185,7 +5207,7 @@ function heardHtml(it){ if(!it.heard) return ""; const sc=it.heard.score; const 
 function micBtn(it){ return it.listening
   ? `<button class="btn bad" data-act="micstop">${ICON.mic} Ouvindo… <span class="ct">toque para parar</span></button>`
   : `<button class="btn saff" data-act="mic">${ICON.mic} Falar</button>`; }
-function heardLive(txt){ let el=$("#heard-live"); if(!el){ const flash=$("#drill .flash"); if(!flash) return; el=document.createElement("div"); el.id="heard-live"; el.className="verdict mid"; flash.appendChild(el); } el.textContent = txt ? "Ouvindo: "+txt : "Ouvindo… pode falar"; }
+function heardLive(txt){ let el=$("#heard-live"); if(!el){ const flash=$("#drill .flash"); if(!flash) return; el=document.createElement("div"); el.id="heard-live"; el.className="verdict mid"; flash.appendChild(el); } el.textContent = txt ? "Ouvindo: "+txt : "Ouvindo… pense com calma, você tem 20 segundos"; }
 function mcItem(c, dir, pool){
   const field = dir==="pt" ? "es" : "pt";
   const same = CARDS.filter(x=>x.id!==c.id && x.kind===c.kind && x[field]!==c[field]);
@@ -5235,7 +5257,7 @@ function drawDrill(){
     if(!oral && !it.played){ it.played=true; speak(c.es); }
     const front = oral ? c.pt : c.es;
     const back = oral ? c.es : c.pt;
-    stage = `<div class="flash"><span class="kind">${it.fix?"Correção · ":""}${oral?"Diga em voz alta, em espanhol":"Ouça: o que significa?"}</span><div class="big ${oral?"pt":""}">${oral?h(front):W(front)}</div>${!oral?sayBtn(c.es,true):""}${heardHtml(it)}${D.revealed?`<hr><div class="ans">${oral?W(back):h(back)}</div>${oral?sayRow(c.es):""}${c.note?`<div class="note">${h(c.note)}</div>`:""}`:""}</div>`;
+    stage = `<div class="flash"><span class="kind">${it.fix?"Correção · ":""}${oral?"Diga em voz alta, em espanhol":"Ouça: o que significa?"}</span><div class="big ${oral?"pt":""}">${oral?h(front):W(front)}</div>${!oral?sayBtn(c.es,true):""}${oral&&!D.revealed?`<hr>`+blanksHtml(it, c.es):""}${heardHtml(it)}${D.revealed?`<hr><div class="ans">${oral?W(back):h(back)}</div>${oral?sayRow(c.es):""}${c.note?`<div class="note">${h(c.note)}</div>`:""}`:""}</div>`;
     actions = D.revealed
       ? `<div class="actions three"><button class="btn bad" data-act="grade" data-g="bad">Não saiu</button><button class="btn soft" data-act="grade" data-g="mid">Quase</button><button class="btn ok" data-act="grade" data-g="good">${oral?"Falei bem":"Entendi"}</button></div>`
       : `<div class="actions${MIC&&oral?" duo":""}">${MIC&&oral?micBtn(it):""}<button class="btn wide" data-act="reveal">${oral?"Já falei: ouvir a resposta":"Mostrar significado"}</button></div>`;
@@ -5246,7 +5268,7 @@ function drawDrill(){
     actions = `<div class="actions"><button class="btn wide" data-act="next">${nextMine?"Sua vez de responder":"Continuar"}</button></div>`;
   } else if(it.t==="mine"){
     const hint = it.hinted && !D.revealed;
-    stage = `${convLog(it)}<div class="flash"><span class="kind">${it.fix?"Correção · ":`Fala ${convPos(it)} · `}Sua vez · diga em espanhol</span><div class="big pt">${h(it.line[2])}</div>${hint?`<hr><div class="ans">${W(it.line[1])}</div>${sayRow(it.line[1])}<p class="small muted">Leia em voz alta quantas vezes quiser. Depois toque em ${MIC?"Falar":"Já falei"}.</p>`:""}${heardHtml(it)}${D.revealed?`<hr><div class="ans">${W(it.line[1])}</div>${sayRow(it.line[1])}<p class="small muted">${it.hinted?"Esta volta na correção, no fim da conversa.":"Repita imitando a entonação."}</p>`:""}</div>`;
+    stage = `${convLog(it)}<div class="flash"><span class="kind">${it.fix?"Correção · ":`Fala ${convPos(it)} · `}Sua vez · diga em espanhol</span><div class="big pt">${h(it.line[2])}</div>${hint?`<hr><div class="ans">${W(it.line[1])}</div>${sayRow(it.line[1])}<p class="small muted">Leia em voz alta quantas vezes quiser. Depois toque em ${MIC?"Falar":"Já falei"}.</p>`:(D.revealed?"":`<hr>`+blanksHtml(it, it.line[1]))}${heardHtml(it)}${D.revealed?`<hr><div class="ans">${W(it.line[1])}</div>${sayRow(it.line[1])}<p class="small muted">${it.hinted?"Esta volta na correção, no fim da conversa.":"Repita imitando a entonação."}</p>`:""}</div>`;
     actions = D.revealed ? (it.hinted || (it.heard && it.heard.score>=.5) || it.fix ? `<div class="actions"><button class="btn wide" data-act="next">Próxima fala</button></div>`
           : `<div class="actions duo"><button class="btn soft" data-act="convbad">Não saiu</button><button class="btn wide" data-act="next">Saiu bem</button></div>`)
       : `<div class="actions${MIC?" duo":""}">${MIC?micBtn(it):""}<button class="btn wide" data-act="reveal">Já falei: ouvir o certo</button></div>${hint?"":`<div class="actions" style="margin-top:8px"><button class="btn ghost wide" data-act="hint">Não sei: ver a frase escrita</button></div>`}`;
@@ -5290,9 +5312,9 @@ function drawDrill(){
            <p class="small muted">${it.bank.length-it.target.length} ${it.bank.length-it.target.length===1?"palavra sobra":"palavras sobram"}. Toque numa palavra da frase para tirar.</p>`}</div>`;
     actions = res ? `<div class="actions"><button class="btn wide" data-act="next">Próxima</button></div>` : `<div class="actions"><button class="btn wide" data-act="bcheck" ${it.seq.length?"":"disabled"}>Conferir</button></div>`;
   } else if(it.t==="frame"){
-    stage = `<div class="ctx">${it.peg ? `Pegadinha: <b>${h(it.fr.es)}</b>` : `Fórmula: <b>${h(it.fr.es.replace("{x}","…"))}</b> (${h(it.fr.pt.replace("{x}","…"))})`}</div><div class="flash"><span class="kind">${it.fix?"Correção · ":""}Diga a frase inteira em espanhol</span><div class="big pt">${h(it.pt)}</div>${heardHtml(it)}${D.revealed?`<hr><div class="ans">${W(it.es)}</div>${sayRow(it.es)}<p class="small" style="text-align:left;background:var(--paper);border-radius:10px;padding:8px 10px">${it.fr.g}</p>`:""}</div>`;
-    actions = D.revealed ? (it.heard && it.heard.score>=.8 || it.fix ? `<div class="actions"><button class="btn wide" data-act="next">Próxima</button></div>` : `<div class="actions duo"><button class="btn soft" data-act="convbad">Não saiu</button><button class="btn wide" data-act="framegood">Saiu bem</button></div>`)
-      : `<div class="actions${MIC?" duo":""}">${MIC?micBtn(it):""}<button class="btn wide" data-act="reveal">Já falei: ver a frase</button></div>`;
+    stage = `<div class="ctx">${it.peg ? `Pegadinha: <b>${h(it.fr.es)}</b>` : `Fórmula: <b>${h(it.fr.es.replace("{x}","…"))}</b> (${h(it.fr.pt.replace("{x}","…"))})`}</div><div class="flash"><span class="kind">${it.fix?"Correção · ":""}Diga a frase inteira em espanhol</span><div class="big pt">${h(it.pt)}</div>${D.revealed?"":`<hr>`+blanksHtml(it, it.es, it.peg?[]:it.fr.es.replace("{x}","").split(/\s+/))}${heardHtml(it)}${D.revealed?`<hr><div class="ans">${W(it.es)}</div>${sayRow(it.es)}<p class="small" style="text-align:left;background:var(--paper);border-radius:10px;padding:8px 10px">${it.fr.g}</p>`:""}</div>`;
+    actions = D.revealed ? (it.hinted || (it.heard && it.heard.score>=.8) || it.fix ? `<div class="actions"><button class="btn wide" data-act="next">Próxima</button></div>` : `<div class="actions duo"><button class="btn soft" data-act="convbad">Não saiu</button><button class="btn wide" data-act="framegood">Saiu bem</button></div>`)
+      : `<div class="actions${MIC?" duo":""}">${MIC?micBtn(it):""}<button class="btn wide" data-act="reveal">Já falei: ver a frase</button></div><div class="actions" style="margin-top:8px"><button class="btn ghost wide" data-act="hint">Não sei: ver a frase inteira</button></div>`;
   } else if(it.t==="write"){
     const res = it.answer;
     stage = `<div class="flash"><span class="kind">${it.fix?"Correção · ":""}Escreva em espanhol</span><div class="big pt">${h(c.pt)}</div>
@@ -5465,18 +5487,18 @@ document.addEventListener("click", e=>{
     case "sons": startSons(); break;
     case "slow": speak(el.dataset.say, true); break;
     case "spoke": logToday().s++; save(); D.i++; drawDrill(); break;
-    case "micstop": { try{ if(REC) REC.stop(); }catch(e){} break; }
+    case "micstop": { try{ if(REC){ REC.userStop=true; REC.stop(); } }catch(e){} break; }
     case "mic": {
       const it=D.items[D.i]; if(it.listening) break;
       const target = it.txt || (it.c ? it.c.es : it.line[1]);
       it.listening=true; drawDrill(); heardLive("");
-      hear(heardLive, 12000).then(r=>{
+      hear(heardLive, 20000).then(r=>{
         it.listening=false;
         if(!D || D.items[D.i]!==it) return;
         const alts=r.alts;
         if(!alts.length){
           it.micFail=(it.micFail||0)+1;
-          toast(IS_IOS && STANDALONE && it.micFail>=2 ? "No iPhone instalado o microfone costuma falhar. Abra o mesmo endereço no Safari." : "Não ouvi nada. Pense com calma; quando estiver pronta, toque em Falar e comece a falar logo em seguida.");
+          toast(IS_IOS && STANDALONE && it.micFail>=2 ? "No iPhone instalado o microfone costuma falhar. Abra o mesmo endereço no Safari." : "Não ouvi nada em 20 segundos. Toque numa lacuna para ver uma palavra, ou em Falar de novo quando estiver pronta.");
           drawDrill(); return;
         }
         if(it.t==="pron"){
@@ -5524,7 +5546,10 @@ document.addEventListener("click", e=>{
     case "chip": phraseFilter=el.dataset.k; renderFrases(); break;
     case "closedrill": closeDrill(); break;
     case "learned": { const c=D.items[D.i].c; if(!S.cards[c.id]){ S.cards[c.id]={b:0,d:todayN()}; logToday().n++; save(); } D.i++; drawDrill(); break; }
-    case "hint": { const it=D.items[D.i]; it.hinted=true; miss(it); drawDrill(); speak(it.line[1]); break; }
+    case "hint": { const it=D.items[D.i]; const es = it.es || (it.line ? it.line[1] : (it.c ? it.c.es : "")); if(!it.hinted){ it.hinted=true; miss(it); } if(it.t==="frame"){ D.revealed=true; } drawDrill(); speak(es); break; }
+    case "bw": { const it=D.items[D.i]; const i=+el.dataset.i; const es = it.es || (it.line ? it.line[1] : (it.c ? it.c.es : "")); const toks=es.split(/\s+/).filter(Boolean); it.hints=it.hints||[]; if(!it.hints.includes(i)) it.hints.push(i);
+      const n = toks.length; if((it.t==="mine"||it.t==="frame") && !it.hinted && it.hints.length >= Math.max(2, Math.ceil(n/2))){ it.hinted=true; miss(it); }
+      drawDrill(); speak(toks[i].replace(/[¿¡?!.,;:…]/g,"")); break; }
     case "convbad": { const it=D.items[D.i]; miss(it); tone("bad"); if(D.mode==="conv" && !it.fix){ const lg=logToday(); lg.cl=(lg.cl||0)+1; save(); } D.revealed=false; D.i++; convMaybeDone(); drawDrill(); break; }
     case "again_build": startBuild(); break;
     case "reveal": { const it=D.items[D.i]; const first=!D.revealed; D.revealed=true;
