@@ -2464,10 +2464,11 @@ const LOLA = `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32
 
 /* Fotos reais: a imagem principal do artigo da Wikipédia em espanhol, carregada no aparelho (não aqui no Claude). */
 const WP_WEEK = {1:"Plaza_Mayor_de_Madrid",2:"Aeropuerto_Adolfo_Suárez_Madrid-Barajas",3:"Café_con_leche",4:"Tortilla_de_patatas",5:"Gran_Vía_(Madrid)",6:"Mercado_de_San_Miguel",7:"Hotel_Ritz_(Madrid)",8:"Calle_de_Preciados",9:"Metro_de_Madrid",10:"Parque_del_Retiro",11:"Farmacia",12:"Tapa_(gastronomía)",13:"Toledo",14:"Plaza_de_Cibeles"};
-const WP_CITY = {madrid:"Puerta_de_Alcalá", barcelona:"Templo_Expiatorio_de_la_Sagrada_Familia", sevilla:"Plaza_de_España_(Sevilla)"};
+const WP_CITY = {madrid:"Puerta_de_Alcalá", barcelona:"Templo_Expiatorio_de_la_Sagrada_Familia", sevilla:"Plaza_de_España_(Sevilla)", segovia:"Acueducto_de_Segovia"};
 const WP_PLACE = {
  "Museo del Prado":"Museo_del_Prado","Museo Reina Sofía":"Museo_Nacional_Centro_de_Arte_Reina_Sofía","Palacio Real":"Palacio_Real_de_Madrid","Plaza Mayor e Mercado de San Miguel":"Plaza_Mayor_de_Madrid","Parque del Retiro e Palacio de Cristal":"Palacio_de_Cristal_del_Retiro","Templo de Debod ao pôr do sol":"Templo_de_Debod","Tapas em La Latina":"La_Latina_(Madrid)","Gran Vía, Sol e Chueca a pé":"Gran_Vía_(Madrid)","Tour do Estádio Bernabéu":"Estadio_Santiago_Bernabéu","Museo Sorolla":"Museo_Sorolla","Museo Thyssen":"Museo_Thyssen-Bornemisza","El Rastro (domingo)":"El_Rastro","Flamenco no Corral de la Morería":"Corral_de_la_Morería","Chocolate con churros em San Ginés":"Chocolatería_San_Ginés",
  "Toledo":"Toledo","Segovia":"Acueducto_de_Segovia","El Escorial":"Monasterio_de_El_Escorial","Ávila":"Ávila",
+ "Acueducto de Segovia":"Acueducto_de_Segovia","Alcázar de Segovia":"Alcázar_de_Segovia","Catedral de Segovia":"Catedral_de_Segovia","Casa de los Picos e Calle Real":"Casa_de_los_Picos","Judería e Puerta de San Andrés":"Puerta_de_San_Andrés_(Segovia)","Iglesia de la Vera Cruz":"Iglesia_de_la_Vera_Cruz_(Segovia)","Real Casa de Moneda":"Real_Casa_de_Moneda_de_Segovia","Plaza Mayor e tapas":"Plaza_Mayor_(Segovia)","Mirador del Pretil e Canaleja":"Segovia","Cochinillo no Mesón de Cándido ou José María":"Cochinillo_asado","Ponche segoviano e judiones":"Ponche_segoviano","La Granja de San Ildefonso":"Palacio_Real_de_La_Granja_de_San_Ildefonso","Pedraza":"Pedraza","Madrid":"Puerta_de_Alcalá",
  "Sagrada Família":"Templo_Expiatorio_de_la_Sagrada_Familia","Park Güell":"Parque_Güell","Casa Batlló":"Casa_Batlló","La Pedrera (Casa Milà)":"Casa_Milà","Barri Gòtic e Catedral":"Catedral_de_Barcelona","Mercado de La Boqueria":"Mercado_de_La_Boquería","El Born e Museu Picasso":"Museo_Picasso_(Barcelona)","Barceloneta e orla":"La_Barceloneta","Montjuïc: teleférico, MNAC e vista":"Montjuïc","Bunkers del Carmel":"Turó_de_la_Rovira","Spotify Camp Nou: tour e museu":"Camp_Nou","Jantar em Gràcia":"Gracia_(Barcelona)","Flamenco no Tablao Cordobés":"Flamenco","Palau de la Música Catalana":"Palacio_de_la_Música_Catalana",
  "Montserrat":"Montserrat_(montaña)","Girona":"Gerona","Sitges":"Sitges","Figueres (Museu Dalí)":"Teatro-Museo_Dalí","Tarragona":"Tarragona",
  "Real Alcázar":"Real_Alcázar_de_Sevilla","Catedral e Giralda":"Catedral_de_Sevilla","Plaza de España e Parque de María Luisa":"Plaza_de_España_(Sevilla)","Barrio de Santa Cruz a pé":"Barrio_de_Santa_Cruz_(Sevilla)","Triana: mercado e cerâmica":"Triana_(Sevilla)","Setas de Sevilla (mirante)":"Metropol_Parasol","Flamenco na Casa de la Memoria":"Flamenco","Tapas em Alameda e El Arenal":"Tapa_(gastronomía)","Torre del Oro e passeio pelo Guadalquivir":"Torre_del_Oro","Casa de Pilatos":"Casa_de_Pilatos","Hospital de los Venerables":"Hospital_de_los_Venerables","Metropol e Calle Sierpes (compras)":"Calle_Sierpes",
@@ -2745,6 +2746,51 @@ sevilla: {
     [["m","Barrio de Santa Cruz a pé"],["m","Triana: mercado e cerâmica"],["t","Plaza de España e Parque de María Luisa"],["t","Torre del Oro e passeio pelo Guadalquivir"],["n","Flamenco na Casa de la Memoria"]],
     [["m","Hospital de los Venerables|Casa de Pilatos"],["t","Metropol e Calle Sierpes (compras)|Casa de Pilatos"],["n","Tapas em Alameda e El Arenal"]]
   ]
+},
+segovia: {
+  name:"Segovia", emoji:"🏰", region:"Castela e Leão · 27 min de Madri", cityMax:2,
+  stay:{min:1, ideal:1, text:"Vale 1 dia inteiro (ou um bate-volta de Madri). Dormindo lá você vê o aqueduto e o Alcázar iluminados, sem a multidão do meio-dia. 2 dias só se quiser La Granja e Pedraza."},
+  curios:[
+    "O aqueduto tem quase 2 mil anos, 167 arcos e 28 m no ponto mais alto, e as pedras se sustentam sem argamassa. Levou água à cidade até 1973.",
+    "O <b>Alcázar</b>, com torres pontudas de ardósia, é uma das inspirações do castelo da Cinderela. Foi residência real, prisão de Estado e academia de artilharia.",
+    "O prato da cidade é o <b>cochinillo asado</b> (leitão). No Mesón de Cándido cortam-no com a borda de um prato, para provar que está macio, e depois quebram o prato no chão.",
+    "A cidade velha inteira e o aqueduto são Patrimônio da Humanidade desde 1985.",
+    "<b>Isabel, a Católica</b>, foi proclamada rainha de Castela aqui, na igreja de San Miguel, em 1474.",
+    "Fica a 1.000 m de altitude: em fevereiro faz de 0 a 10 °C, com neve possível na serra ao lado. Leve casaco bom."
+  ],
+  must:[
+    {t:"Acueducto de Segovia", area:"Plaza del Azoguejo", slot:"m", tags:["historia"], pay:0, book:"g", price:"grátis", link:"https://turismodesegovia.com", tip:"Chegue pela Plaza del Azoguejo e suba a escadaria à esquerda (Postigo del Consuelo) até o mirante, para ver os arcos de cima. À noite, iluminado, é outra coisa."},
+    {t:"Alcázar de Segovia", area:"ponta oeste da cidade velha", slot:"t", tags:["historia","arte"], pay:1, book:"d", price:"~10 € (com torre ~13 €)", link:"https://www.alcazardesegovia.com", tip:"Compre online com dia e hora. A Torre de Juan II (152 degraus) tem a melhor vista da cidade. Sala do Trono e Sala de los Reyes são o auge."},
+    {t:"Catedral de Segovia", area:"Plaza Mayor", slot:"t", tags:["historia","arte"], pay:1, book:"h", price:"~4 € (torre ~7 €, com guia)", link:"https://catedralsegovia.es", tip:"A 'Dama das Catedrais', a última gótica da Espanha (1525). A subida à torre é em horários marcados e vale pela vista."},
+    {t:"Casa de los Picos e Calle Real", area:"cidade velha", slot:"m", tags:["historia"], pay:0, book:"g", price:"grátis", link:"https://turismodesegovia.com", tip:"A rua que sobe do aqueduto à Plaza Mayor (Cervantes, Juan Bravo, Isabel la Católica) passa pela Casa de los Picos, pela Plaza de Medina del Campo e pela igreja de San Martín."},
+    {t:"Judería e Puerta de San Andrés", area:"sul da cidade velha", slot:"t", tags:["historia"], pay:0, book:"g", price:"grátis (Centro Didáctico ~3 €)", link:"https://turismodesegovia.com", tip:"Bairro judeu medieval, com a antiga sinagoga (hoje Corpus Christi) e a muralha. Da Puerta de San Andrés dá para andar por cima da muralha."},
+    {t:"Mirador del Pretil e Canaleja", area:"Calle Juan Bravo", slot:"t", tags:["natureza"], pay:0, book:"g", price:"grátis", link:"https://turismodesegovia.com", tip:"Mirantes na borda da cidade velha, de frente para a serra de Guadarrama. Perfeitos para o fim de tarde."},
+    {t:"Iglesia de la Vera Cruz", area:"fora da muralha, abaixo do Alcázar", slot:"m", tags:["historia"], pay:1, book:"h", price:"~2 €", link:"https://turismodesegovia.com", tip:"Igreja românica de 12 lados, do século XIII, ligada aos Templários. Dali sai a foto clássica do Alcázar no alto do penhasco. Fecha às segundas."},
+    {t:"Cochinillo no Mesón de Cándido ou José María", area:"Azoguejo / Plaza Mayor", slot:"n", tags:["comida"], pay:1, book:"d", price:"~35 a 45 € por pessoa", link:"https://www.mesondecandido.es", tip:"Reserve pelo site, sobretudo no sábado. O leitão vem em porção para dividir. Mais barato: <i>menú del día</i> com cochinillo nos bares da Calle Real."},
+    {t:"Ponche segoviano e judiones", area:"confeitarias da Plaza Mayor", slot:"t", tags:["comida"], pay:1, book:"h", price:"~4 € a fatia", link:"https://turismodesegovia.com", tip:"O ponche é um bolo de massapão e creme com açúcar queimado em xadrez (a Limón y Menta, na Plaza Mayor, é a clássica). Os <i>judiones</i> são feijões gigantes de La Granja, em ensopado."},
+    {t:"Real Casa de Moneda", area:"beira do rio Eresma", slot:"m", tags:["historia"], pay:1, book:"h", price:"~4 €", link:"https://www.casademonedasegovia.es", tip:"A casa da moeda mecanizada mais antiga da Europa (1583), restaurada, com as rodas d'água. O passeio pelo vale do Eresma até lá é bonito."},
+    {t:"Plaza Mayor e tapas", area:"Plaza Mayor", slot:"n", tags:["comida"], pay:0, book:"g", price:"grátis", link:"https://turismodesegovia.com", tip:"A praça com a catedral de fundo e bares com terraço. Tapas da terra: torreznos, chorizo de Cantimpalos e queijo da serra."}
+  ],
+  daytrips:[
+    {t:"La Granja de San Ildefonso", how:"Ônibus La Sepulvedana, 20 min", price:"~2 € cada trecho; palácio ~9 €", book:"h", link:"https://www.patrimonionacional.es", tags:["historia","natureza"], tip:"O 'Versalhes espanhol': palácio dos Bourbons com jardins e 26 fontes monumentais. As fontes só funcionam em datas marcadas (primavera e verão), mas os jardins valem no inverno. Grátis para ibero-americanos nas últimas horas de alguns dias: confirme no site."},
+    {t:"Pedraza", how:"Carro ou táxi, 40 min; sem ônibus útil", price:"táxi ~50 € ida e volta", book:"h", link:"https://www.pedraza.net", tags:["historia","comida"], tip:"Vila medieval murada, uma das mais bonitas de Castela, com castelo e praça porticada. Vale com carro; de táxi, combine a volta."},
+    {t:"Madrid", how:"AVE/Avant até Chamartín, 27 min", price:"~14 € cada trecho", book:"s", link:"https://www.renfe.com", tags:["arte","comida"], tip:"Se Segovia for sua base por um dia a mais, Madri fica a meia hora de trem."},
+    {t:"Ávila", how:"Ônibus Avanza, 1 h", price:"~7 € cada trecho", book:"d", link:"https://www.avanzabus.com", tags:["historia"], tip:"A cidade da muralha completa. Dá para combinar com Segovia num dia longo saindo de Madri, mas é corrido."}
+  ],
+  transit:[
+    {t:"Madri ↔ Segovia", o:[
+      ["AVE/Avant de Chamartín a Segovia-Guiomar","~14 € cada trecho, 27 min","https://www.renfe.com","A estação Guiomar fica a 6 km da cidade: na saída, ônibus 11 até o aqueduto (~2 €, 15 min) ou 12 até a rodoviária. Compre o trem com antecedência."],
+      ["Ônibus Avanza de Moncloa","~5 € cada trecho, 1 h 15","https://www.avanzabus.com","Mais barato, sai a cada 30 min e chega à rodoviária, a 10 min a pé do aqueduto."],
+      ["Trem regional de Chamartín","~8 €, 2 h","https://www.renfe.com","Lento, mas chega à estação velha, mais perto do centro, e cruza a serra com vista."]]},
+    {t:"Dentro da cidade", o:[
+      ["A pé","grátis","","Tudo cabe em 1,5 km: do aqueduto ao Alcázar são 20 minutos de subida leve pela Calle Real."],
+      ["Ônibus urbanos 11 e 12","~2 €","https://turismodesegovia.com","Só para a estação do AVE e a rodoviária."],
+      ["Táxi","~10 € dentro da cidade","","Ponto no Azoguejo, ao lado do aqueduto."]]}
+  ],
+  days:[
+    [["m","Acueducto de Segovia"],["m","Casa de los Picos e Calle Real"],["t","Catedral de Segovia"],["t","Alcázar de Segovia"],["n","Cochinillo no Mesón de Cándido ou José María"]],
+    [["m","Iglesia de la Vera Cruz|Real Casa de Moneda"],["t","Judería e Puerta de San Andrés|Mirador del Pretil e Canaleja"],["t","Ponche segoviano e judiones"],["n","Plaza Mayor e tapas"]]
+  ]
 }
 };
 
@@ -2752,9 +2798,13 @@ sevilla: {
 const LEGS = {
  "madrid-barcelona":{how:"Trem de alta velocidade Atocha → Sants, 2 h 30 a 3 h", links:[["Renfe","https://www.renfe.com"],["Iryo","https://iryo.eu"],["Ouigo","https://www.ouigo.com/es"]], tip:"Compre 1 a 2 meses antes: a diferença é de 20 € para 90 €."},
  "madrid-sevilla":{how:"Trem de alta velocidade Atocha → Santa Justa, 2 h 30", links:[["Renfe","https://www.renfe.com"],["Iryo","https://iryo.eu"]], tip:"Sente do lado direito indo para o sul para ver os campos de oliveira."},
- "barcelona-sevilla":{how:"Voo de 1 h 45 (o trem leva 5 h 30)", links:[["Vueling","https://www.vueling.com"],["Renfe","https://www.renfe.com"]], tip:"Com 2 malas, confira a franquia de bagagem da companhia low cost antes de comprar."}
+ "barcelona-sevilla":{how:"Voo de 1 h 45 (o trem leva 5 h 30)", links:[["Vueling","https://www.vueling.com"],["Renfe","https://www.renfe.com"]], tip:"Com 2 malas, confira a franquia de bagagem da companhia low cost antes de comprar."},
+ "madrid-segovia":{how:"AVE/Avant Chamartín ↔ Segovia-Guiomar, 27 min, depois ônibus 11 até o aqueduto (15 min)", links:[["Renfe","https://www.renfe.com"],["Avanza (ônibus de Moncloa, 1 h 15)","https://www.avanzabus.com"]], tip:"Compre o trem com antecedência; o ônibus é a opção barata e sem hora marcada."},
+ "segovia-barcelona":{how:"Trem a Madrid Chamartín (27 min) e de lá AVE a Barcelona Sants (2 h 30)", links:[["Renfe","https://www.renfe.com"],["Iryo","https://iryo.eu"]], tip:"Deixe ao menos 40 min entre os trens em Chamartín."},
+ "segovia-sevilla":{how:"Trem a Madrid Chamartín (27 min), Cercanías até Atocha (15 min) e AVE a Sevilla (2 h 30)", links:[["Renfe","https://www.renfe.com"],["Iryo","https://iryo.eu"]], tip:"Com bilhete de AVE do mesmo dia, o Cercanías entre Chamartín e Atocha é grátis."}
 };
-function legFor(a,b){ return LEGS[a+"-"+b] || LEGS[b+"-"+a]; }
+function legFor(a,b){ const l=LEGS[a+"-"+b] || LEGS[b+"-"+a]; if(l) return l; const A=DEST[a], B=DEST[b]; if(!A||!B) return null;
+  return {how:`${A.name} → ${B.name}: trem (Renfe) ou ônibus (Alsa/Avanza); confira horários e duração`, links:[["Renfe","https://www.renfe.com"],["Alsa","https://www.alsa.com"],["Rota no Google Maps",`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(A.name+", España")}&destination=${encodeURIComponent(B.name+", España")}&travelmode=transit`]], tip:"Trecho sem detalhes no app ainda: me peça o pacote desta cidade."}; }
 
 /* Monta o roteiro de um destino, dado o número de dias e os interesses */
 function buildPlan(id, days, interests, ritmo){
@@ -3037,6 +3087,28 @@ if(!V.custom) V.custom={};
 /* Curiosidades extras por cidade. `on` liga a curiosidade a um imperdível ou bate-volta (parte do título);
    sem `on`, é geral e aparece nas listas, nos cartões "¿Sabías que…?" e no roteiro. `k` é só a categoria. */
 const CURIOS = {
+  segovia: [
+    {on:["Acueducto"], k:"história", t:"Diz a lenda que o aqueduto foi obra do diabo numa só noite, em troca da alma de uma moça; faltou uma pedra ao amanhecer e o pacto se desfez. No nicho onde ficava a estátua de Hércules há hoje uma Virgem."},
+    {on:["Alcázar"], k:"história", t:"Um incêndio em 1862 destruiu o interior do Alcázar: os tetos mudéjares que você vê são reconstruções do século XIX. Felipe II casou-se ali com Ana de Áustria."},
+    {on:["Catedral"], k:"história", t:"A catedral anterior ficava ao lado do Alcázar e foi destruída na revolta dos Comuneros, em 1520. A nova foi erguida na Plaza Mayor com pedras carregadas em procissão pelos fiéis."},
+    {on:["Vera Cruz"], k:"história", t:"A Vera Cruz guardava uma relíquia da cruz de Cristo. O pequeno edifício de dois andares no centro servia para as vigílias de armas dos cavaleiros antes de serem ordenados."},
+    {on:["Casa de los Picos"], k:"história", t:"A Casa de los Picos tem 617 pontas de granito na fachada. Reza a lenda que o dono as mandou pôr para apagar o apelido de 'casa do judeu'."},
+    {on:["Judería"], k:"história", t:"A sinagoga maior virou o convento do Corpus Christi em 1410. O Centro Didáctico de la Judería ocupa a casa de Abraham Seneor, rabino-mor de Castela e banqueiro dos Reis Católicos."},
+    {on:["Cochinillo"], k:"comida", t:"O leitão certo tem três semanas e uns 4 kg; assa duas horas em forno de lenha, em prato de barro, só com água e sal. O ritual de cortá-lo com um prato foi popularizado por Cándido, nos anos 1930."},
+    {on:["Ponche"], k:"comida", t:"O ponche segoviano foi criado em 1926 na confeitaria El Alcázar, de Frutos García, e ganhou medalha de ouro na Exposição de Barcelona de 1929."},
+    {on:["Casa de Moneda"], k:"história", t:"Felipe II mandou construir a Casa de Moneda em 1583 com máquinas trazidas de Innsbruck: foi a primeira a cunhar moedas com rodas movidas pela água, no caso do rio Eresma."},
+    {on:["La Granja"], k:"história", t:"La Granja foi mandada construir por Felipe V, o primeiro Bourbon espanhol, com saudade de Versalhes, onde cresceu. Dizem que ao vê-la pronta comentou: 'custou-me três milhões e divertiu-me três minutos'."},
+    {on:["Pedraza"], k:"festas", t:"Em julho, Pedraza apaga as luzes e acende milhares de velas nas 'Noches de las Velas', com concertos na praça: um dos espetáculos mais bonitos de Castela."},
+    {on:["Ávila"], k:"comida", t:"Santa Teresa de Jesus nasceu em Ávila em 1515. O doce da cidade, as <i>yemas de Santa Teresa</i>, é feito só de gema e açúcar."},
+    {on:["Madrid"], k:"transporte", t:"Segovia-Guiomar, a estação do AVE, abriu em 2007 e cortou a viagem a Madri de 2 horas para 27 minutos: muita gente mora em Segovia e trabalha na capital."},
+    {k:"idioma", t:"Em português se escreve Segóvia, com acento; em espanhol é Segovia, e a sílaba forte é 'go'."},
+    {k:"história", t:"A cidade velha fica num esporão de rocha entre dois rios, o Eresma e o Clamores. Vista de longe parece um navio: o Alcázar é a proa e a catedral, o mastro."},
+    {k:"história", t:"Nos séculos XV e XVI Segovia viveu da lã: seus panos eram vendidos em toda a Europa, e dessa riqueza vieram os palácios e a catedral."},
+    {k:"cinema", t:"A inspiração do Alcázar para o castelo da Disney é verdadeira (os desenhistas usaram fotos dele e do Neuschwanstein), mas a visita de Walt Disney à cidade nunca foi comprovada."},
+    {k:"comida", t:"Antes do cochinillo, peça uma <i>sopa castellana</i> (alho, pão, presunto e ovo): é o prato de inverno dos castelhanos e cai bem no frio de fevereiro."},
+    {k:"costumes", t:"Segovia é cidade universitária pequena: à noite, nos bares da Calle Infanta Isabel (a 'calle de los bares'), ao lado da Plaza Mayor, é onde todo mundo está."},
+    {k:"fevereiro", t:"Fevereiro em Segovia: 0 a 10 °C, dias curtos e, com sorte, a serra de Guadarrama branca de neve atrás do Alcázar. Luvas e gorro não são exagero."}
+  ],
   madrid: [
     {on:["La Latina"], k:"bairros", t:"La Latina segue o traçado da antiga muralha muçulmana: a Cava Baja, a rua das tabernas, era o fosso. Domingo depois do Rastro, ao meio-dia, não cabe mais ninguém."},
     {on:["San Ginés"], k:"comida", t:"San Ginés serve churros no mesmo beco desde 1894. O chocolate é grosso de propósito: molha-se o churro e o que sobra se toma de colher."},
@@ -3139,8 +3211,58 @@ function curiosFor(id, title){ if(!title) return []; return curioList(id).filter
 /* n curiosidades gerais distintas, variando com o dia e com um "salt" para cada lugar da tela. */
 function curioPick(id, n, salt){ const L=curiosGeneral(id); if(!L.length) return []; const start=(todayN()*3 + (salt||0)*7) % L.length; const out=[]; for(let i=0;i<Math.min(n,L.length);i++) out.push(L[(start+i*5)%L.length]); return out; }
 function sabiasCard(id, salt, cls){ const c=curioPick(id,1,salt)[0]; if(!c) return ""; return `<div class="sabias${cls?" "+cls:""}"><span class="eyebrow">¿Sabías que…? · ${h(DEST[id].name)}</span><p>${c.t}</p></div>`; }
-function registerCustom(id, name){ DEST[id]={custom:true, name, emoji:"📍", region:"cidade adicionada por você", stay:{min:1, ideal:1, text:"Ainda não tenho guia desta cidade. Peça para o app ganhar um pacote dela: curiosidades, imperdíveis, bate-voltas e transporte."}, curios:[], must:[], daytrips:[], transit:[], days:[]}; }
-Object.entries(V.custom).forEach(([id,c])=>registerCustom(id, c.name));
+/* Guia automático para cidades sem pacote: resumo da Wikipédia em português + lugares do Wikivoyage (es, senão en). Fica em cache para funcionar offline. */
+let AUTO = {}; try{ AUTO = JSON.parse(localStorage.getItem("rumbo-auto")||"{}"); }catch(e){}
+function autoSave(){ try{ localStorage.setItem("rumbo-auto", JSON.stringify(AUTO)); }catch(e){} }
+const AUTO_PENDING = {};
+function wvClean(t){ return (t||"").replace(/<ref[^>]*\/>/g,"").replace(/<ref[\s\S]*?<\/ref>/g,"").replace(/\{\{[^{}]*\}\}/g,m=>{ const parts=m.slice(2,-2).split("|"); const last=parts[parts.length-1]; return parts.length>1 && !last.includes("=") ? last : ""; }).replace(/\[\[(?:[^\]|]*\|)?([^\]]*)\]\]/g,"$1").replace(/\[https?:[^\s\]]+\s([^\]]*)\]/g,"$1").replace(/'{2,5}/g,"").replace(/<[^>]+>/g,"").replace(/\s+/g," ").trim(); }
+/* Separa os parâmetros de um template respeitando [[...]] e {{...}} aninhados */
+function wvParams(body){ const out={}; let depth=0, cur=""; const parts=[]; for(let i=0;i<body.length;i++){ const two=body.slice(i,i+2); if(two==="[["||two==="{{"){ depth++; cur+=two; i++; continue; } if(two==="]]"||two==="}}"){ depth--; cur+=two; i++; continue; } if(body[i]==="|" && depth===0){ parts.push(cur); cur=""; continue; } cur+=body[i]; }
+  parts.push(cur); parts.forEach(pt=>{ const m=pt.match(/^\s*([^=]+?)\s*=\s*([\s\S]*)$/); if(m) out[m[1].trim().toLowerCase()]=m[2].trim(); }); return out; }
+function wvListings(wikitext){
+  const KIND={see:"ver",do:"fazer",eat:"comer",drink:"beber",buy:"comprar",ver:"ver",hacer:"fazer",comer:"comer",beber:"beber",comprar:"comprar"};
+  const out=[]; const re=/\{\{\s*(see|do|eat|drink|buy|ver|hacer|comer|beber|comprar|listing)\b/gi; let m;
+  while((m=re.exec(wikitext))){ let i=m.index+2, depth=1; while(i<wikitext.length && depth>0){ const two=wikitext.slice(i,i+2); if(two==="{{"){ depth++; i+=2; continue; } if(two==="}}"){ depth--; i+=2; continue; } i++; }
+    const body=wikitext.slice(m.index+2, i-2); const bar=body.indexOf("|"); if(bar<0) continue; const P=wvParams(body.slice(bar+1));
+    let kind=m[1].toLowerCase(); if(kind==="listing") kind=(P.type||P.tipo||"see").toLowerCase(); kind=KIND[kind]||"ver";
+    const t=wvClean(P.name||P.nombre||""); if(!t) continue;
+    out.push({t, kind, url:(P.url||"").trim(), hours:wvClean(P.hours||P.horario||""), price:wvClean(P.price||P.precio||""), desc:wvClean(P.content||P.descripción||P.descripcion||P.description||"").slice(0,320), addr:wvClean(P.address||P["dirección"]||P.direccion||"")});
+    re.lastIndex=i; }
+  const seen=new Set(); return out.filter(x=>{ const k=norm(x.t); if(seen.has(k)) return false; seen.add(k); return true; });
+}
+async function autoGuide(id){
+  const d=DEST[id]; if(!d||!d.custom) return null;
+  if(AUTO[id] && AUTO[id].t > Date.now()-30*864e5) return AUTO[id];
+  if(AUTO_PENDING[id]) return AUTO_PENDING[id];
+  AUTO_PENDING[id]=(async()=>{
+    const out={t:Date.now(), about:"", aboutUrl:"", items:[], src:"", err:""};
+    const name=d.name;
+    try{ const sr=await wpJson("https://pt.wikipedia.org/w/api.php?action=query&list=search&srsearch="+encodeURIComponent(name+" Espanha")+"&srlimit=1&format=json&origin=*");
+      const hit=sr&&sr.query&&sr.query.search&&sr.query.search[0];
+      if(hit){ const sm=await wpJson("https://pt.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(hit.title.replace(/ /g,"_"))); out.about=(sm.extract||"").slice(0,700); out.aboutUrl=(sm.content_urls&&sm.content_urls.mobile&&sm.content_urls.mobile.page)||("https://pt.wikipedia.org/wiki/"+encodeURIComponent(hit.title)); }
+    }catch(e){ out.err+="wikipedia: "+(e.message||e)+" "; }
+    for(const lang of ["es","en"]){
+      try{ const sr=await wpJson(`https://${lang}.wikivoyage.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(name)}&srlimit=1&format=json&origin=*`);
+        const hit=sr&&sr.query&&sr.query.search&&sr.query.search[0]; if(!hit) continue;
+        const pj=await wpJson(`https://${lang}.wikivoyage.org/w/api.php?action=parse&page=${encodeURIComponent(hit.title)}&prop=wikitext&format=json&origin=*`);
+        const wt=pj&&pj.parse&&pj.parse.wikitext&&pj.parse.wikitext["*"]; if(!wt) continue;
+        const items=wvListings(wt); if(items.filter(x=>x.kind==="ver"||x.kind==="fazer").length>=3){ out.items=items.slice(0,60); out.src=lang; out.srcUrl=`https://${lang}.wikivoyage.org/wiki/${encodeURIComponent(hit.title.replace(/ /g,"_"))}`; break; }
+      }catch(e){ out.err+=lang+": "+(e.message||e)+" "; }
+    }
+    AUTO[id]=out; autoSave(); delete AUTO_PENDING[id]; return out;
+  })();
+  return AUTO_PENDING[id];
+}
+function autoItemLink(d, it){ return it.url && /^https?:/.test(it.url) ? it.url : "https://www.google.com/maps/search/"+encodeURIComponent(it.t+" "+d.name+" España"); }
+function autoItemHtml(d, it){ return `<div class="item"><div class="hd"><a href="${h(autoItemLink(d,it))}" target="_blank" rel="noopener">${h(it.t)}</a><div class="meta2"><span class="bk ${it.kind==="comer"||it.kind==="beber"?"d":"h"}"><i></i>${h(it.kind)}</span><span class="meta">${h([it.addr, it.hours, it.price].filter(Boolean).join(" · "))}</span></div></div>${it.desc?`<div class="tip">${h(it.desc)}</div>`:""}</div>`; }
+/* Blocos de roteiro para uma cidade sem pacote, a partir do guia automático */
+function autoDayBlocks(id, dayIndex){ const a=AUTO[id]; if(!a||!a.items.length) return []; const see=a.items.filter(x=>x.kind==="ver"||x.kind==="fazer"), eat=a.items.filter(x=>x.kind==="comer"); const b=[]; const s1=see[dayIndex*3], s2=see[dayIndex*3+1], s3=see[dayIndex*3+2], e=eat[dayIndex%Math.max(1,eat.length)];
+  if(s1) b.push({slot:"m", it:s1}); if(s2) b.push({slot:"t", it:s2}); if(s3) b.push({slot:"t", it:s3}); if(e) b.push({slot:"n", it:e}); return b; }
+function registerCustom(id, name){ DEST[id]={custom:true, name, emoji:"📍", region:"cidade adicionada por você", stay:{min:1, ideal:1, text:"Cidade sem pacote completo: o app monta um guia automático com a Wikipédia e o Wikivoyage."}, curios:[], must:[], daytrips:[], transit:[], days:[]}; }
+const normName = x => String(x||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim();
+Object.entries(V.custom).forEach(([id,c])=>{ const built=Object.keys(DEST).find(k=>!DEST[k].custom && normName(DEST[k].name)===normName(c.name));
+  if(built){ V.dests=V.dests.map(x=>x===id?built:x).filter((x,i,a)=>a.indexOf(x)===i); if(V.dep===id) V.dep=built; if(V.city===id) V.city=built; if(V.days[id]){ V.days[built]=V.days[built]||V.days[id]; delete V.days[id]; } delete V.custom[id]; }
+  else registerCustom(id, c.name); });
 function addCustomCity(name){
   name=(name||"").trim().slice(0,24); if(!name) return null;
   const existing=Object.keys(DEST).find(k=>norm(DEST[k].name)===norm(name)); if(existing) return existing;
@@ -3858,6 +3980,7 @@ function viajeSearch(q){
     d.must.forEach(m=>{ if(cityHit || hit(m.t, m.area, m.tip, m.price)) out.push({city:d.name, id, kind:"Imperdível", m}); });
     d.daytrips.forEach(m=>{ if(cityHit || hit(m.t, m.how, m.tip)) out.push({city:d.name, id, kind:"Bate e volta", m}); });
     curioList(id).forEach(c=>{ if(hit(c.t)) out.push({city:d.name, id, kind:"Curiosidade", text:c.t}); });
+    if(d.custom && AUTO[id]) AUTO[id].items.forEach(it=>{ if(cityHit || hit(it.t, it.desc, it.addr)) out.push({city:d.name, id, kind:"Guia automático", m:{t:it.t, how:it.kind+(it.addr?" · "+it.addr:""), link:autoItemLink(d,it), tip:it.desc, book:"h", pay:1, price:it.price}}); });
     d.transit.forEach(g=>g.o.forEach(o=>{ if(hit(o[0], o[3], g.t)) out.push({city:d.name, id, kind:"Transporte", m:{t:o[0], how:g.t+" · "+o[1], link:o[2], tip:o[3], book:"h", pay:0}}); }));
   });
   return out.slice(0,40);
@@ -3896,7 +4019,7 @@ function renderViaje(){
       <p class="small muted" style="padding:0 4px;margin-top:-6px">O que fazer em cada dia, com manhã, tarde e noite, trechos de trem e o que reservar antes.</p>
       <button class="menu" data-act="vgo" data-s="roteiro"><span class="ic">${ICON.cal}</span><span><b>Ver o roteiro</b><span>${totalDays} dias · ${sel.length} ${sel.length===1?"cidade":"cidades"} · interesses: ${V.interests.length?V.interests.map(k=>(INTERESES.find(x=>x[0]===k)||[])[1]).filter(Boolean).join(", "):"todos"}</span></span><span class="chev">›</span></button>
       <button class="menu" data-act="gokit" style="margin-top:8px"><span class="ic" style="background:var(--bad-soft);color:var(--bad)">${ICON.sos}</span><span><b>Kit de sobrevivência</b><span>${SURV_CARDS.length} frases por situação, telefones, embaixada, dinheiro. Offline.</span></span><span class="chev">›</span></button>
-      <div class="card tint-g small"><b>Cidades menores?</b> Me diga quais (Toledo, Granada, Córdoba, Girona, Cádiz…) e eu acrescento.</div>`;
+      <div class="card tint-g small"><b>Outras cidades?</b> Adicione em Sua rota. Toda cidade nova ganha um guia automático (Wikipédia + Wikivoyage) na hora; Madrid, Barcelona, Sevilla e Segovia têm pacote completo. Me peça o pacote das que você incluir.</div>`;
   }
   else if(V.screen==="rota"){
     const selOpt = cur => Object.keys(DEST).map(id=>`<option value="${id}" ${id===cur?"selected":""}>${h(DEST[id].name)}</option>`).join("");
@@ -3927,8 +4050,15 @@ function renderViaje(){
     const prev=sel[i-1], next=sel[i+1];
     if(d.custom){ html = back(h(d.name)) + `${PHOTOS_ON ? photoEl(d.name, "banner", d.name) : ""}
       <p class="small muted" style="padding:0 4px">${V.days[id]||1} ${V.days[id]===1?"dia":"dias"}, ${fmtDay(cd[0])}${cd[1]>cd[0]?` a ${fmtDay(cd[1])}`:""} · <a href="#" data-act="vgo" data-s="rota" style="color:var(--cobalt);font-weight:700;text-decoration:none">mudar dias</a></p>
-      <div class="verd"><b>Sem guia ainda.</b> ${h(d.stay.text)}</div>
-      <div class="card stack" style="gap:8px"><b>Enquanto isso</b><a class="btn soft wide" href="https://www.google.com/maps/search/${encodeURIComponent(d.name+" España")}" target="_blank" rel="noopener">Abrir ${h(d.name)} no Google Maps ↗</a><a class="btn ghost wide" href="https://es.wikipedia.org/wiki/${encodeURIComponent(d.name.replace(/ /g,"_"))}" target="_blank" rel="noopener">Ler sobre ${h(d.name)} na Wikipédia ↗</a><a class="btn ghost wide" href="https://www.renfe.com" target="_blank" rel="noopener">Trens para ${h(d.name)} (Renfe) ↗</a></div>
+      ${(()=>{ const a=AUTO[id]; if(!a){ autoGuide(id).then(()=>{ if(V.screen==="cidade" && V.city===id) renderViaje(); }); return `<div class="verd"><b>Montando um guia automático…</b> Busco o resumo da cidade na Wikipédia e os lugares no Wikivoyage. Leva alguns segundos e precisa de internet na primeira vez.</div>`; }
+        const see=a.items.filter(x=>x.kind==="ver"||x.kind==="fazer"), eat=a.items.filter(x=>x.kind==="comer"||x.kind==="beber"), buy=a.items.filter(x=>x.kind==="comprar");
+        return `${a.about?`<div class="sec-h"><h3>Sobre ${h(d.name)}</h3></div><div class="card"><p>${h(a.about)}</p><p class="small muted" style="margin-top:8px"><a href="${h(a.aboutUrl)}" target="_blank" rel="noopener" style="color:var(--cobalt);font-weight:700;text-decoration:none">Wikipédia ↗</a></p></div>`:""}
+        <div class="verd"><b>Guia automático.</b> ${a.items.length ? `${a.items.length} lugares do Wikivoyage (textos em ${a.src==="es"?"espanhol":"inglês"}, licença CC BY-SA; toque numa palavra para traduzir). Não tem a curadoria dos pacotes de Madrid, Sevilla, Barcelona e Segovia: me peça o pacote completo desta cidade.` : `Não achei ${h(d.name)} no Wikivoyage${a.err?" (sem conexão?)":""}. Use os atalhos abaixo e me peça o pacote completo.`}</div>
+        ${see.length?`<div class="sec-h"><h3>Ver e fazer</h3></div><div class="card" style="padding:4px 16px">${see.slice(0,14).map(it=>autoItemHtml(d,it)).join("")}</div>`:""}
+        ${eat.length?`<div class="sec-h"><h3>Comer e beber</h3></div><div class="card" style="padding:4px 16px">${eat.slice(0,8).map(it=>autoItemHtml(d,it)).join("")}</div>`:""}
+        ${buy.length?`<div class="sec-h"><h3>Comprar</h3></div><div class="card" style="padding:4px 16px">${buy.slice(0,5).map(it=>autoItemHtml(d,it)).join("")}</div>`:""}
+        <div class="row" style="gap:8px">${a.srcUrl?`<a class="btn soft" href="${h(a.srcUrl)}" target="_blank" rel="noopener">Artigo completo no Wikivoyage ↗</a>`:""}<button class="btn ghost" data-act="autorefresh" data-id="${id}">Atualizar guia</button></div>`; })()}
+      <div class="card stack" style="gap:8px"><b>Atalhos</b><a class="btn soft wide" href="https://www.google.com/maps/search/${encodeURIComponent(d.name+" España")}" target="_blank" rel="noopener">Abrir ${h(d.name)} no Google Maps ↗</a><a class="btn ghost wide" href="https://es.wikipedia.org/wiki/${encodeURIComponent(d.name.replace(/ /g,"_"))}" target="_blank" rel="noopener">Ler sobre ${h(d.name)} na Wikipédia ↗</a><a class="btn ghost wide" href="https://www.renfe.com" target="_blank" rel="noopener">Trens para ${h(d.name)} (Renfe) ↗</a></div>
       <div class="citynav"><button data-act="vgo" data-s="cidade" data-city="${prev||""}" ${prev?"":"disabled"}>${prev?"← "+h(DEST[prev].name):"← início"}</button><button data-act="vgo" data-s="cidade" data-city="${next||""}" ${next?"":"disabled"}>${next?h(DEST[next].name)+" →":"fim →"}</button></div>
       <button class="btn ghost wide" data-act="vgo" data-s="home">← Voltar para Viaje</button>`; }
     else html = back(h(d.name)) + `
@@ -3956,7 +4086,9 @@ function renderViaje(){
     sel.forEach((id,i)=>{
       if(i===0){ const ap=DEST[id].transit.find(t=>/Aeroporto/i.test(t.t)); if(ap) parts.push(`<div class="leg"><b>${h(fmtDay(CD[id][0]))} · Chegada em ${h(DEST[id].name)}</b><span>Do aeroporto ao centro: ${ap.o.map(o=>`${h(o[0])} (${h(o[1])})`).join(" · ")}</span><span class="muted">Detalhes em Cidades › ${h(DEST[id].name)} › Transporte.</span></div>`); }
       if(i>0){ const lg=legFor(sel[i-1],id); if(lg) parts.push(`<div class="leg"><b>${h(fmtDay(CD[id][0]))} · ${h(DEST[sel[i-1]].name)} → ${h(DEST[id].name)}</b><span>${h(lg.how)}</span><span>${lg.links.map(l=>`<a href="${h(l[1])}" target="_blank" rel="noopener">${h(l[0])} ↗</a>`).join("")}</span><span class="muted">${h(lg.tip)}</span></div>`); }
-      if(DEST[id].custom){ for(let k=0;k<(V.days[id]||1);k++) parts.push(`<div class="dayc"><h3>${h(fmtDay(CD[id][0]+k))} · ${h(DEST[id].name)}, dia ${k+1}</h3><p class="small muted">Dia livre: ainda não tenho o guia de ${h(DEST[id].name)}. Use a busca da aba Viaje ou o Google Maps, e me peça o pacote desta cidade.</p></div>`); }
+      if(DEST[id].custom){ const dd=DEST[id]; if(!AUTO[id]) autoGuide(id).then(()=>{ if(V.screen==="roteiro") renderViaje(); });
+        for(let k=0;k<(V.days[id]||1);k++){ const bl=autoDayBlocks(id,k);
+          parts.push(`<div class="dayc"><h3>${h(fmtDay(CD[id][0]+k))} · ${h(dd.name)}, dia ${k+1}</h3>${bl.length ? bl.map(b=>`<div class="blk"><span class="sl ${b.slot}">${b.slot==="m"?"Manhã":b.slot==="t"?"Tarde":"Noite"}</span><div><a href="${h(autoItemLink(dd,b.it))}" target="_blank" rel="noopener">${h(b.it.t)}</a><div class="meta">${h([b.it.addr,b.it.price].filter(Boolean).join(" · ")||"guia automático (Wikivoyage)")}</div></div></div>`).join("")+`<p class="small muted">Sugestão automática, sem curadoria. Toque em "Ver tudo" para a lista completa.</p>` : `<p class="small muted">${AUTO[id] ? `Sem lugares no Wikivoyage para ${h(dd.name)}: dia livre. Use a busca ou o Google Maps.` : "Montando sugestões automáticas…"}</p>`}<button class="btn ghost" style="min-height:38px;padding:6px 12px;align-self:flex-start" data-act="vgo" data-s="cidade" data-city="${id}">Ver tudo sobre ${h(dd.name)} ›</button></div>`); } }
       buildPlan(id, V.days[id]||1, V.interests, V.ritmo).forEach((day,k)=>{
         day.title = `${fmtDay(CD[id][0]+k)} · ${day.title}`;
         const dayCur = (()=>{ for(const b of (day.blocks||[])){ const cs=curiosFor(id,b.m.t); if(cs.length) return cs[(k+ (day.blocks.indexOf(b)))%cs.length]; } if(day.trip){ const cs=curiosFor(id,day.trip.t); if(cs.length) return cs[0]; } return curioPick(id,1,10+k+i*3)[0]; })();
@@ -4322,6 +4454,7 @@ document.addEventListener("click", e=>{
     case "vritmo": V.ritmo=el.dataset.k; saveProfiles(); renderViaje(); break;
     case "vmove": { const id=el.dataset.id; if(id===arrivalId()||id===V.dep) break; const i=V.dests.indexOf(id), j=i+(+el.dataset.d); const lo=1, hi=(V.dep!==arrivalId() && V.dests.includes(V.dep)) ? V.dests.length-2 : V.dests.length-1; if(j<lo||j>hi) break; moveDest(id, +el.dataset.d); saveProfiles(); renderViaje(); break; }
     case "vclear": viajeQ=""; renderViaje(); break;
+    case "autorefresh": { const id=el.dataset.id; delete AUTO[id]; autoSave(); toast("Atualizando guia…"); autoGuide(id).then(a=>{ renderViaje(); toast(a && a.items.length ? `${a.items.length} lugares encontrados.` : "Não encontrei nada novo."); }); break; }
     case "gokit": phraseFilter="kit"; phraseQuery=""; renderFrases(); showTab("frases"); setTimeout(()=>{ const el=$("#kq"); if(el) el.scrollIntoView({block:"start",behavior:"smooth"}); }, 50); break;
     case "trdir": { TR.dir=el.dataset.k; try{ localStorage.setItem("rumbo-trdir",TR.dir); }catch(e){} renderFrases(); break; }
     case "trsay": { const es = TR.dir==="es" ? TR.text : ($("#tr-out")||{}).textContent; if(es && es.trim()) speak(es); else toast("Nada para ouvir ainda."); break; }
@@ -4453,7 +4586,7 @@ setTimeout(()=>{ if(!PR.onboarded && $("#sheet").hidden) openOnboarding(); }, 40
   } else toast("Esse link de backup não é válido."); return; }
   const d=parseInvite(location.hash); if(d && receiveScore(d)){ try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} renderAll(); setTimeout(()=>{ toast(`Placar de ${d.name} recebido. Agora mande o seu!`); if(PR.onboarded) openPasajeros(); }, 600); } })();
 /* Atualização automática: quando sai versão nova, o app baixa e recarrega sozinho (fora de um treino). */
-const APP_VERSION = "2026.10.25-0047";
+const APP_VERSION = "2026.10.25-1729";
 let pendingReload = false;
 function maybeReload(){ if(!pendingReload) return; if(D || !$("#drill").hidden){ return; } pendingReload=false; toast("Atualizando o app…"); setTimeout(()=>location.reload(), 600); }
 if("serviceWorker" in navigator && !window.claude && location.protocol==="https:"){
