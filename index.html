@@ -3195,7 +3195,7 @@ function todaySteps(){
   const m=S.minutes||15;
   const all=[
     {id:"session", t:"Sessão", d: (nw===0&&due===0) ? "Frases de hoje em dia" : (due===0 && (l.n||0)>=S.daily) ? `Meta feita · extra: ${nw} novas à espera` : `${nw} novas · ${due} revisões · ≈ ${sessionMinutes(nw,due)} min`, done: due===0 && (nw===0 || (l.n||0)>=S.daily), started:(l.n||0)+(l.r||0)>0, act:"session", go:"Começar"},
-    {id:"conv", t:"Conversa falada", d:`${WEEKS[curWeek()-1].title} · ≈ 3 min`, done:(l.c||0)>0, act:"conv", go:"Conversar"},
+    {id:"conv", t:"Conversa falada", d:`${WEEKS[curWeek()-1].title}${WEEKS[curWeek()-1].dialogB?` · conversa ${todayConv()==="B"?2:1}`:""} · ≈ 3 min`, done:(l.c||0)>0, act:"conv", which:todayConv(), go:"Conversar"},
     MIC ? {id:"eco", t:"Pronúncia no microfone", d:"5 palavras e 7 frases · ≈ 3 min", done:(l.e||0)>0, act:"pron", go:"Falar"}
         : {id:"eco", t:"Eco: repetir imitando", d:"10 frases · ≈ 2 min", done:(l.e||0)>0, act:"eco", go:"Repetir"},
     {id:"quiz", t:"Quiz", d:"10 perguntas, com 'o que responder?' · ≈ 3 min", done:(l.q||0)>=10, act:"quiz", go:"Jogar"},
@@ -3204,6 +3204,8 @@ function todaySteps(){
   const n = m<=5 ? 1 : m<=10 ? 2 : m<=15 ? 3 : m<=20 ? 4 : 5;
   return all.slice(0,n);
 }
+/* Qual conversa do tema de hoje praticar: alterna entre a 1ª e a 2ª conforme a menos feita. */
+function todayConv(){ const w=WEEKS[curWeek()-1]; if(!w.dialogB) return "A"; const cv=S.conv||{}; return (cv[w.n+"B"]||0) < (cv[w.n+"A"]||0) ? "B" : "A"; }
 function spokenTotal(){ return Object.values(S.log).reduce((a,l)=>a+(l.s||0),0); }
 function sessionMinutes(nw, due){ return Math.max(1, Math.round((nw*2.2 + due*0.6)/2)); }
 function newLeftToday(){ const l=S.log[todayKey()]; return Math.max(0, S.daily + (l ? (l.x||0) : 0) - (l ? l.n : 0)); }
@@ -3453,7 +3455,7 @@ function renderHoje(){
   const CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`;
   const stepsHtml = steps.map((st,i)=>{
     const cls = st.done ? "done" : (cur && cur.id===st.id ? "cur" : "todo");
-    const go = st.done ? `<span class="go">Feito</span>` : (cls==="cur" ? `<button class="go" data-act="${st.act}">${st.started && st.id==="session" ? "Continuar" : st.go}</button>` : `<span class="go">depois</span>`);
+    const go = st.done ? `<span class="go">Feito</span>` : (cls==="cur" ? `<button class="go" data-act="${st.act}"${st.which?` data-which="${st.which}"`:""}>${st.started && st.id==="session" ? "Continuar" : st.go}</button>` : `<span class="go">depois</span>`);
     return `<div class="step ${cls}"><span class="n">${st.done?CHECK:i+1}</span><div><b>${h(st.t)}</b><span class="d">${h(st.d)}</span></div>${go}</div>`;
   }).join("");
   $("#v-hoje").innerHTML = `
@@ -3872,7 +3874,7 @@ function showTab(t){
    TREINOS (tela cheia)
    ============================================================ */
 let D = null; // treino atual
-function openDrill(d){ D = d; D.i = 0; D.score = 0; D.revealed = false; D.total = d.items.length; $("#drill").hidden = false; document.body.style.overflow="hidden"; drawDrill(); }
+function openDrill(d){ D = d; D.i = 0; D.score = 0; D.revealed = false; D.total = d.items.length; D.misses = []; D.fixing = false; D.fixed = 0; $("#drill").hidden = false; document.body.style.overflow="hidden"; drawDrill(); }
 function closeDrill(){ hideDict(); D = null; setTimeout(maybeReload, 300); $("#drill").hidden = true; document.body.style.overflow=""; try{ speechSynthesis.cancel(); }catch(e){} renderAll(); }
 function drillTop(){ const pct = D.items.length ? Math.round(100*D.i/D.items.length) : 100;
   return `<div class="top"><button class="x" data-act="closedrill" aria-label="Fechar">${ICON.x}</button><div class="meter"><span style="width:${pct}%"></span></div><span class="count">${Math.min(D.i+1,D.items.length)}/${D.items.length}</span></div>`; }
@@ -3975,12 +3977,23 @@ function startFalsos(){
   openDrill({mode:"falsos", items:qs});
 }
 
+/* Guarda um item para a rodada de correção do fim (uma cópia limpa, sem repetir o mesmo). */
+function miss(it){ if(!D || D.fixing || D.mode==="duel") return; const key = it.c ? it.c.id : (it.line ? it.line[1] : null); if(key && D.misses.some(m=>(m.c?m.c.id:(m.line?m.line[1]:null))===key)) return;
+  const cp = Object.assign({}, it, {picked:null, msg:null, heard:null, hinted:false, played:false, answer:null, listening:false, fix:true});
+  if(cp.t==="test") cp.dir="pt"; if(cp.t==="mc") cp.opts=shuffle(cp.opts); D.misses.push(cp); }
 function drawDrill(){
   const el = $("#drill");
-  if(D.i >= D.items.length){ return drawDone(); }
+  if(D.i >= D.items.length){
+    if(!D.fixing && D.misses.length){ D.fixing=true; D.fixed=D.misses.length; D.items.push({t:"fixintro", list:D.misses.slice()}, ...D.misses); D.misses=[]; }
+    else return drawDone();
+  }
   const it = D.items[D.i], c = it.c;
   let stage = "", actions = "";
-  if(it.t==="learn"){
+  if(it.t==="fixintro"){
+    const n=it.list.length; tone("ok");
+    stage = `<div class="flash" style="align-items:stretch;text-align:left"><span class="kind" style="text-align:center">Correção · ${n} ${n===1?"item":"itens"}</span><div class="big" style="text-align:center;font-size:24px">Vamos rever o que não saiu</div><p class="muted small" style="text-align:center">Ouça cada uma, repita em voz alta e depois pratique de novo.</p><div class="list">${it.list.map(m=>{ const es=m.c?(m.t==="mc"&&m.dir==="reply"?m.c.ans:m.c.es):m.line[1]; const pt=m.c?(m.t==="mc"&&m.dir==="reply"?m.c.ansPt:m.c.pt):m.line[2]; return `<div class="phrase"><div class="txt"><div class="es">${W(es)}</div><div class="pt">${h(pt)}</div></div>${sayBtn(es)}</div>`; }).join("")}</div></div>`;
+    actions = `<div class="actions"><button class="btn wide" data-act="next">Praticar a correção</button></div>`;
+  } else if(it.t==="learn"){
     if(!it.played){ it.played=true; speak(c.es); }
     stage = `<div class="flash"><span class="kind">${c.kind==="fa"?"Falso amigo":"Frase nova"} · ouça e repita em voz alta</span><div class="big">${W(c.es)}</div>${sayRow(c.es,true)}<hr><div class="ans" style="color:var(--muted)">${h(c.pt)}</div>${c.note?`<div class="note">${h(c.note)}</div>`:""}</div>`;
     actions = `<div class="actions"><button class="btn wide" data-act="learned">¡Dicho! Próxima</button></div>`;
@@ -3989,7 +4002,7 @@ function drawDrill(){
     if(!oral && !it.played){ it.played=true; speak(c.es); }
     const front = oral ? c.pt : c.es;
     const back = oral ? c.es : c.pt;
-    stage = `<div class="flash"><span class="kind">${oral?"Diga em voz alta, em espanhol":"Ouça: o que significa?"}</span><div class="big ${oral?"pt":""}">${oral?h(front):W(front)}</div>${!oral?sayBtn(c.es,true):""}${heardHtml(it)}${D.revealed?`<hr><div class="ans">${oral?W(back):h(back)}</div>${oral?sayRow(c.es):""}${c.note?`<div class="note">${h(c.note)}</div>`:""}`:""}</div>`;
+    stage = `<div class="flash"><span class="kind">${it.fix?"Correção · ":""}${oral?"Diga em voz alta, em espanhol":"Ouça: o que significa?"}</span><div class="big ${oral?"pt":""}">${oral?h(front):W(front)}</div>${!oral?sayBtn(c.es,true):""}${heardHtml(it)}${D.revealed?`<hr><div class="ans">${oral?W(back):h(back)}</div>${oral?sayRow(c.es):""}${c.note?`<div class="note">${h(c.note)}</div>`:""}`:""}</div>`;
     actions = D.revealed
       ? `<div class="actions three"><button class="btn bad" data-act="grade" data-g="bad">Não saiu</button><button class="btn soft" data-act="grade" data-g="mid">Quase</button><button class="btn ok" data-act="grade" data-g="good">${oral?"Falei bem":"Entendi"}</button></div>`
       : `<div class="actions${MIC&&oral?" duo":""}">${MIC&&oral?micBtn(it):""}<button class="btn wide" data-act="reveal">${oral?"Já falei: ouvir a resposta":"Mostrar significado"}</button></div>`;
@@ -3999,9 +4012,11 @@ function drawDrill(){
     stage = `<div class="flash"><span class="kind">${h(it.line[0])} fala</span><div class="big">${W(it.line[1])}</div>${sayRow(it.line[1],true)}<hr><div class="pt">${h(it.line[2])}</div></div>`;
     actions = `<div class="actions"><button class="btn wide" data-act="next">${nextMine?"Sua vez de responder":"Continuar"}</button></div>`;
   } else if(it.t==="mine"){
-    stage = `${it.prev?`<div class="ctx">${h(it.prev[0])}: “${h(it.prev[1])}”</div>`:""}<div class="flash"><span class="kind">Sua fala · diga em espanhol</span><div class="big pt">${h(it.line[2])}</div>${heardHtml(it)}${D.revealed?`<hr><div class="ans">${W(it.line[1])}</div>${sayRow(it.line[1])}<p class="small muted">Repita imitando a entonação.</p>`:""}</div>`;
-    actions = D.revealed ? `<div class="actions"><button class="btn wide" data-act="next">Próxima fala</button></div>`
-      : `<div class="actions${MIC?" duo":""}">${MIC?micBtn(it):""}<button class="btn wide" data-act="reveal">Já falei: ouvir o certo</button></div>`;
+    const hint = it.hinted && !D.revealed;
+    stage = `${it.prev?`<div class="ctx">${h(it.prev[0])}: “${h(it.prev[1])}”</div>`:""}<div class="flash"><span class="kind">${it.fix?"Correção · ":""}Sua fala · diga em espanhol</span><div class="big pt">${h(it.line[2])}</div>${hint?`<hr><div class="ans">${W(it.line[1])}</div>${sayRow(it.line[1])}<p class="small muted">Leia em voz alta quantas vezes quiser. Depois toque em ${MIC?"Falar":"Já falei"}.</p>`:""}${heardHtml(it)}${D.revealed?`<hr><div class="ans">${W(it.line[1])}</div>${sayRow(it.line[1])}<p class="small muted">${it.hinted?"Esta volta na correção, no fim da conversa.":"Repita imitando a entonação."}</p>`:""}</div>`;
+    actions = D.revealed ? (it.hinted || (it.heard && it.heard.score>=.5) || it.fix ? `<div class="actions"><button class="btn wide" data-act="next">Próxima fala</button></div>`
+          : `<div class="actions duo"><button class="btn soft" data-act="convbad">Não saiu</button><button class="btn wide" data-act="next">Saiu bem</button></div>`)
+      : `<div class="actions${MIC?" duo":""}">${MIC?micBtn(it):""}<button class="btn wide" data-act="reveal">Já falei: ouvir o certo</button></div>${hint?"":`<div class="actions" style="margin-top:8px"><button class="btn ghost wide" data-act="hint">Não sei: ver a frase escrita</button></div>`}`;
   } else if(it.t==="pron"){
     if(!it.played){ it.played=true; speak(it.txt); }
     const hd=it.heard;
@@ -4027,14 +4042,15 @@ function drawDrill(){
     stage = `<div class="flash"><span class="kind">Duelo · ${D.dscore[D.players[0].id]} × ${D.dscore[D.players[1].id]}</span><div class="av" style="width:84px;height:84px">${faceOf(it.who.id)}</div><div class="big">Vez de ${h(it.who.name)}</div><p class="muted">Passe o celular. Vale 1 ponto por acerto.</p></div>`;
     actions = `<div class="actions"><button class="btn wide" data-act="next">¡Vamos!</button></div>`;
   } else if(it.t==="mc"){
-    const prompt = it.dir==="listen" ? `<span class="kind">Ouça e escolha</span>${sayBtn(c.es,true)}${it.picked!==null?`<div class="ans">${h(c.es)}</div>`:""}`
-      : it.dir==="reply" ? `<span class="kind">Alguém diz… o que você responde?</span><div class="big">${W(c.es)}</div><div class="pt">${h(c.pt)}</div>${sayBtn(c.es)}`
-      : `<span class="kind">${it.dir==="es"?"O que significa?":"Como se diz em espanhol?"}</span><div class="big ${it.dir==="pt"?"pt":""}">${h(it.dir==="es"?c.es:c.pt)}</div>${it.dir==="es"?sayBtn(c.es):""}`;
+    const fx = it.fix ? "Correção · " : "";
+    const prompt = it.dir==="listen" ? `<span class="kind">${fx}Ouça e escolha</span>${sayBtn(c.es,true)}${it.picked!==null?`<div class="ans">${h(c.es)}</div>`:""}`
+      : it.dir==="reply" ? `<span class="kind">${fx}Alguém diz… o que você responde?</span><div class="big">${W(c.es)}</div><div class="pt">${h(c.pt)}</div>${sayBtn(c.es)}`
+      : `<span class="kind">${fx}${it.dir==="es"?"O que significa?":"Como se diz em espanhol?"}</span><div class="big ${it.dir==="pt"?"pt":""}">${h(it.dir==="es"?c.es:c.pt)}</div>${it.dir==="es"?sayBtn(c.es):""}`;
     stage = `${it.who?`<div class="ctx">Respondendo: <b>${h(it.who.name)}</b></div>`:""}<div class="flash">${prompt}</div><div class="opts">${it.opts.map((o,k)=>{ let cls=""; if(it.picked!==null){ if(o===c[it.field]) cls=" right"; else if(k===it.picked) cls=" wrong"; } return `<button class="opt${cls}" data-act="pick" data-k="${k}" ${it.picked!==null?"disabled":""}>${h(o)}</button>`; }).join("")}</div>${it.msg ? `<div class="verdict ${it.msg.ok?"ok":"mid"}">${h(it.msg.es)} <span class="muted" style="font-weight:400">${h(it.msg.pt)}</span></div>`:""}${it.picked!==null && c.note ? `<div class="note">${h(c.note)}</div>`:""}`;
     actions = it.picked!==null ? `<div class="actions"><button class="btn wide" data-act="next">Próxima</button></div>` : "";
   } else if(it.t==="write"){
     const res = it.answer;
-    stage = `<div class="flash"><span class="kind">Escreva em espanhol</span><div class="big pt">${h(c.pt)}</div>
+    stage = `<div class="flash"><span class="kind">${it.fix?"Correção · ":""}Escreva em espanhol</span><div class="big pt">${h(c.pt)}</div>
       ${res ? `<div class="verdict ${res.v}">${res.v==="ok"?"¡Perfecto!":res.v==="mid"?"Quase! Confira os acentos:":"A resposta é:"} <span style="font-family:var(--f-display)">${h(c.es)}</span></div>${sayBtn(c.es)}${c.note?`<div class="note">${h(c.note)}</div>`:""}`
       : `<input class="answer" id="ans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Digite aqui"><div class="accents">${["á","é","í","ó","ú","ñ","ü","¿","¡"].map(a=>`<button data-act="acc" data-a="${a}">${a}</button>`).join("")}</div>`}</div>`;
     actions = res ? `<div class="actions"><button class="btn wide" data-act="next">Próxima</button></div>` : `<div class="actions"><button class="btn wide" data-act="check">Conferir</button></div>`;
@@ -4044,20 +4060,20 @@ function drawDrill(){
 }
 function drawDone(){
   if(D.mode==="duel") return drawDuelDone();
-  if(!D.logged){ D.logged=true; const lg=logToday(); if(D.mode==="conv"){ lg.c=(lg.c||0)+1; save(); } if(D.mode==="eco"||D.mode==="sons"||D.mode==="pron"){ lg.e=(lg.e||0)+1; save(); } }
+  if(!D.logged){ D.logged=true; const lg=logToday(); if(D.mode==="conv"){ lg.c=(lg.c||0)+1; S.conv=S.conv||{}; S.conv[D.week+D.which]=(S.conv[D.week+D.which]||0)+1; save(); } if(D.mode==="eco"||D.mode==="sons"||D.mode==="pron"){ lg.e=(lg.e||0)+1; save(); } }
   const good = D.mode==="session" || D.mode==="conv" || D.mode==="eco" || D.mode==="sons" || D.score>=D.total*0.8;
   const pr = good ? rnd(PRAISE) : rnd(CHEER);
   confetti_if(good); tone("done");
   const M = {
-    session:["¡Olé!","Sessão concluída!",`Agora pratique a conversa da semana. Sequência: ${streak()} ${streak()===1?"dia":"dias"}.`],
-    conv:["¡Genial!","Conversa completa!","Agora troque de papel e faça a outra pessoa."],
+    session:["¡Olé!","Sessão concluída!",`${D.fixed ? `${D.fixed} ${D.fixed===1?"frase revista":"frases revistas"} na correção; elas voltam amanhã. ` : ""}Agora pratique a conversa de hoje. Sequência: ${streak()} ${streak()===1?"dia":"dias"}.`],
+    conv:["¡Genial!","Conversa completa!", D.fixed ? `${D.fixed} ${D.fixed===1?"fala revista":"falas revistas"} na correção. Amanhã vem ${D.week && WEEKS[D.week-1].dialogB?"a outra conversa deste tema":"a conversa do próximo tema"}.` : "Tudo de primeira. Se quiser, troque de papel e faça a outra pessoa."],
     eco:["¡Bien!","Eco concluído","Quanto mais você repete em voz alta, mais natural fica."],
     pron:["¡Qué bien suena!","Pronúncia treinada",`${D.firstTry} de ${D.total} entendidas de primeira. As que falharam voltam amanhã.`],
     sons:["¡Perfecto!","Sons revisados","Volte aqui sempre que algum som travar."]
   }[D.mode];
-  const [, msg0, sub] = M || ["", `${D.score} de ${D.total}`, good ? "Você está mandando bem." : "Os erros voltam na sua próxima sessão de revisão."];
+  const [, msg0, sub] = M || ["", `${D.score} de ${D.total}`, (D.fixed ? `${D.fixed} ${D.fixed===1?"erro revisto":"erros revistos"} na correção. ` : "") + (good ? "Você está mandando bem." : "Os erros voltam na sua próxima sessão de revisão.")];
   const big = pr[0], msg = msg0 ? `${msg0} · ${pr[1]}` : pr[1];
-  const btns = D.mode==="session" ? `<button class="btn saff wide" data-act="conv">Praticar a conversa da semana</button>`
+  const btns = D.mode==="session" ? `<button class="btn saff wide" data-act="conv" data-which="${todayConv()}">Praticar a conversa de hoje</button>`
     : D.mode==="conv" ? `<button class="btn saff wide" data-act="convswap">Trocar de papel</button>${WEEKS[D.week-1].dialogB ? `<button class="btn soft wide" data-act="conv" data-week="${D.week}" data-which="${D.which==="B"?"A":"B"}">${D.which==="B"?"Conversa 1 desta semana":"2ª conversa desta semana"}</button>`:""}<button class="btn ghost wide" data-act="again">De novo</button>`
     : `<button class="btn soft wide" data-act="again">Mais uma rodada</button>`;
   $("#drill").innerHTML = drillTop() + `<div class="stage"><div class="done-box"><div class="av cheer" style="width:84px;height:84px">${LOLA}</div><div class="big">${h(big)}</div>${msg?`<p style="font-size:18px;font-weight:700">${h(msg)}</p>`:""}<p class="muted">${h(sub)}</p></div></div><div class="actions">${btns}<button class="btn ghost wide" data-act="closedrill">Voltar</button></div>`;
@@ -4076,8 +4092,8 @@ function checkWrite(){
   const exact = strip(v)===strip(it.c.es);
   const loose = norm(strip(v))===norm(strip(it.c.es));
   it.answer = {v: exact?"ok":loose?"mid":"bad"}; tone(exact||loose?"ok":"bad");
-  if(exact||loose) D.score++;
-  if(!exact && !loose && S.cards[it.c.id]){ S.cards[it.c.id].d = todayN(); }
+  if((exact||loose) && !it.fix) D.score++;
+  if(!exact && !loose){ if(S.cards[it.c.id]) S.cards[it.c.id].d = todayN(); miss(it); }
   logToday().q++; save();
   drawDrill();
 }
@@ -4204,13 +4220,13 @@ document.addEventListener("click", e=>{
       const it=D.items[D.i]; if(it.listening) break;
       const target = it.txt || (it.c ? it.c.es : it.line[1]);
       it.listening=true; drawDrill(); heardLive("");
-      hear(heardLive, 9000).then(r=>{
+      hear(heardLive, 12000).then(r=>{
         it.listening=false;
         if(!D || D.items[D.i]!==it) return;
         const alts=r.alts;
         if(!alts.length){
           it.micFail=(it.micFail||0)+1;
-          toast(IS_IOS && STANDALONE && it.micFail>=2 ? "No iPhone instalado o microfone costuma falhar. Abra o mesmo endereço no Safari." : "Não ouvi nada. Toque em Falar e comece a falar logo em seguida.");
+          toast(IS_IOS && STANDALONE && it.micFail>=2 ? "No iPhone instalado o microfone costuma falhar. Abra o mesmo endereço no Safari." : "Não ouvi nada. Pense com calma; quando estiver pronta, toque em Falar e comece a falar logo em seguida.");
           drawDrill(); return;
         }
         if(it.t==="pron"){
@@ -4221,6 +4237,7 @@ document.addEventListener("click", e=>{
           return;
         }
         it.heard={text:alts[0], score:Math.max(...alts.map(a=>similarity(a,target)))}; tone(it.heard.score>=.5?"ok":"bad"); if(it.heard.score>=.8) buzz(15);
+        if(it.t==="mine" && it.heard.score<.5) miss(it);
         D.revealed=true; logToday().s++; save(); drawDrill(); speak(target);
       }).catch(code=>{
         it.listening=false;
@@ -4257,21 +4274,23 @@ document.addEventListener("click", e=>{
     case "chip": phraseFilter=el.dataset.k; renderFrases(); break;
     case "closedrill": closeDrill(); break;
     case "learned": { const c=D.items[D.i].c; if(!S.cards[c.id]){ S.cards[c.id]={b:0,d:todayN()}; logToday().n++; save(); } D.i++; drawDrill(); break; }
+    case "hint": { const it=D.items[D.i]; it.hinted=true; miss(it); drawDrill(); speak(it.line[1]); break; }
+    case "convbad": { const it=D.items[D.i]; miss(it); tone("bad"); D.revealed=false; D.i++; drawDrill(); break; }
     case "reveal": { const it=D.items[D.i]; const first=!D.revealed; D.revealed=true;
-      if(it.t==="mine"){ if(first && !it.heard){ logToday().s++; save(); } drawDrill(); speak(it.line[1]); }
+      if(it.t==="mine"){ if(first && !it.heard){ logToday().s++; save(); } if(it.heard && it.heard.score<.5) miss(it); drawDrill(); speak(it.line[1]); }
       else { drawDrill(); if(it.dir==="pt") speak(it.c.es); } break; }
     case "grade": {
       const it=D.items[D.i], g=el.dataset.g;
       const wasNew = !S.cards[it.c.id];
       grade(it.c, g); tone(g==="bad"?"bad":"ok"); if(g!=="bad") buzz(15);
       const lg=logToday(); if(wasNew) lg.n++; else lg.r++; if(it.dir==="pt" && !it.heard) lg.s++;
-      if(g==="bad"){ D.retries[it.c.id]=(D.retries[it.c.id]||0)+1; if(D.retries[it.c.id]<=2) D.items.push({t:"test",c:it.c,dir:it.dir==="pt"?"es":"pt"}); }
+      if(g!=="good") miss(it);
       save(); D.revealed=false; D.i++; drawDrill(); break; }
     case "pick": {
       const it=D.items[D.i]; if(it.picked!==null) break; it.picked=+el.dataset.k;
       const right = it.opts[it.picked]===it.c[it.field];
       if(D.mode==="duel"){ if(right) D.dscore[it.who.id]++; }
-      else if(right) D.score++; else if(S.cards[it.c.id]) S.cards[it.c.id].d=todayN();
+      else if(right){ if(!it.fix) D.score++; } else { if(S.cards[it.c.id]) S.cards[it.c.id].d=todayN(); miss(it); }
       const pm = right ? rnd(PRAISE) : rnd(CHEER); it.msg={ok:right, es:pm[0], pt:pm[1]}; tone(right?"ok":"bad"); if(right) buzz(15);
       if(D.mode!=="duel"){ logToday().q++; save(); } drawDrill(); if(it.dir==="pt") speak(it.c.es); else if(it.dir==="reply") speak(it.c.ans); break; }
     case "next": D.revealed=false; D.i++; drawDrill(); break;
@@ -4310,7 +4329,7 @@ setTimeout(()=>{ if(!PR.onboarded && $("#sheet").hidden) openOnboarding(); }, 40
   } else toast("Esse link de backup não é válido."); return; }
   const d=parseInvite(location.hash); if(d && receiveScore(d)){ try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} renderAll(); setTimeout(()=>{ toast(`Placar de ${d.name} recebido. Agora mande o seu!`); if(PR.onboarded) openPasajeros(); }, 600); } })();
 /* Atualização automática: quando sai versão nova, o app baixa e recarrega sozinho (fora de um treino). */
-const APP_VERSION = "2026.10.24-1928";
+const APP_VERSION = "2026.10.25-0038";
 let pendingReload = false;
 function maybeReload(){ if(!pendingReload) return; if(D || !$("#drill").hidden){ return; } pendingReload=false; toast("Atualizando o app…"); setTimeout(()=>location.reload(), 600); }
 if("serviceWorker" in navigator && !window.claude && location.protocol==="https:"){
