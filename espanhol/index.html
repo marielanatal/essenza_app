@@ -4350,7 +4350,7 @@ function rankCard(){
     <div class="spread"><span class="eyebrow">Ranking da semana</span><span class="small muted">${fmtShort(a)} – ${fmtShort(b)}</span></div>
     ${rk.map((pf,i)=>`<div class="prow"><div class="av" style="background:${i===0&&lead?"var(--saffron-soft)":"var(--paper)"}">${faceOf(pf.id)}</div><div><b>${h(pf.name)}</b>${pf.id===PR.active?' <span class="small muted">(você)</span>':""}<div class="sub">${tr[pf.id]?`<span class="trophy">${ICON.trophy}</span> ${tr[pf.id]} ${tr[pf.id]===1?"semana":"semanas"}`:"ainda sem troféu"}${PR.duels[pf.id]?` · ${PR.duels[pf.id]} ${PR.duels[pf.id]===1?"duelo":"duelos"}`:""}${pf.remote?` · placar ${agoText(pf.updated)}`:""}</div></div><div class="xp">${pf.xp} XP${lead&&lead.id===pf.id?`<small class="crown">LÍDER</small>`:""}</div></div>`).join("")}
     <p class="small muted">Quem tiver mais XP no domingo à noite leva o troféu da semana.${PR.list.some(x=>x.remote)?" Troquem os placares por link para atualizar.":""}</p>
-    <div class="row"><button class="btn saff" style="flex:1" data-act="share">Compartilhar placar</button>${locals().length>1?`<button class="btn ghost" style="flex:1" data-act="duel">Duelo</button>`:`<button class="btn ghost" style="flex:1" data-act="pasajeros">Pasajeros</button>`}</div>
+    <div class="row"><button class="btn saff" style="flex:1" data-act="share">Compartilhar placar</button><button class="btn ghost" style="flex:1" data-act="pasajeros">Pasajeros</button></div>
   </div>`;
 }
 const FACES=[["#2443a6","#fff"],["#1d7448","#fff"],["#d9372b","#fff"],["#8a5a00","#fff"]];
