@@ -3088,9 +3088,9 @@ function fmtShort(n){ const k=keyFromNum(n).split("-"); const m=["jan","fev","ma
   try{ const txt=decodeURIComponent(escape(atob(m[1].replace(/-/g,"+").replace(/_/g,"/")))); const data=JSON.parse(txt);
     const mine = localStorage.getItem("rumbo-profiles"); let n=0;
     Object.keys(data).forEach(k=>{ if(!/^rumbo-/.test(k)) return; if(mine && k==="rumbo-profiles"){ try{ const cur=JSON.parse(mine); const inc=JSON.parse(data[k]); const curHas = (cur.list||[]).some(x=>localStorage.getItem("rumbo-espana-v1:"+x.id)); if(curHas && !confirm("Este endereço já tem progresso. Substituir pelo progresso vindo do endereço antigo?")) return; }catch(e){} } localStorage.setItem(k, data[k]); n++; });
-    history.replaceState(null,"",location.pathname+location.search);
-    if(n){ alert("Progresso trazido do endereço antigo ("+n+" itens). O app vai abrir com ele."); location.reload(); }
-  }catch(e){ alert("Não consegui ler os dados do endereço antigo: "+(e&&e.message||e)); }
+    if(n){ alert("Progresso trazido do endereço antigo ("+n+" itens). O app vai abrir com ele."); }
+    location.replace(location.pathname+location.search); throw new Error("migrando");
+  }catch(e){ if(e && e.message==="migrando") return; alert("Não consegui ler os dados do endereço antigo: "+(e&&e.message||e)); }
 })();
 const LS_KEY = "rumbo-espana-v1";
 function defaults(){ return {v:1,goal:"trip",start:todayKey(),trip:"2027-02-01",dest:"ESPAÑA",daily:12,minutes:15,planWeeks:0,rate:0.9,voice:"",unlocked:1,name:"",sound:true,cards:{},missions:{},log:{},badges:{},updatedAt:0}; }
