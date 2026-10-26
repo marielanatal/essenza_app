@@ -481,6 +481,9 @@ nav.tabs button.on svg{stroke-width:2.4}
 .opt.right{border-color:var(--ok);background:var(--ok-soft)}
 .opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
 .answer{width:100%;border:1.5px solid var(--line);background:var(--surface);border-radius:var(--r-sm);padding:14px;font-size:20px;font-family:var(--f-display)}
+.lect{font-family:var(--f-display);font-size:19px;line-height:1.65;text-align:left;width:100%}
+.sent{border-radius:6px;transition:background .15s;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.sent.on{background:var(--saffron-soft);box-shadow:0 0 0 3px var(--saffron-soft)}
 .seq{min-height:54px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;border-bottom:2px dashed var(--line);padding:4px 0 10px;width:100%}
 .seq button{background:var(--cobalt);color:var(--on-cobalt);border:0;border-radius:10px;padding:8px 12px;font-size:17px;font-family:var(--f-display);font-weight:600}
 .bank{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
@@ -4275,10 +4278,11 @@ function todaySteps(){
                     : {id:"build", t:"Fórmulas", d:"Molde + encaixe: diga a frase inteira · 10 frases · ≈ 3 min", done:(l.b||0)>0, act:"frames", go:"Montar"}),
     MIC ? {id:"eco", t:"Pronúncia no microfone", d:"5 palavras e 7 frases · ≈ 3 min", done:(l.e||0)>0, act:"pron", go:"Falar"}
         : {id:"eco", t:"Eco: repetir imitando", d:"10 frases · ≈ 2 min", done:(l.e||0)>0, act:"eco", go:"Repetir"},
+    (()=>{ const r=readOfDay(); return {id:"read", t:"Leitura", d: r ? `${DEST[r.id]?DEST[r.id].name:r.id}: ${r.L.t} · ${r.L.q.length} perguntas · ≈ 4 min` : "Texto em espanhol com perguntas", done:(l.rd||0)>0, act:"read", go:"Ler"}; })(),
     {id:"quiz", t:"Quiz", d:"10 perguntas, com 'o que responder?' · ≈ 3 min", done:(l.q||0)>=10, act:"quiz", go:"Jogar"},
     {id:"extra", t:"Frases extra", d:`+${S.daily} além da meta · ≈ ${sessionMinutes(S.daily,0)} min`, done:(l.x||0)>0 && (l.n||0)>=S.daily*2, act:"extra", go:"Mais"}
   ];
-  const n = m<=5 ? 1 : m<=10 ? 2 : m<=15 ? 4 : m<=20 ? 5 : 6;
+  const n = m<=5 ? 1 : m<=10 ? 2 : m<=15 ? 4 : m<=20 ? 5 : 7;
   return all.slice(0,n);
 }
 /* Qual conversa do tema de hoje praticar: alterna entre a 1ª e a 2ª conforme a menos feita. */
@@ -4719,6 +4723,7 @@ function renderTreino(){
     </div>
     <div class="eyebrow" style="margin-top:4px">Montar frases</div>
     <div class="tiles">
+      <button class="tile t-g" data-act="read" data-pick="1"><span class="ic">${ICON.cards}</span><b>Leitura</b><span>Textos em espanhol sobre as cidades, com áudio e perguntas</span></button>
       <button class="tile t-c" data-act="build"><span class="ic">${ICON.cards}</span><b>Ordenar palavras</b><span>Coloque as palavras de uma frase na ordem certa</span></button>
       <button class="tile t-s" data-act="frames"><span class="ic">${ICON.pen}</span><b>Fórmulas e pegadinhas</b><span>18 moldes com encaixe e as regras que o portunhol erra</span></button>
     </div>
@@ -4966,6 +4971,7 @@ function renderViaje(){
       ${PHOTOS_ON ? photoEl(WP_CITY[id], "banner", d.name) : ""}
       <p class="small muted" style="padding:0 4px">${h(d.region)} · ${V.days[id]||1} ${V.days[id]===1?"dia":"dias"}, ${fmtDay(cd[0])}${cd[1]>cd[0]?` a ${fmtDay(cd[1])}`:""} · <a href="#" data-act="vgo" data-s="rota" style="color:var(--cobalt);font-weight:700;text-decoration:none">mudar dias</a></p>
       <div class="verd"><b>Quantos dias vale?</b> ${h(d.stay.text)}</div>
+      ${LECTURAS[id] ? `<div class="row" style="gap:8px">${LECTURAS[id].map((L,i)=>`<button class="btn soft" style="flex:1" data-act="read" data-city="${id}" data-i="${i}">${ICON.cards.replace("<svg ","<svg style=\"width:18px;height:18px\" ")} Ler em espanhol: ${h(L.t)}</button>`).join("")}</div>` : ""}
       <div class="sec-h"><h3>Curiosidades</h3></div>
       ${(()=>{ const G=curiosGeneral(id), first=G.slice(0,6), rest=G.slice(6); const tied=curioList(id).length-G.length;
         return `<div class="card" style="padding:6px 16px">${first.map(c=>`<p class="curio">${c.t}</p>`).join("")}${rest.length?`<details class="more"><summary>Mais ${rest.length} curiosidades</summary>${rest.map(c=>`<p class="curio">${c.t}</p>`).join("")}</details>`:""}</div>
@@ -5038,7 +5044,7 @@ function showTab(t){
    ============================================================ */
 let D = null; // treino atual
 function openDrill(d){ D = d; D.i = 0; D.score = 0; D.revealed = false; D.total = d.items.length; D.misses = []; D.fixing = false; D.fixed = 0; $("#drill").hidden = false; document.body.style.overflow="hidden"; drawDrill(); }
-function closeDrill(){ hideDict(); D = null; setTimeout(maybeReload, 300); $("#drill").hidden = true; document.body.style.overflow=""; try{ speechSynthesis.cancel(); }catch(e){} renderAll(); }
+function closeDrill(){ hideDict(); try{ readStop(); }catch(e){} D = null; setTimeout(maybeReload, 300); $("#drill").hidden = true; document.body.style.overflow=""; try{ speechSynthesis.cancel(); }catch(e){} renderAll(); }
 /* Transcrição curta das falas anteriores da conversa (até 3), como um chat */
 function convPos(it){ const L=D.items.filter(x=>!x.fix && (x.t==="mine"||x.t==="theirs")); return `${L.indexOf(it)+1} de ${L.length}`; }
 function convLog(it){ if(it.fix){ return it.prev?`<div class="ctx">${h(it.prev[0])}: “${h(it.prev[1])}”</div>`:""; } const L=D.items.filter(x=>!x.fix && (x.t==="mine"||x.t==="theirs")); const i=L.indexOf(it); const prev=L.slice(Math.max(0,i-3), i); if(!prev.length) return "";
@@ -5225,6 +5231,126 @@ function startConv(week, role, which){
 /* Ao terminar a última fala da conversa (antes da correção), registra a conversa como feita no dia. */
 function convMaybeDone(){ if(!D || D.mode!=="conv" || D.convDone) return; const left=D.items.slice(D.i).some(x=>!x.fix && (x.t==="mine"||x.t==="theirs")); if(left) return;
   D.convDone=true; D.logged=true; const lg=logToday(); lg.c=(lg.c||0)+1; lg.cw=D.which; S.conv=S.conv||{}; S.conv[D.week+D.which]=(S.conv[D.week+D.which]||0)+1; save(); }
+/* Leituras em espanhol (A1-A2) sobre as cidades da viagem, com perguntas de compreensão.
+   q: pergunta em espanhol; o: opções; a: índice da certa. Toda palavra é tocável (dicionário). */
+const LECTURAS = {
+  madrid: [
+    {t:"Llegar a Madrid", lvl:"A1", txt:"El avión llega a Madrid por la mañana. El aeropuerto se llama Barajas y está a 15 kilómetros del centro. Para ir al hotel, Ana toma el autobús amarillo, el Exprés Aeropuerto. Cuesta cinco euros y para en la estación de Atocha. El viaje dura treinta minutos. En el hotel, la recepcionista habla despacio y le da la llave de la habitación 204. Ana deja la maleta y sale a pasear. Primero va a la Puerta del Sol, que es el centro de la ciudad. Después come un bocadillo de calamares en un bar de la Plaza Mayor. Por la tarde visita el Palacio Real y, al final del día, ve la puesta de sol en el Templo de Debod. Está cansada, pero muy contenta.",
+     q:[{q:"¿Cómo va Ana del aeropuerto al centro?", o:["En taxi","En el autobús Exprés Aeropuerto","En metro"], a:1},
+        {q:"¿Cuánto cuesta el autobús?", o:["Cinco euros","Quince euros","Treinta euros"], a:0},
+        {q:"¿Qué come Ana en la Plaza Mayor?", o:["Una paella","Churros con chocolate","Un bocadillo de calamares"], a:2},
+        {q:"¿Dónde ve la puesta de sol?", o:["En el Palacio Real","En el Templo de Debod","En la Puerta del Sol"], a:1}]},
+    {t:"Un día de museos", lvl:"A2", txt:"Hoy Ana quiere ver arte. Compra la entrada del Museo del Prado por internet, así no hace cola. Dentro del museo busca Las Meninas, el cuadro más famoso de Velázquez. Pasa dos horas y media entre pinturas de Goya y El Greco. A la una tiene hambre y va al barrio de Las Letras. Pide el menú del día: sopa, pollo con patatas, postre y café por catorce euros. Por la tarde entra en el Museo Reina Sofía para ver el Guernica de Picasso. Es gratis a partir de las siete de la tarde, pero hay mucha gente. Al salir, camina por el Parque del Retiro hasta el Palacio de Cristal. Allí se sienta en un banco y escribe una postal para su madre.",
+     q:[{q:"¿Por qué compra la entrada por internet?", o:["Porque es más barata","Para no hacer cola","Porque el museo está cerrado"], a:1},
+        {q:"¿Cuánto cuesta el menú del día?", o:["Catorce euros","Cuarenta euros","Cuatro euros"], a:0},
+        {q:"¿Qué cuadro ve en el Reina Sofía?", o:["Las Meninas","El Guernica","Un cuadro de Goya"], a:1},
+        {q:"¿Qué hace en el Retiro?", o:["Come un helado","Alquila una bicicleta","Escribe una postal"], a:2}]}
+  ],
+  barcelona: [
+    {t:"La Sagrada Familia", lvl:"A1", txt:"Ana llega a Barcelona en tren desde Madrid. El viaje dura dos horas y media. En la estación de Sants toma el metro hasta la Sagrada Familia. La iglesia es enorme y todavía no está terminada: las obras empezaron en 1882. Ana tiene una entrada para las diez de la mañana. Dentro, la luz entra por las vidrieras de colores y parece un bosque de piedra. Después sube a una torre y ve toda la ciudad y el mar. A mediodía come pan con tomate y una tortilla en un bar del barrio. Por la tarde pasea por el Paseo de Gracia y mira las casas de Gaudí: la Casa Batlló tiene un tejado como un dragón. Por la noche cena en Gràcia, un barrio con plazas pequeñas y mucha gente joven.",
+     q:[{q:"¿Cómo llega Ana a Barcelona?", o:["En avión","En tren","En autobús"], a:1},
+        {q:"¿A qué hora es su entrada para la Sagrada Familia?", o:["A las diez","A las doce","A las dos"], a:0},
+        {q:"¿Qué ve desde la torre?", o:["Solo el mar","El parque Güell","La ciudad y el mar"], a:2},
+        {q:"¿Cómo es el tejado de la Casa Batlló?", o:["Como un dragón","Como una montaña","Como un barco"], a:0}]}
+  ],
+  sevilla: [
+    {t:"Tapas en Sevilla", lvl:"A1", txt:"En Sevilla hace sol y las calles huelen a naranja. Ana visita el Real Alcázar por la mañana, con una entrada que compró hace tres semanas. Los jardines tienen fuentes, pavos reales y mucha sombra. Después sube a la Giralda, la torre de la catedral. No hay escaleras: hay rampas, porque antes subían a caballo. A las dos va a un bar de Santa Cruz a comer tapas. Pide espinacas con garbanzos, salmorejo y una caña. El camarero escribe la cuenta con tiza en la barra. Por la tarde cruza el puente de Triana y compra una taza de cerámica. Por la noche ve un espectáculo de flamenco en una sala pequeña, sin micrófono. La bailaora mira al público y todos aplauden.",
+     q:[{q:"¿Cuándo compró Ana la entrada del Alcázar?", o:["El mismo día","Hace tres semanas","Hace tres meses"], a:1},
+        {q:"¿Por qué la Giralda tiene rampas?", o:["Porque es moderna","Para las bicicletas","Porque antes subían a caballo"], a:2},
+        {q:"¿Dónde escribe la cuenta el camarero?", o:["En un papel","En la barra, con tiza","En el móvil"], a:1},
+        {q:"¿Qué compra en Triana?", o:["Una taza de cerámica","Un abanico","Unas naranjas"], a:0}]}
+  ],
+  segovia: [
+    {t:"El acueducto y el cochinillo", lvl:"A1", txt:"Ana toma el tren rápido en la estación de Chamartín. Veintisiete minutos después está en Segovia. La estación está lejos del centro, así que toma el autobús número once hasta el acueducto. El acueducto es romano, tiene casi dos mil años y no tiene cemento: las piedras se sostienen solas. Ana sube la calle Real hasta la Plaza Mayor y entra en la catedral. Luego camina hasta el Alcázar, un castillo con torres azules que parece de cuento. A las dos y media reserva mesa en un restaurante antiguo y pide cochinillo, el plato típico. Es cordero no: es cerdo pequeño, asado en horno de leña, con la piel muy crujiente. De postre prueba el ponche segoviano. Vuelve a Madrid a las ocho, con frío y feliz.",
+     q:[{q:"¿Cuánto dura el tren de Madrid a Segovia?", o:["Veintisiete minutos","Una hora","Dos horas"], a:0},
+        {q:"¿Cómo va de la estación al acueducto?", o:["A pie","En el autobús once","En taxi"], a:1},
+        {q:"¿Qué es el cochinillo?", o:["Cordero asado","Pescado frito","Cerdo pequeño asado"], a:2},
+        {q:"¿Qué prueba de postre?", o:["Churros","Ponche segoviano","Flan"], a:1}]}
+  ],
+  toledo: [
+    {t:"La ciudad de las tres culturas", lvl:"A2", txt:"Toledo está a media hora de Madrid en tren. La ciudad está en una colina y el río Tajo la rodea casi por completo. Ana sube al centro por unas escaleras mecánicas, porque las calles son empinadas. Toledo se llama la ciudad de las tres culturas: durante siglos vivieron juntos cristianos, judíos y musulmanes. En una misma mañana Ana ve la catedral, una sinagoga y una mezquita pequeña. En la iglesia de Santo Tomé hay un cuadro famoso de El Greco, un pintor que vivió aquí muchos años. Para comer, prueba las carcamusas, un guiso de cerdo con tomate. Antes de volver compra mazapán, un dulce de almendra que hacen las monjas. Desde el otro lado del río, al atardecer, la ciudad parece de oro.",
+     q:[{q:"¿Por qué Ana sube con escaleras mecánicas?", o:["Porque llueve","Porque las calles son empinadas","Porque está cansada"], a:1},
+        {q:"¿Qué tres culturas vivieron en Toledo?", o:["Romanos, griegos y árabes","Cristianos, judíos y musulmanes","Franceses, ingleses y españoles"], a:1},
+        {q:"¿Qué es el mazapán?", o:["Un guiso de cerdo","Un queso","Un dulce de almendra"], a:2},
+        {q:"¿Quién fue El Greco?", o:["Un pintor","Un rey","Un cocinero"], a:0}]}
+  ],
+  cordoba: [
+    {t:"La Mezquita", lvl:"A2", txt:"Ana llega a Córdoba a las ocho de la mañana porque quiere entrar en la Mezquita antes de las nueve y media: a esa hora es gratis y hay poca gente. Dentro hay cientos de columnas y arcos rojos y blancos. En el centro, en el siglo dieciséis, construyeron una catedral. Es un lugar extraño y hermoso. Después pasea por la judería, con calles blancas y macetas azules llenas de flores. En la Calleja de las Flores se ve la torre entre las casas. A la una come salmorejo, una crema fría de tomate, y flamenquín, un rollo de carne frito. Por la tarde visita el Alcázar y sus jardines con naranjos. Antes de irse cruza el puente romano para ver la Mezquita desde el otro lado del río.",
+     q:[{q:"¿Por qué entra Ana antes de las nueve y media?", o:["Porque luego cierra","Porque es gratis y hay poca gente","Porque hace calor"], a:1},
+        {q:"¿Qué hay en el centro de la Mezquita?", o:["Una fuente","Un jardín","Una catedral"], a:2},
+        {q:"¿Qué es el salmorejo?", o:["Una crema fría de tomate","Una carne frita","Un postre"], a:0},
+        {q:"¿Desde dónde ve la Mezquita al final?", o:["Desde una torre","Desde el puente romano","Desde el tren"], a:1}]}
+  ],
+  granada: [
+    {t:"La Alhambra", lvl:"A2", txt:"La entrada de la Alhambra tiene hora: Ana debe estar en los Palacios Nazaríes a las once y media. Llega media hora antes con el pasaporte, porque lo piden en la puerta. Los palacios tienen paredes llenas de letras árabes y patios con agua. En el Patio de los Leones hay una fuente con doce leones de piedra. Después pasea por el Generalife, los jardines del palacio, con vistas a la ciudad. Por la tarde sube al Albaicín, el barrio antiguo, por calles estrechas y blancas. Desde el mirador de San Nicolás ve la Alhambra con la Sierra Nevada detrás, llena de nieve. Por la noche va de tapas: en Granada, con cada bebida, el bar regala un plato de comida. Con tres cañas, Ana ya ha cenado.",
+     q:[{q:"¿Por qué llega Ana media hora antes?", o:["Para comprar la entrada","Porque piden el pasaporte y la hora es fija","Para desayunar"], a:1},
+        {q:"¿Cuántos leones hay en la fuente?", o:["Doce","Dos","Veinte"], a:0},
+        {q:"¿Qué ve desde el mirador de San Nicolás?", o:["El mar","La Alhambra y la Sierra Nevada","El Generalife"], a:1},
+        {q:"¿Qué pasa en los bares de Granada?", o:["La bebida es gratis","No hay tapas","Con cada bebida regalan una tapa"], a:2}]}
+  ],
+  valencia: [
+    {t:"Paella de verdad", lvl:"A2", txt:"En Valencia Ana aprende que la paella de verdad no lleva marisco. La paella valenciana lleva pollo, conejo, judías verdes y garrofón, un tipo de alubia. Se come al mediodía, nunca por la noche. Ana toma el autobús 25 hasta El Palmar, un pueblo junto a la Albufera, un lago donde crece el arroz. El restaurante tarda cuarenta minutos en hacer la paella, porque la cocinan con fuego de leña. Lo mejor es el socarrat, el arroz tostado del fondo. Después del almuerzo da un paseo en barca por el lago al atardecer. Al volver a la ciudad pasea por el Jardín del Turia, un parque de nueve kilómetros en el antiguo río. Termina el día con una horchata fría y unos fartons en una horchatería del centro.",
+     q:[{q:"¿Qué lleva la paella valenciana?", o:["Marisco y pescado","Pollo, conejo y judías verdes","Chorizo y jamón"], a:1},
+        {q:"¿Cuándo se come la paella?", o:["Al mediodía","Por la noche","Para desayunar"], a:0},
+        {q:"¿Qué es el socarrat?", o:["Una salsa","El arroz tostado del fondo","Una bebida"], a:1},
+        {q:"¿Qué es el Jardín del Turia?", o:["Un lago","Un mercado","Un parque en el antiguo río"], a:2}]}
+  ],
+  zaragoza: [
+    {t:"Una parada en el Pilar", lvl:"A2", txt:"Zaragoza está justo en medio del camino entre Madrid y Barcelona, a una hora y veinte minutos de cada una en tren rápido. Ana baja en la estación de Delicias y toma un autobús hasta la Plaza del Pilar. La basílica es enorme y tiene once cúpulas. Dentro, los zaragozanos besan una columna pequeña: el Pilar. También hay dos bombas de la guerra que cayeron en la iglesia y no explotaron. Al lado está el río Ebro, el más grande de España. Ana cruza el Puente de Piedra para hacer la foto de la basílica reflejada en el agua. Para comer va al Tubo, unas calles estrechas llenas de bares. Pide champiñones a la plancha con gamba y ternasco, que es cordero joven. De postre compra frutas de Aragón: fruta confitada con chocolate.",
+     q:[{q:"¿Dónde está Zaragoza?", o:["Cerca del mar","Entre Madrid y Barcelona","Al sur de Sevilla"], a:1},
+        {q:"¿Qué hacen los zaragozanos dentro de la basílica?", o:["Besan una columna","Tocan una campana","Encienden velas"], a:0},
+        {q:"¿Qué es el Tubo?", o:["Un túnel del metro","Un puente","Unas calles llenas de bares"], a:2},
+        {q:"¿Qué es el ternasco?", o:["Un pescado","Cordero joven","Un queso"], a:1}]}
+  ],
+  salamanca: [
+    {t:"La rana de la universidad", lvl:"A2", txt:"Salamanca es una ciudad de estudiantes y de piedra dorada. Su universidad es la más antigua de España: tiene más de ochocientos años. En la fachada hay cientos de figuras pequeñas y, entre ellas, una rana sobre una calavera. Dicen que el estudiante que encuentra la rana sin ayuda aprueba los exámenes. Ana la busca durante diez minutos y al final la encuentra en la columna de la derecha. Después visita las dos catedrales, la vieja y la nueva. En la puerta de la nueva hay un astronauta: lo pusieron en 1992, en una restauración. Por la noche la Plaza Mayor se ilumina de color dorado y todo el mundo se sienta en las terrazas. Ana cena un hornazo, una empanada de chorizo, lomo y huevo, y se queda mirando la plaza hasta muy tarde.",
+     q:[{q:"¿Qué tiene de especial la universidad de Salamanca?", o:["Es la más grande de Europa","Es la más antigua de España","Es nueva"], a:1},
+        {q:"¿Dónde está la rana?", o:["En la Plaza Mayor","En la catedral","En la fachada de la universidad"], a:2},
+        {q:"¿Cuándo pusieron el astronauta?", o:["En 1492","En 1992","En 2020"], a:1},
+        {q:"¿Qué es el hornazo?", o:["Una empanada","Una sopa","Un vino"], a:0}]}
+  ],
+  avila: [
+    {t:"La muralla", lvl:"A1", txt:"Ávila es la ciudad más alta de España y en febrero hace mucho frío. Ana lleva gorro, bufanda y guantes. La muralla rodea toda la ciudad antigua: tiene dos kilómetros y medio y ochenta y ocho torres. Ana compra la entrada y camina por encima de la muralla durante una hora. Desde arriba ve la catedral, los tejados y la sierra con nieve. Después visita la casa donde nació Santa Teresa, una monja muy famosa. Para comer pide un chuletón de Ávila, un filete de ternera muy grande, con patatas revolconas. De postre toma yemas de Santa Teresa, unos dulces pequeños de huevo y azúcar. Al atardecer cruza el río hasta los Cuatro Postes. Desde allí ve la muralla entera, iluminada. Es la foto más bonita del viaje.",
+     q:[{q:"¿Qué tiempo hace en Ávila en febrero?", o:["Hace calor","Llueve mucho","Hace mucho frío"], a:2},
+        {q:"¿Cuántas torres tiene la muralla?", o:["Ochenta y ocho","Dieciocho","Doscientas"], a:0},
+        {q:"¿Qué es el chuletón?", o:["Un pescado","Un filete de ternera muy grande","Una sopa"], a:1},
+        {q:"¿Desde dónde ve la muralla entera?", o:["Desde la catedral","Desde los Cuatro Postes","Desde el tren"], a:1}]}
+  ],
+  tarragona: [
+    {t:"Romanos junto al mar", lvl:"A2", txt:"Tarragona está a una hora de Barcelona en tren. Hace dos mil años se llamaba Tarraco y era la capital romana de media España. Ana empieza por el anfiteatro, que está justo al lado de la playa: los romanos veían a los gladiadores con el mar de fondo. Después sube a la Part Alta, la ciudad antigua, y visita la catedral y las murallas. En el Balcón del Mediterráneo toca la barandilla de hierro, porque dicen que da suerte. Para comer baja al Serrallo, el barrio de los pescadores. Pide romesco, una salsa de pimiento seco y almendras que nació aquí, con pescado a la plancha. Por la tarde toma un autobús hasta el Puente del Diablo, un acueducto romano en medio de un bosque de pinos. Se puede caminar por encima.",
+     q:[{q:"¿Cómo se llamaba Tarragona en tiempos romanos?", o:["Tarraco","Barcino","Hispalis"], a:0},
+        {q:"¿Dónde está el anfiteatro?", o:["En la montaña","Al lado de la playa","Dentro de la catedral"], a:1},
+        {q:"¿Por qué toca la barandilla del Balcón?", o:["Porque está caliente","Para hacer una foto","Porque dicen que da suerte"], a:2},
+        {q:"¿Qué es el romesco?", o:["Un pescado","Una salsa de pimiento y almendras","Un vino"], a:1}]}
+  ],
+  ronda: [
+    {t:"El puente sobre el Tajo", lvl:"A2", txt:"Para llegar a Ronda, Ana toma un autobús desde Sevilla que tarda casi dos horas por carreteras de montaña. La ciudad está dividida por un barranco de cien metros de profundidad: el Tajo. El Puente Nuevo lo cruza y tiene más de doscientos años. Ana lo ve primero desde arriba y luego baja por un camino para verlo entero desde el valle. La subida es cansada, pero la vista vale la pena. Después visita la plaza de toros, la más antigua de España, y los baños árabes, que están muy bien conservados. Para comer pide rabo de toro, un guiso que se cocina durante horas. Por la tarde pasea por la Alameda, un parque con miradores sobre la sierra. En el hotel, por la noche, se oye solo el viento.",
+     q:[{q:"¿Cómo llega Ana a Ronda?", o:["En tren desde Madrid","En autobús desde Sevilla","En avión"], a:1},
+        {q:"¿Qué es el Tajo de Ronda?", o:["Un río grande","Una plaza","Un barranco de cien metros"], a:2},
+        {q:"¿Qué tiene de especial la plaza de toros?", o:["Es la más antigua de España","Es la más grande del mundo","Es nueva"], a:0},
+        {q:"¿Qué es el rabo de toro?", o:["Un postre","Un guiso que se cocina durante horas","Un pescado"], a:1}]}
+  ]
+};
+
+/* Leitura com perguntas */
+const READ={playing:false,k:-1};
+function readAll(){ return Object.keys(LECTURAS).flatMap(id=>LECTURAS[id].map((L,i)=>({id,i,L}))); }
+function readOfDay(){ const ids=(V.dests||[]).filter(id=>LECTURAS[id]); const pool = ids.length ? ids.flatMap(id=>LECTURAS[id].map((L,i)=>({id,i,L}))) : readAll(); if(!pool.length) return null; const done=S.reads||{}; const fresh=pool.filter(x=>!done[x.id+":"+x.i]); const P=fresh.length?fresh:pool; return P[todayN()%P.length]; }
+function sentences(txt){ return (txt.match(/[^.!?…]+[.!?…]+["»]?\s*|[^.!?…]+$/g)||[txt]).map(x=>x.trim()).filter(Boolean); }
+function readStop(){ READ.playing=false; READ.k=-1; try{ speechSynthesis.cancel(); }catch(e){} document.querySelectorAll(".sent.on").forEach(x=>x.classList.remove("on")); const b=document.querySelector('[data-act="readplay"]:not([data-slow])'); if(b) b.innerHTML=ICON.say+" Ouvir"; }
+function readPlay(sents, slow){ if(!canSpeak) return; readStop(); READ.playing=true; try{ speechSynthesis.resume(); }catch(e){} warmVoice(true); SPEAK_LAST=Date.now();
+  const b=document.querySelector('[data-act="readplay"]:not([data-slow])'); if(b) b.innerHTML=ICON.say+" Parar";
+  sents.forEach((sn,k)=>{ const u=utter(sn,0,slow); u.onstart=()=>{ READ.k=k; document.querySelectorAll(".sent").forEach(x=>x.classList.toggle("on", +x.dataset.k===k)); const el=document.querySelector(`.sent[data-k="${k}"]`); if(el) el.scrollIntoView({block:"center",behavior:"smooth"}); };
+    if(k===sents.length-1) u.onend=()=>{ if(READ.playing) readStop(); }; speechSynthesis.speak(u); }); }
+function startRead(id, i){ const L=(LECTURAS[id]||[])[i||0]; if(!L){ toast("Ainda não há leitura para esta cidade."); return; } const sents=sentences(L.txt);
+  const qs=L.q.map((q,n)=>({t:"mc", c:{es:q.q, pt:"", ans:q.o[q.a], note:""}, dir:"readq", field:"ans", opts:shuffle(q.o.slice()), picked:null, sents, qn:n+1}));
+  openDrill({mode:"read", city:id, ri:i||0, items:[{t:"read", L, sents, city:id}, ...qs]}); }
+function pickRead(){
+  const done=S.reads||{}; const ids=Object.keys(LECTURAS).sort((a,b)=>((V.dests||[]).includes(b)?1:0)-((V.dests||[]).includes(a)?1:0));
+  openDrill({mode:"pick", items:[{t:"pick"}]});
+  $("#drill").innerHTML = drillTop().replace(/<div class="meter">.*?<\/div><span class="count">.*?<\/span>/,'<h2 style="font-size:20px;flex:1">Escolha a leitura</h2>') +
+    `<div class="stage" style="justify-content:flex-start"><p class="small muted">Textos curtos em espanhol sobre as cidades, com perguntas no fim. As cidades da sua rota vêm primeiro.</p><div class="opts">${ids.flatMap(id=>LECTURAS[id].map((L,i)=>`<button class="opt" data-act="read" data-city="${id}" data-i="${i}"><b>${h(DEST[id]?DEST[id].name:id)}</b> · ${h(L.t)} <span class="pill soon" style="font-size:10px">${h(L.lvl)}</span>${done[id+":"+i]?' <span class="pill ok" style="font-size:10px">lida</span>':""}<br><span class="muted small">${h(L.txt.split(" ").slice(0,14).join(" "))}…</span></button>`)).join("")}</div></div>`;
+}
 function pickConv(){
   const cw = curWeek();
   openDrill({mode:"pick", items:[{t:"pick"}]});
@@ -5337,9 +5463,15 @@ function drawDrill(){
   } else if(it.t==="turn"){
     stage = `<div class="flash"><span class="kind">Duelo · ${D.dscore[D.players[0].id]} × ${D.dscore[D.players[1].id]}</span><div class="av" style="width:84px;height:84px">${faceOf(it.who.id)}</div><div class="big">Vez de ${h(it.who.name)}</div><p class="muted">Passe o celular. Vale 1 ponto por acerto.</p></div>`;
     actions = `<div class="actions"><button class="btn wide" data-act="next">¡Vamos!</button></div>`;
+  } else if(it.t==="read"){
+    stage = `<div class="flash" style="align-items:stretch;text-align:left"><span class="kind" style="text-align:center">Leitura · ${h(DEST[it.city]?DEST[it.city].name:it.city)} · nível ${h(it.L.lvl)}</span><div class="big" style="text-align:center;font-size:24px">${h(it.L.t)}</div>
+      <div class="row" style="justify-content:center;gap:8px">${canSpeak?`<button class="btn soft" data-act="readplay">${ICON.say} ${READ.playing?"Parar":"Ouvir"}</button><button class="slowbtn" data-act="readplay" data-slow="1">Devagar</button>`:""}<button class="slowbtn" data-act="readhide">${it.hide?"Mostrar texto":"Esconder texto"}</button></div>
+      ${it.hide ? `<p class="muted small" style="text-align:center">Texto escondido: treino de escuta. Toque em Ouvir e depois em Mostrar texto se quiser conferir.</p>` : `<div class="lect">${it.sents.map((sn,k)=>`<span class="sent${READ.k===k?" on":""}" data-k="${k}">${W(sn)}</span> `).join("")}</div><p class="small muted">Leia no seu ritmo. Toque numa palavra para ver o significado; toque em Ouvir para escutar enquanto lê, a frase lida fica marcada.</p>`}</div>`;
+    actions = `<div class="actions"><button class="btn wide" data-act="next">Responder ${it.L.q.length} perguntas</button></div>`;
   } else if(it.t==="mc"){
     const fx = it.fix ? "Correção · " : "";
-    const prompt = it.dir==="listen" ? `<span class="kind">${fx}Ouça e escolha</span>${sayBtn(c.es,true)}${it.picked!==null?`<div class="ans">${h(c.es)}</div>`:""}`
+    const prompt = it.dir==="readq" ? `<span class="kind">${fx}Pergunta ${it.qn} sobre o texto</span><div class="big" style="font-size:22px">${W(c.es)}</div>${sayBtn(c.es)}${it.showText?`<div class="lect small" style="max-height:38vh;overflow:auto;background:var(--paper);border-radius:12px;padding:10px 12px;font-size:16px;width:100%">${it.sents.map(sn=>W(sn)).join(" ")}</div>`:""}<button class="slowbtn" data-act="readshow">${it.showText?"Esconder o texto":"Ver o texto"}</button>`
+      : it.dir==="listen" ? `<span class="kind">${fx}Ouça e escolha</span>${sayBtn(c.es,true)}${it.picked!==null?`<div class="ans">${h(c.es)}</div>`:""}`
       : it.dir==="reply" ? `<span class="kind">${fx}Alguém diz… o que você responde?</span><div class="big">${W(c.es)}</div><div class="pt">${h(c.pt)}</div>${sayBtn(c.es)}`
       : `<span class="kind">${fx}${it.dir==="es"?"O que significa?":"Como se diz em espanhol?"}</span><div class="big ${it.dir==="pt"?"pt":""}">${h(it.dir==="es"?c.es:c.pt)}</div>${it.dir==="es"?sayBtn(c.es):""}`;
     stage = `${it.who?`<div class="ctx">Respondendo: <b>${h(it.who.name)}</b></div>`:""}<div class="flash">${prompt}</div><div class="opts">${it.opts.map((o,k)=>{ let cls=""; if(it.picked!==null){ if(o===c[it.field]) cls=" right"; else if(k===it.picked) cls=" wrong"; } return `<button class="opt${cls}" data-act="pick" data-k="${k}" ${it.picked!==null?"disabled":""}>${h(o)}</button>`; }).join("")}</div>${it.msg ? `<div class="verdict ${it.msg.ok?"ok":"mid"}">${h(it.msg.es)} <span class="muted" style="font-weight:400">${h(it.msg.pt)}</span></div>`:""}${it.picked!==null && c.note ? `<div class="note">${h(c.note)}</div>`:""}`;
@@ -5369,7 +5501,7 @@ function drawDrill(){
 function drawDone(){
   if(D.mode==="duel") return drawDuelDone();
   if(D.mode==="conv") convMaybeDone();
-  if(!D.logged){ D.logged=true; const lg=logToday(); if(D.mode==="build"||D.mode==="frames"){ lg.b=(lg.b||0)+1; save(); } if(D.mode==="eco"||D.mode==="sons"||D.mode==="pron"){ lg.e=(lg.e||0)+1; save(); } }
+  if(!D.logged){ D.logged=true; const lg=logToday(); if(D.mode==="read"){ lg.rd=(lg.rd||0)+1; S.reads=S.reads||{}; S.reads[D.city+":"+D.ri]=todayN(); save(); } if(D.mode==="build"||D.mode==="frames"){ lg.b=(lg.b||0)+1; save(); } if(D.mode==="eco"||D.mode==="sons"||D.mode==="pron"){ lg.e=(lg.e||0)+1; save(); } }
   const good = D.mode==="session" || D.mode==="conv" || D.mode==="eco" || D.mode==="sons" || D.score>=D.total*0.7;
   const pr = good ? rnd(PRAISE) : rnd(CHEER);
   confetti_if(good); tone("done");
@@ -5377,6 +5509,7 @@ function drawDone(){
     session:["¡Olé!","Sessão concluída!",`${D.fixed ? `${D.fixed} ${D.fixed===1?"frase revista":"frases revistas"} na correção; elas voltam amanhã. ` : ""}Agora pratique a conversa de hoje. Sequência: ${streak()} ${streak()===1?"dia":"dias"}.`],
     conv:["¡Genial!","Conversa completa!", D.fixed ? `${D.fixed} ${D.fixed===1?"fala revista":"falas revistas"} na correção. Amanhã vem ${D.week && WEEKS[D.week-1].dialogB?"a outra conversa deste tema":"a conversa do próximo tema"}.` : "Tudo de primeira. Se quiser, troque de papel e faça a outra pessoa."],
     eco:["¡Bien!","Eco concluído","Quanto mais você repete em voz alta, mais natural fica."],
+    read:["¡Bien leído!",`${D.score} de ${D.items.filter(x=>x.t==="mc"&&!x.fix).length} perguntas`,`${D.fixed ? `${D.fixed} ${D.fixed===1?"pergunta revista":"perguntas revistas"} na correção. ` : ""}Ler em espanhol sobre o lugar aonde você vai fixa vocabulário de verdade. Amanhã vem outro texto.`],
     build:["¡Muy bien!",`${D.score} de ${D.total} na ordem certa`,`${D.fixed ? `${D.fixed} ${D.fixed===1?"frase revista":"frases revistas"} na correção. ` : ""}Montar a frase é o passo entre decorar e falar: amanhã vêm outras.`],
     frames:["¡Eso es!",`${D.score} de ${D.total} fórmulas`,`${D.fixed ? `${D.fixed} ${D.fixed===1?"revista":"revistas"} na correção. ` : ""}Com 18 moldes e o encaixe certo você diz quase tudo que precisa numa viagem.`],
     pron:["¡Qué bien suena!","Pronúncia treinada",`${D.firstTry} de ${D.total} entendidas de primeira. As que falharam voltam amanhã.`],
@@ -5386,6 +5519,7 @@ function drawDone(){
   const big = pr[0], msg = msg0 ? `${msg0} · ${pr[1]}` : pr[1];
   const btns = D.mode==="session" ? `<button class="btn saff wide" data-act="conv" data-which="${todayConv()}">Praticar a conversa de hoje</button>`
     : D.mode==="conv" ? `<button class="btn saff wide" data-act="convswap">Trocar de papel</button>${WEEKS[D.week-1].dialogB ? `<button class="btn soft wide" data-act="conv" data-week="${D.week}" data-which="${D.which==="B"?"A":"B"}">${D.which==="B"?"Conversa 1 desta semana":"2ª conversa desta semana"}</button>`:""}<button class="btn ghost wide" data-act="again">De novo</button>`
+    : D.mode==="read" ? `<button class="btn saff wide" data-act="read" data-pick="1">Outra leitura</button><button class="btn ghost wide" data-act="again">Ler de novo</button>`
     : `<button class="btn soft wide" data-act="again">Mais uma rodada</button>`;
   $("#drill").innerHTML = drillTop() + `<div class="stage"><div class="done-box"><div class="av cheer" style="width:84px;height:84px">${LOLA}</div><div class="big">${h(big)}</div>${msg?`<p style="font-size:18px;font-weight:700">${h(msg)}</p>`:""}<p class="muted">${h(sub)}</p></div></div><div class="actions">${btns}<button class="btn ghost wide" data-act="closedrill">Voltar</button></div>`;
 }
@@ -5529,7 +5663,7 @@ document.addEventListener("click", e=>{
     case "recvinv": { const d=parseInvite(($("#s-inv")||{}).value); if(!d){ toast("Não reconheci esse link. Cole o link inteiro."); break; } if(receiveScore(d)){ renderAll(); openPasajeros(); toast(`Placar de ${d.name} atualizado.`); } break; }
     case "addprofile": { const id=addProfile(($("#s-newp")||{}).value); if(!id){ toast("Digite um nome"); break; } openPasajeros(); toast("Passageiro adicionado. Toque em Usar para trocar."); break; }
     case "duel": startDuel(); break;
-    case "again": { const m=D.mode, wk=D.week, me=D.me, wh=D.which; closeDrill(); if(m==="build"){ startBuild(); break; } if(m==="frames"){ startFrames(10); break; } if(m==="write") startWrite(); else if(m==="falsos") startFalsos(); else if(m==="conv") startConv(wk,me,wh); else if(m==="duel") startDuel(); else if(m==="eco") startEco(); else if(m==="pron") startPron(); else if(m==="sons") startSons(); else startQuiz(m); break; }
+    case "again": { const m=D.mode, wk=D.week, me=D.me, wh=D.which, rc=D.city, ri=D.ri; closeDrill(); if(m==="read"){ startRead(rc, ri); break; } if(m==="build"){ startBuild(); break; } if(m==="frames"){ startFrames(10); break; } if(m==="write") startWrite(); else if(m==="falsos") startFalsos(); else if(m==="conv") startConv(wk,me,wh); else if(m==="duel") startDuel(); else if(m==="eco") startEco(); else if(m==="pron") startPron(); else if(m==="sons") startSons(); else startQuiz(m); break; }
     case "conv": { if(el.dataset.pick){ pickConv(); break; } const wk = el.dataset.week ? +el.dataset.week : null; const wh=el.dataset.which||"A"; if(D) closeDrill(); startConv(wk, null, wh); break; }
     case "convswap": { const wk=D.week, me=D.me, wh=D.which||"A"; const lines = wh==="B" ? WEEKS[wk-1].dialogB : WEEKS[wk-1].dialog; const other=[...new Set(lines.map(l=>l[0]))].find(x=>x!==me); closeDrill(); startConv(wk, other, wh); break; }
     case "eco": startEco(); break;
@@ -5599,6 +5733,10 @@ document.addEventListener("click", e=>{
     case "bw": { const it=D.items[D.i]; const i=+el.dataset.i; const es = it.es || (it.line ? it.line[1] : (it.c ? it.c.es : "")); const toks=es.split(/\s+/).filter(Boolean); it.hints=it.hints||[]; if(!it.hints.includes(i)) it.hints.push(i);
       const n = toks.length; if((it.t==="mine"||it.t==="frame") && !it.hinted && it.hints.length >= Math.max(2, Math.ceil(n/2))){ it.hinted=true; miss(it); }
       drawDrill(); speak(toks[i].replace(/[¿¡?!.,;:…]/g,"")); break; }
+    case "read": { if(el.dataset.pick){ pickRead(); break; } if(D) closeDrill(); if(el.dataset.city){ startRead(el.dataset.city, +(el.dataset.i||0)); } else { const r=readOfDay(); if(r) startRead(r.id, r.i); else toast("Ainda não há leituras para as cidades da rota."); } break; }
+    case "readplay": { const it=D.items[D.i]; if(READ.playing && !el.dataset.slow){ readStop(); break; } readPlay(it.sents, !!el.dataset.slow); break; }
+    case "readhide": { const it=D.items[D.i]; it.hide=!it.hide; drawDrill(); break; }
+    case "readshow": { const it=D.items[D.i]; it.showText=!it.showText; drawDrill(); break; }
     case "convbad": { const it=D.items[D.i]; miss(it); tone("bad"); if(D.mode==="conv" && !it.fix){ const lg=logToday(); lg.cl=(lg.cl||0)+1; save(); } D.revealed=false; D.i++; convMaybeDone(); drawDrill(); break; }
     case "again_build": startBuild(); break;
     case "reveal": { const it=D.items[D.i]; const first=!D.revealed; D.revealed=true;
@@ -5619,7 +5757,7 @@ document.addEventListener("click", e=>{
       else if(right){ if(!it.fix) D.score++; } else { if(S.cards[it.c.id]) S.cards[it.c.id].d=todayN(); miss(it); }
       const pm = right ? rnd(PRAISE) : rnd(CHEER); it.msg={ok:right, es:pm[0], pt:pm[1]}; tone(right?"ok":"bad"); if(right) buzz(15);
       if(D.mode!=="duel"){ logToday().q++; save(); } drawDrill(); if(it.dir==="pt") speak(it.c.es); else if(it.dir==="reply") speak(it.c.ans); break; }
-    case "next": { const it=D.items[D.i]; if(D && D.mode==="conv" && it && it.t==="mine" && !it.fix){ const lg=logToday(); lg.cl=(lg.cl||0)+1; save(); } D.revealed=false; D.i++; convMaybeDone(); drawDrill(); break; }
+    case "next": { const it=D.items[D.i]; if(it && it.t==="read") readStop(); if(D && D.mode==="conv" && it && it.t==="mine" && !it.fix){ const lg=logToday(); lg.cl=(lg.cl||0)+1; save(); } D.revealed=false; D.i++; convMaybeDone(); drawDrill(); break; }
     case "check": checkWrite(); break;
     case "bpick": { const it=D.items[D.i]; const bi=+el.dataset.bi; if(it.seq.includes(bi)) break; it.seq.push(bi); drawDrill(); break; }
     case "bdrop": { const it=D.items[D.i]; it.seq.splice(+el.dataset.k,1); drawDrill(); break; }
