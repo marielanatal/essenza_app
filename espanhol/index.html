@@ -4199,6 +4199,9 @@ function restoreBackup(bk){
   if(!PR.list.length) return false;
   Object.entries(bk.states).forEach(([id,x])=>{ try{ localStorage.setItem(stateKey(id), JSON.stringify(unpackState(x))); }catch(e){} });
   if(!PR.list.some(x=>x.id===PR.active && !x.remote)) PR.active=(locals()[0]||PR.list[0]).id;
+  /* A viagem (V) é um apelido fixo para PR.viaje: troca o conteúdo no lugar, senão a tela Viaje continua mostrando a rota antiga até reabrir o app. */
+  if(bk.viaje && bk.viaje!==V){ Object.keys(V).forEach(k=>delete V[k]); Object.assign(V, bk.viaje); } PR.viaje=V; if(!V.custom) V.custom={}; if(!Array.isArray(V.dests)||!V.dests.length) V.dests=["madrid","sevilla","barcelona"]; if(!V.days) V.days={};
+  Object.entries(V.custom).forEach(([id,c])=>{ if(!DEST[id]) registerCustom(id, c.name); });
   saveProfiles(); S=loadState(stateKey(PR.active))||defaults(); remote=null; openWeek=null; renderAll(); connectRemote(); return true;
 }
 function parseBackup(text){ const m=String(text||"").match(/bk=([A-Za-z0-9_-]+)/); if(m){ try{ return b64d(m[1]); }catch(e){ return null; } } try{ const o=JSON.parse(text); if(o && o.cards) return {v:2,legacy:o}; if(o && o.v===2) return o; }catch(e){} return null; }
