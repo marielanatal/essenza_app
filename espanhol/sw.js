@@ -1,5 +1,6 @@
 // Guarda o app no aparelho para funcionar sem internet.
-const CACHE = "rumbo-v56";
+const CACHE = "rumbo-v57";
+const AUDIO_CACHE = "rumbo-audio"; // áudios gravados: cache próprio, que sobrevive às atualizações
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", e => {
@@ -7,12 +8,17 @@ self.addEventListener("install", e => {
 });
 
 self.addEventListener("activate", e => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE && k !== AUDIO_CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
 });
 
 // Rede primeiro (pega atualizações), cache quando estiver offline.
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET") return;
+  // Áudios gravados: cache primeiro (não mudam), rede só na primeira vez
+  if (new URL(e.request.url).origin === location.origin && /\/audio\/[^/]+\.mp3$/.test(new URL(e.request.url).pathname)) {
+    e.respondWith(caches.open(AUDIO_CACHE).then(c => c.match(e.request).then(hit => hit || fetch(e.request).then(res => { if (res.ok) c.put(e.request, res.clone()); return res; }))));
+    return;
+  }
   const isPage = e.request.mode === "navigate" || /\/(index\.html)?(\?.*)?$/.test(new URL(e.request.url).pathname) && new URL(e.request.url).origin === location.origin;
   e.respondWith(
     fetch(isPage ? new Request(e.request, { cache: "no-store" }) : e.request)
