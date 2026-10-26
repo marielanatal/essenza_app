@@ -4418,7 +4418,7 @@ function voiceIntro(v){ if(!v) return "Hola, soy la voz por defecto del teléfon
 function voiceNow(){ const el=$("#s-voice-now"); if(el) el.textContent = LAST_VOICE ? `Falou agora com: ${LAST_VOICE}` : ""; }
 function voiceLabel(v){ const q=isGoodVoice(v) ? (/premium/i.test(v.name+" "+v.voiceURI) ? " · premium" : " · aprimorada") : " · comum"; return `${v.name.replace(/\s*\(.*?\)\s*/g," ").trim()} (${v.lang.replace("_","-")})${q}`; }
 function cleanSpeech(t){ return t.replace(/\(.*?\)/g,"").replace(/…/g,"").replace(/\s\/\s/g,", ").trim(); }
-function utter(t, pitch, slow){ const u=new SpeechSynthesisUtterance(cleanSpeech(t)); u.lang="es-ES"; const v=esVoice(); if(v) u.voice=v; u.rate=slow ? Math.max(0.5,S.rate*0.7) : S.rate; if(pitch) u.pitch=pitch; return u; }
+function utter(t, pitch, slow){ const u=new SpeechSynthesisUtterance(cleanSpeech(t)); u.lang="es-ES"; const v=useSystemVoice()?null:esVoice(); if(v) u.voice=v; u.rate=slow ? Math.max(0.5,S.rate*0.7) : S.rate; if(pitch) u.pitch=pitch; return u; }
 /* Fala com a voz escolhida; se ela não começar em 1,8 s (acontece no iPhone logo após baixar uma voz), tenta de novo sem fixar a voz. */
 let SPEAK_FAILS=0, SPEAK_SEQ=0, SPEAK_WARM=false, SPEAK_LAST=0, MIC_END=0;
 /* Áudio gravado com vozes neurais (Elvira e Álvaro, es-ES), gerado pela rotina do GitHub em audio/<chave>.mp3.
@@ -4452,10 +4452,10 @@ function speak(t, slow, who, onstart, onend){
 }
 function speakTTS(t, slow, who, onstart, onend){ if(!canSpeak) return;
   const seq=++SPEAK_SEQ;
-  try{ loadVoices();
+  try{ if(!useSystemVoice()) loadVoices();
     const busy = speechSynthesis.speaking || speechSynthesis.pending;
     if(busy){ try{ speechSynthesis.cancel(); }catch(e){} }
-    try{ speechSynthesis.resume(); }catch(e){}
+    if(!useSystemVoice()){ try{ speechSynthesis.resume(); }catch(e){} }
     const go=()=>{ if(seq!==SPEAK_SEQ) return;
       // no iPhone, a primeira fala depois de um cancelamento, de um som, do microfone ou de um tempo parado sai na voz comum:
       // uma sílaba muda antes de cada frase evita isso (custa ~0,1 s e não se ouve)
