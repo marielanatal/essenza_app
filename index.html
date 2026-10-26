@@ -4421,10 +4421,36 @@ function cleanSpeech(t){ return t.replace(/\(.*?\)/g,"").replace(/…/g,"").repl
 function utter(t, pitch, slow){ const u=new SpeechSynthesisUtterance(cleanSpeech(t)); u.lang="es-ES"; const v=esVoice(); if(v) u.voice=v; u.rate=slow ? Math.max(0.5,S.rate*0.7) : S.rate; if(pitch) u.pitch=pitch; return u; }
 /* Fala com a voz escolhida; se ela não começar em 1,8 s (acontece no iPhone logo após baixar uma voz), tenta de novo sem fixar a voz. */
 let SPEAK_FAILS=0, SPEAK_SEQ=0, SPEAK_WARM=false, SPEAK_LAST=0, MIC_END=0;
+/* Áudio gravado com vozes neurais (Elvira e Álvaro, es-ES), gerado pela rotina do GitHub em audio/<chave>.mp3.
+   A chave é um hash do texto limpo; audio/index.json lista as chaves existentes. Sem arquivo, cai na voz do celular. */
+const AUDIO={keys:null, el:null, unlocked:false, seq:0, on:true};
+try{ AUDIO.on = localStorage.getItem("rumbo-audio")!=="off"; }catch(e){}
+function fnv(t){ let h=0x811c9dc5; for(let i=0;i<t.length;i++){ h^=t.charCodeAt(i); h=Math.imul(h,0x01000193)>>>0; } return h.toString(16).padStart(8,"0")+t.length.toString(16); }
+function audioKey(t){ return fnv(cleanSpeech(t).trim()); }
+function hasAudio(t, who){ return !!(AUDIO.on && AUDIO.keys && !window.claude && AUDIO.keys.has(audioKey(t)+(who==="m"?"-m":""))); }
+function audioEl(){ if(!AUDIO.el){ AUDIO.el=new Audio(); AUDIO.el.preload="auto"; try{ AUDIO.el.preservesPitch=true; AUDIO.el.webkitPreservesPitch=true; }catch(e){} } return AUDIO.el; }
+function audioUnlock(){ if(AUDIO.unlocked) return; AUDIO.unlocked=true; try{ const a=audioEl(); a.src="data:audio/wav;base64,UklGRkQDAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YSADAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA=="; a.play().catch(()=>{}); }catch(e){} }
+try{ document.addEventListener("pointerdown", ()=>audioUnlock(), {once:true, passive:true}); }catch(e){}
+async function loadAudioIndex(){ try{ const r=await fetch("audio/index.json",{cache:"no-cache"}); if(!r.ok) throw 0; const j=await r.json(); AUDIO.keys=new Set(j.k||j); }catch(e){ AUDIO.keys=AUDIO.keys||new Set(); } }
+if(!window.claude) loadAudioIndex();
+function playAudio(t, slow, who, onstart, onend){ const a=audioEl(); const seq=++AUDIO.seq; const k=audioKey(t)+(who==="m"?"-m":"");
+  try{ a.pause(); }catch(e){}
+  a.src=`audio/${k}.mp3`; a.playbackRate = slow ? 0.72 : Math.max(0.7, Math.min(1.25, S.rate||1));
+  a.onplay=()=>{ if(seq!==AUDIO.seq) return; LAST_VOICE = who==="m" ? "Álvaro (gravada, es-ES)" : "Elvira (gravada, es-ES)"; voiceNow(); if(onstart) onstart(); };
+  a.onended=()=>{ if(seq===AUDIO.seq && onend) onend(); };
+  a.onerror=()=>{ if(seq!==AUDIO.seq) return; speakTTS(t, slow, who, onstart, onend); };
+  const pr=a.play(); if(pr && pr.catch) pr.catch(()=>{ if(seq===AUDIO.seq) speakTTS(t, slow, who, onstart, onend); });
+}
+function stopAudio(){ AUDIO.seq++; try{ if(AUDIO.el){ AUDIO.el.onended=null; AUDIO.el.pause(); } }catch(e){} }
 /* Primeira fala da sessão no iPhone sai na voz comum (a aprimorada ainda não carregou): fala uma sílaba muda antes. */
 function warmVoice(force){ if((SPEAK_WARM && !force) || !canSpeak) return; SPEAK_WARM=true; try{ const w=new SpeechSynthesisUtterance("a"); w.lang="es-ES"; w.volume=0; w.rate=2; const v=esVoice(); if(v) w.voice=v; speechSynthesis.speak(w); }catch(e){} }
 try{ document.addEventListener("pointerdown", ()=>warmVoice(), {once:true, passive:true}); }catch(e){}
-function speak(t, slow){ if(!canSpeak) return;
+function speak(t, slow, who, onstart, onend){
+  stopAudio();
+  if(hasAudio(t, who)){ try{ speechSynthesis.cancel(); }catch(e){} playAudio(t, slow, who, onstart, onend); return; }
+  speakTTS(t, slow, who, onstart, onend);
+}
+function speakTTS(t, slow, who, onstart, onend){ if(!canSpeak) return;
   const seq=++SPEAK_SEQ;
   try{ loadVoices();
     const busy = speechSynthesis.speaking || speechSynthesis.pending;
@@ -4436,8 +4462,8 @@ function speak(t, slow){ if(!canSpeak) return;
       warmVoice(true);
       SPEAK_LAST=Date.now();
       const u=utter(t, 0, slow); let started=false;
-      u.onstart=()=>{ started=true; SPEAK_FAILS=0; LAST_VOICE = u.voice ? voiceLabel(u.voice) : "a voz padrão do iPhone para espanhol (a marcada em Ajustes › Vozes)"; voiceNow(); };
-      u.onerror=()=>{ started=true; };
+      u.onstart=()=>{ started=true; SPEAK_FAILS=0; LAST_VOICE = u.voice ? voiceLabel(u.voice) : "a voz padrão do iPhone para espanhol (a marcada em Ajustes › Vozes)"; voiceNow(); if(onstart) onstart(); };
+      u.onerror=()=>{ started=true; }; u.onend=()=>{ if(onend && seq===SPEAK_SEQ) onend(); };
       speechSynthesis.speak(u);
       if(u.voice){ setTimeout(()=>{ if(started || seq!==SPEAK_SEQ || !(speechSynthesis.speaking || speechSynthesis.pending)) return;
         try{ speechSynthesis.cancel(); }catch(e){}
@@ -4516,7 +4542,9 @@ function pronScore(alts, target){
   return best;
 }
 function similarity(said, target){ const w=x=>norm(x).replace(/[¿?¡!.,;:…]/g," ").split(/\s+/).filter(Boolean); const T=w(cleanSpeech(target)); const A=new Set(w(said)); return T.length ? T.filter(x=>A.has(x)).length/T.length : 0; }
-function speakDialog(lines){ if(!canSpeak) return; try{ speechSynthesis.cancel(); const who=[...new Set(lines.map(l=>l[0]))]; lines.forEach(l=>speechSynthesis.speak(utter(l[1], who.indexOf(l[0])%2 ? 1.25 : 0.9))); }catch(e){} }
+function speakDialog(lines){ if(!canSpeak) return; const who=[...new Set(lines.map(l=>l[0]))]; const L=lines.slice(); stopAudio(); try{ speechSynthesis.cancel(); }catch(e){}
+  const next=()=>{ const l=L.shift(); if(!l) return; const g = who.indexOf(l[0])%2 ? "m" : ""; if(hasAudio(l[1], g)) playAudio(l[1], false, g, null, ()=>setTimeout(next, 350)); else { const u=utter(l[1], g?1.25:0.9); u.onend=()=>setTimeout(next, 350); warmVoice(true); speechSynthesis.speak(u); } };
+  next(); }
 
 /* ============================================================
    HELPERS DE UI
@@ -5333,15 +5361,26 @@ const LECTURAS = {
 };
 
 /* Leitura com perguntas */
-const READ={playing:false,k:-1};
+const READ={playing:false,k:-1,run:0};
+function allSpeakables(){
+  const out=new Map(); const add=(t,m)=>{ if(!t) return; const c=cleanSpeech(String(t)).trim(); if(!c) return; const k=audioKey(c); const cur=out.get(k)||{k,t:c,m:false}; if(m) cur.m=true; out.set(k,cur); };
+  CARDS.forEach(c=>add(c.es)); SURV_CARDS.forEach(c=>add(c.es));
+  WEEKS.forEach(w=>{ (w.dialog||[]).forEach(l=>add(l[1],true)); (w.dialogB||[]).forEach(l=>add(l[1],true)); });
+  FRAMES.forEach(fr=>fr.x.forEach(x=>add(fr.es.replace("{x}",x[0])))); PEGADINHAS.forEach(pg=>pg.ex.forEach(x=>add(x[0])));
+  Object.values(LECTURAS).forEach(L=>L.forEach(x=>{ sentences(x.txt).forEach(sn=>add(sn)); x.q.forEach(q=>add(q.q)); }));
+  SOUNDS.forEach(x=>(x.ex||[]).forEach(e=>add(e)));
+  return [...out.values()];
+}
 function readAll(){ return Object.keys(LECTURAS).flatMap(id=>LECTURAS[id].map((L,i)=>({id,i,L}))); }
 function readOfDay(){ const ids=(V.dests||[]).filter(id=>LECTURAS[id]); const pool = ids.length ? ids.flatMap(id=>LECTURAS[id].map((L,i)=>({id,i,L}))) : readAll(); if(!pool.length) return null; const done=S.reads||{}; const fresh=pool.filter(x=>!done[x.id+":"+x.i]); const P=fresh.length?fresh:pool; return P[todayN()%P.length]; }
 function sentences(txt){ return (txt.match(/[^.!?…]+[.!?…]+["»]?\s*|[^.!?…]+$/g)||[txt]).map(x=>x.trim()).filter(Boolean); }
-function readStop(){ READ.playing=false; READ.k=-1; try{ speechSynthesis.cancel(); }catch(e){} document.querySelectorAll(".sent.on").forEach(x=>x.classList.remove("on")); const b=document.querySelector('[data-act="readplay"]:not([data-slow])'); if(b) b.innerHTML=ICON.say+" Ouvir"; }
-function readPlay(sents, slow){ if(!canSpeak) return; readStop(); READ.playing=true; try{ speechSynthesis.resume(); }catch(e){} warmVoice(true); SPEAK_LAST=Date.now();
+function readStop(){ READ.playing=false; READ.k=-1; READ.run=(READ.run||0)+1; stopAudio(); try{ speechSynthesis.cancel(); }catch(e){} document.querySelectorAll(".sent.on").forEach(x=>x.classList.remove("on")); const b=document.querySelector('[data-act="readplay"]:not([data-slow])'); if(b) b.innerHTML=ICON.say+" Ouvir"; }
+function readPlay(sents, slow){ if(!canSpeak) return; readStop(); READ.playing=true; const run=++READ.run; try{ speechSynthesis.resume(); }catch(e){} SPEAK_LAST=Date.now();
   const b=document.querySelector('[data-act="readplay"]:not([data-slow])'); if(b) b.innerHTML=ICON.say+" Parar";
-  sents.forEach((sn,k)=>{ const u=utter(sn,0,slow); u.onstart=()=>{ READ.k=k; document.querySelectorAll(".sent").forEach(x=>x.classList.toggle("on", +x.dataset.k===k)); const el=document.querySelector(`.sent[data-k="${k}"]`); if(el) el.scrollIntoView({block:"center",behavior:"smooth"}); };
-    if(k===sents.length-1) u.onend=()=>{ if(READ.playing) readStop(); }; speechSynthesis.speak(u); }); }
+  const mark=k=>{ READ.k=k; document.querySelectorAll(".sent").forEach(x=>x.classList.toggle("on", +x.dataset.k===k)); const el=document.querySelector(`.sent[data-k="${k}"]`); if(el) el.scrollIntoView({block:"center",behavior:"smooth"}); };
+  const go=k=>{ if(!READ.playing || run!==READ.run) return; if(k>=sents.length){ readStop(); return; }
+    speak(sents[k], slow, "", ()=>mark(k), ()=>setTimeout(()=>go(k+1), 250)); };
+  go(0); }
 function startRead(id, i){ const L=(LECTURAS[id]||[])[i||0]; if(!L){ toast("Ainda não há leitura para esta cidade."); return; } const sents=sentences(L.txt);
   const qs=L.q.map((q,n)=>({t:"mc", c:{es:q.q, pt:"", ans:q.o[q.a], note:""}, dir:"readq", field:"ans", opts:shuffle(q.o.slice()), picked:null, sents, qn:n+1}));
   openDrill({mode:"read", city:id, ri:i||0, items:[{t:"read", L, sents, city:id}, ...qs]}); }
@@ -5429,9 +5468,9 @@ function drawDrill(){
       ? `<div class="actions three"><button class="btn bad" data-act="grade" data-g="bad">Não saiu</button><button class="btn soft" data-act="grade" data-g="mid">Quase</button><button class="btn ok" data-act="grade" data-g="good">${oral?"Falei bem":"Entendi"}</button></div>`
       : `<div class="actions${MIC&&oral?" duo":""}">${MIC&&oral?micBtn(it):""}<button class="btn wide" data-act="reveal">${oral?"Já falei: ouvir a resposta":"Mostrar significado"}</button></div>`;
   } else if(it.t==="theirs"){
-    if(!it.played){ it.played=true; speak(it.line[1]); }
+    if(!it.played){ it.played=true; speak(it.line[1], false, "m"); }
     const nextMine = D.items[D.i+1] && D.items[D.i+1].t==="mine";
-    stage = `${convLog(it)}<div class="flash"><span class="kind">${h(it.line[0])} fala${it.fix?"":` · fala ${convPos(it)}`}</span><div class="big">${W(it.line[1])}</div>${sayRow(it.line[1],true)}<hr><div class="pt">${h(it.line[2])}</div></div>`;
+    stage = `${convLog(it)}<div class="flash"><span class="kind">${h(it.line[0])} fala${it.fix?"":` · fala ${convPos(it)}`}</span><div class="big">${W(it.line[1])}</div><div class="row" style="justify-content:center">${canSpeak?`<button class="say lg" data-act="say" data-say="${h(it.line[1])}" data-who="m" aria-label="Ouvir">${ICON.say}</button>`:""}${slowBtn(it.line[1])}</div><hr><div class="pt">${h(it.line[2])}</div></div>`;
     actions = `<div class="actions"><button class="btn wide" data-act="next">${nextMine?"Sua vez de responder":"Continuar"}</button></div>`;
   } else if(it.t==="mine"){
     const hint = it.hinted && !D.revealed;
@@ -5563,7 +5602,8 @@ function openSettings(){
       <div class="field"><label for="s-daily">Frases novas por dia (ajuste fino)</label><select id="s-daily">${[3,4,5,6,8,10,12,15,16,20,24].map(n=>`<option value="${n}" ${S.daily===n?"selected":""}>${n}</option>`).join("")}</select></div>
       <p class="hint" id="s-feas">${(()=>{ const f=feasibility(); return f.left===0 ? "Todas as frases do plano já vistas." : f.ok ? `No ritmo: faltam ${f.left} frases e ${f.days} dias; ${S.daily}/dia dá conta.` : `Atenção: faltam ${f.left} frases em ${f.days} dias; precisaria de ${f.need}/dia.`; })()}</p>
     </div>
-    <div class="field"><label for="s-voice">Voz do espanhol</label>${canSpeak ? (()=>{ loadVoices(); const L=esVoices(); const auto=esVoice(); return `<select id="s-voice"><option value="system" ${useSystemVoice()?"selected":""}>Padrão do iPhone: a voz marcada em Ajustes › Vozes (use esta para a aprimorada)</option><option value="" ${!useSystemVoice()&&!S.voice?"selected":""}>Automática do app (${auto?voiceLabel(auto):"a do celular"})</option>${L.map(v=>`<option value="${h(v.voiceURI)}" ${S.voice===v.voiceURI||S.voice===v.name?"selected":""}>${h(voiceLabel(v))}</option>`).join("")}</select><div class="row" style="gap:8px;margin-top:6px"><button class="btn soft" data-act="voicetest">Testar voz</button>${L.length>1?`<button class="btn ghost" data-act="voicecompare">Comparar as ${L.length} vozes</button>`:""}${IS_IOS?`<button class="btn ghost" data-act="voiceab">Comum × padrão</button>`:""}</div><span class="hint" id="s-voice-now" style="color:var(--cobalt);font-weight:700">${LAST_VOICE?"Falou agora com: "+h(LAST_VOICE):""}</span><span class="hint">${L.length} ${L.length===1?"voz de espanhol instalada":"vozes de espanhol instaladas"} neste aparelho. ${IS_IOS ? "O Safari só mostra ao app as vozes comuns; a aprimorada não aparece nesta lista, mas funciona assim: em Ajustes do iPhone › Acessibilidade › Conteúdo Falado › Vozes › Espanhol, toque em Mónica (Aprimorada) para deixá-la marcada como a voz do espanhol; depois escolha aqui 'Padrão do iPhone' e toque em Testar voz: ela se apresenta como 'la voz mejorada'." : "No Android, em Configurações › Sistema › Idioma › Conversão de texto em voz › Google, instale a voz 'Espanhol (Espanha)' e volte aqui."}</span>`; })() : `<span class="hint">Este navegador não oferece voz.</span>`}</div>
+    <div class="field"><label for="s-voice">Voz do espanhol</label>${canSpeak ? (()=>{ loadVoices(); const L=esVoices(); const auto=esVoice(); return `<select id="s-voice"><option value="system" ${useSystemVoice()?"selected":""}>Padrão do iPhone: a voz marcada em Ajustes › Vozes (use esta para a aprimorada)</option><option value="" ${!useSystemVoice()&&!S.voice?"selected":""}>Automática do app (${auto?voiceLabel(auto):"a do celular"})</option>${L.map(v=>`<option value="${h(v.voiceURI)}" ${S.voice===v.voiceURI||S.voice===v.name?"selected":""}>${h(voiceLabel(v))}</option>`).join("")}</select><div class="row" style="gap:8px;margin-top:6px"><button class="btn soft" data-act="voicetest">Testar voz</button>${L.length>1?`<button class="btn ghost" data-act="voicecompare">Comparar as ${L.length} vozes</button>`:""}${IS_IOS?`<button class="btn ghost" data-act="voiceab">Comum × padrão</button>`:""}</div><span class="hint" id="s-voice-now" style="color:var(--cobalt);font-weight:700">${LAST_VOICE?"Falou agora com: "+h(LAST_VOICE):""}</span>
+    <label class="row" style="gap:8px;margin-top:8px;align-items:center"><input type="checkbox" id="s-audio" ${AUDIO.on?"checked":""} style="width:22px;height:22px;accent-color:var(--cobalt)"> <span><b>Vozes gravadas (Elvira e Álvaro)</b><br><span class="hint">${AUDIO.keys && AUDIO.keys.size ? `${AUDIO.keys.size} áudios disponíveis: frases, diálogos, fórmulas e leituras tocam com voz natural; o resto usa a voz do celular. Precisa de internet na primeira vez que cada frase toca.` : "Ainda sem áudios gravados neste endereço (a rotina do GitHub gera os arquivos). Até lá, usa a voz do celular."}</span></span></label><span class="hint">${L.length} ${L.length===1?"voz de espanhol instalada":"vozes de espanhol instaladas"} neste aparelho. ${IS_IOS ? "O Safari só mostra ao app as vozes comuns; a aprimorada não aparece nesta lista, mas funciona assim: em Ajustes do iPhone › Acessibilidade › Conteúdo Falado › Vozes › Espanhol, toque em Mónica (Aprimorada) para deixá-la marcada como a voz do espanhol; depois escolha aqui 'Padrão do iPhone' e toque em Testar voz: ela se apresenta como 'la voz mejorada'." : "No Android, em Configurações › Sistema › Idioma › Conversão de texto em voz › Google, instale a voz 'Espanhol (Espanha)' e volte aqui."}</span>`; })() : `<span class="hint">Este navegador não oferece voz.</span>`}</div>
     <div class="field"><label for="s-rate">Velocidade da voz: <span id="s-rate-v">${S.rate.toFixed(2)}</span>×</label><input type="range" id="s-rate" min="0.6" max="1.1" step="0.05" value="${S.rate}">${canSpeak?`<span class="hint">Sem som? Escolha "Automática" acima, confira o botão lateral de silêncio e o volume, feche o app por completo e abra de novo. Depois de baixar uma voz nova, o iPhone às vezes só a usa após reiniciar o aparelho.</span>`:`<span class="hint">Este navegador não oferece voz.</span>`}<span class="hint">${canSpeak ? (esVoice() ? "Voz em uso: "+h(esVoice().name) : "Nenhuma voz de espanhol instalada; o aparelho usará a voz padrão. No Android, instale 'Espanhol (Espanha)' em Configurações › Idioma › Conversão de texto em voz.") : ""}</span></div>
     <div class="field"><label>Microfone (botão Falar)</label>
       ${window.claude ? `<span class="hint">Dentro do Claude o microfone não está disponível. Use o app instalado pelo endereço do GitHub.</span>` :
@@ -5587,6 +5627,7 @@ function openSettings(){
   const sp=$("#s-photos"); if(sp) sp.addEventListener("change", ()=>{ try{ localStorage.setItem("rumbo-photos", sp.checked?"on":"off"); }catch(e){} toast(sp.checked?"Fotos ligadas. Recarregando…":"Fotos desligadas. Recarregando…"); setTimeout(()=>location.reload(), 600); });
   const sm=$("#s-minutes"); if(sm) sm.addEventListener("change", ()=>{ S.minutes=+sm.value; S.daily=dailyFor(S.minutes); const sd=$("#s-daily"); if(sd) sd.value=String(S.daily); applySettings(); });
   ["s-trip","s-start","s-daily","s-weeks","s-rate","s-dest","s-name","s-sound"].forEach(id=>{ const el=$("#"+id); if(el) el.addEventListener("change", applySettings); });
+  const sa=$("#s-audio"); if(sa) sa.addEventListener("change", ()=>{ AUDIO.on=sa.checked; try{ localStorage.setItem("rumbo-audio", sa.checked?"on":"off"); }catch(e){} toast(sa.checked?"Vozes gravadas ligadas.":"Vozes gravadas desligadas: usando a voz do celular."); });
   const sv=$("#s-voice"); if(sv) sv.addEventListener("change", ()=>{ S.voice=sv.value||""; save(); loadVoices(); speak(voiceIntro(esVoice())); });
   if(canSpeak) try{ speechSynthesis.addEventListener("voiceschanged", ()=>{ const el=$("#s-voice"); if(el && el.options.length<=1 && esVoices().length){ loadVoices(); const L=esVoices(); el.innerHTML=`<option value="system">Padrão do iPhone</option><option value="">Automática do app</option>`+L.map(v=>`<option value="${h(v.voiceURI)}" ${S.voice===v.voiceURI||S.voice===v.name?"selected":""}>${h(voiceLabel(v))}</option>`).join(""); } }, {once:true}); }catch(e){}
 }
@@ -5625,7 +5666,7 @@ document.addEventListener("click", e=>{
   if(act==="mission") return; // tratado no change
   switch(act){
     case "tab": showTab(el.dataset.tab); break;
-    case "say": speak(el.dataset.say); break;
+    case "say": speak(el.dataset.say, false, el.dataset.who||""); break;
     case "dialog": speakDialog(el.dataset.which==="B" ? WEEKS[+el.dataset.week-1].dialogB : WEEKS[+el.dataset.week-1].dialog); break;
     case "session": startSession(); break;
     case "quiz": startQuiz("quiz", el.dataset.week ? +el.dataset.week : null); break;
@@ -5807,7 +5848,7 @@ setTimeout(()=>{ if(!PR.onboarded && $("#sheet").hidden) openOnboarding(); }, 40
   } else toast("Esse link de backup não é válido."); return; }
   const d=parseInvite(location.hash); if(d && receiveScore(d)){ try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} renderAll(); setTimeout(()=>{ toast(`Placar de ${d.name} recebido. Agora mande o seu!`); if(PR.onboarded) openPasajeros(); }, 600); } })();
 /* Atualização automática: quando sai versão nova, o app baixa e recarrega sozinho (fora de um treino). */
-const APP_VERSION = "2026.10.26-0057";
+const APP_VERSION = "2026.10.26-0109";
 let pendingReload = false;
 function maybeReload(){ if(!pendingReload) return; if(D || !$("#drill").hidden){ return; } pendingReload=false; toast("Atualizando o app…"); setTimeout(()=>location.reload(), 600); }
 if("serviceWorker" in navigator && !window.claude && location.protocol==="https:"){
