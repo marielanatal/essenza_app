@@ -1,5 +1,7 @@
 # Rumbo a España
 
+Endereço do app: https://marielanatal.github.io/cursodeidiomas/ (repositório `marielanatal/cursodeidiomas`; o branch `main` tem o código e o `gh-pages` o site publicado com os áudios).
+
 App de celular para aprender o espanhol da Espanha antes de uma viagem, feito para quem fala português. O plano se adapta ao tempo disponível (de 4 semanas a um ano) e aos minutos por dia. A estrutura é um motor + um pacote de conteúdo (Espanha); outros países entram como novos pacotes.
 Funciona sem internet e guarda o progresso no próprio aparelho.
 
