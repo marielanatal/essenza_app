@@ -551,7 +551,7 @@ nav.tabs button.on svg{stroke-width:2.4}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
       </button>
     </div>
-    <div class="count"><b id="b-days">100</b><div class="lbl"><span>dias para <strong id="b-dest">Espanha</strong></span><span><span id="b-date">1 fev 2027</span> · <span id="b-week">semana 1 de 14</span></span></div></div>
+    <div class="count"><b id="b-days">100</b><div class="lbl"><span id="b-lbl1">dias para <strong id="b-dest">Espanha</strong></span><span><span id="b-date">1 fev 2027</span> · <span id="b-week">semana 1 de 14</span></span></div></div>
     <span class="sync" id="b-sync" hidden><i></i><span></span></span>
   </header>
 
@@ -3084,7 +3084,7 @@ function fmtShort(n){ const k=keyFromNum(n).split("-"); const m=["jan","fev","ma
    ESTADO (localStorage + sincronização opcional)
    ============================================================ */
 const LS_KEY = "rumbo-espana-v1";
-function defaults(){ return {v:1,start:todayKey(),trip:"2027-02-01",dest:"ESPAÑA",daily:12,minutes:15,planWeeks:0,rate:0.9,voice:"",unlocked:1,name:"",sound:true,cards:{},missions:{},log:{},badges:{},updatedAt:0}; }
+function defaults(){ return {v:1,goal:"trip",start:todayKey(),trip:"2027-02-01",dest:"ESPAÑA",daily:12,minutes:15,planWeeks:0,rate:0.9,voice:"",unlocked:1,name:"",sound:true,cards:{},missions:{},log:{},badges:{},updatedAt:0}; }
 function normalize(s){ const d=defaults(); s = (s && typeof s==="object") ? s : {}; return Object.assign(d, s, {cards:s.cards||{}, missions:s.missions||{}, log:s.log||{}, badges:s.badges||{}}); }
 /* Perfis (pasajeros): cada pessoa tem seu progresso; o ranking compara a semana */
 const PROF_KEY = "rumbo-profiles";
@@ -4246,6 +4246,12 @@ document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState=
 /* Cronograma: 14 temas distribuídos entre o início do estudo e a viagem (ou nas semanas definidas) */
 function planWeeks(){ if(S.planWeeks) return Math.max(2, Math.min(52, S.planWeeks)); const w=Math.round((numOf(S.trip)-numOf(S.start))/7); return Math.max(2, Math.min(52, w||14)); }
 function planDays(){ return planWeeks()*7; }
+const MONTH_OPTS=[[1,"1 mês"],[2,"2 meses"],[3,"3 meses"],[4,"4 meses"],[6,"6 meses"],[9,"9 meses"],[12,"1 ano"]];
+function goalTime(){ return S.goal==="time"; }
+function goalDa(){ return goalTime() ? "do fim do plano" : "da viagem"; }     // "antes da viagem" / "antes do fim do plano"
+function goalA(){ return goalTime() ? "o fim do plano" : "a viagem"; }        // "até a viagem" / "até o fim do plano"
+/* Define o plano por tempo de estudo: N meses a partir do começo */
+function setGoalTime(months, start){ S.goal="time"; S.start=start||S.start||todayKey(); const weeks=Math.max(2, Math.min(52, Math.round(months*4.345))); S.planWeeks=weeks; S.trip=keyFromNum(numOf(S.start)+weeks*7); S.months=months; }
 function weekStart(n){ return numOf(S.start)+Math.floor((n-1)*planDays()/TOTAL_WEEKS); }         // dia em que o tema n começa
 function weekEnd(n){ return n>=TOTAL_WEEKS ? numOf(S.start)+planDays()-1 : weekStart(n+1)-1; }    // último dia do tema n
 function weekByDate(){ const t=todayN(); let u=1; for(let n=1;n<=TOTAL_WEEKS;n++){ if(weekStart(n)<=t) u=n; } return u; }
@@ -4368,7 +4374,7 @@ function openPasajeros(){
     <details class="sec"><summary>Mais um perfil neste mesmo celular</summary><div class="in">
       <p class="small muted">Para quem divide o aparelho. Cada perfil tem seu próprio progresso; toque em Usar para trocar.</p>
       <div class="row" style="gap:6px"><input id="s-newp" maxlength="20" placeholder="Nome" style="flex:1;min-width:0;border:0;background:var(--paper);border-radius:10px;padding:10px 12px;font-size:16px"><button class="btn" data-act="addprofile">Adicionar</button></div>
-      ${locals().length>1?`<button class="btn soft wide" data-act="duel">Duelo: quiz passando o celular</button>`:""}
+
     </div></details>
   </div>`;
   el.hidden=false;
@@ -4584,10 +4590,10 @@ const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.
    ============================================================ */
 function renderBoard(){
   const days = Math.max(0, numOf(S.trip) - todayN());
-  $("#b-days").textContent = days;
   const [y,m,d] = S.trip.split("-");
-  $("#b-date").textContent = `${+d} ${["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"][+m-1]} ${y}`;
-  const dest=(S.dest||"Espanha"); $("#b-dest").textContent = dest.toUpperCase()==="ESPAÑA" ? "Espanha" : dest.charAt(0).toUpperCase()+dest.slice(1).toLowerCase();
+  const dest=(S.dest||"Espanha"); const destName = dest.toUpperCase()==="ESPAÑA" ? "Espanha" : dest.charAt(0).toUpperCase()+dest.slice(1).toLowerCase();
+  if(goalTime()){ const wk=Math.max(0, Math.ceil(days/7)); $("#b-days").textContent = wk; $("#b-lbl1").innerHTML = wk===1 ? "semana de estudo restante" : "semanas de estudo restantes"; $("#b-date").textContent = `meta: ${S.months ? MONTH_OPTS.find(x=>x[0]===S.months)?.[1] || planWeeks()+" semanas" : planWeeks()+" semanas"}`; }
+  else { $("#b-days").textContent = days; $("#b-lbl1").innerHTML = `dias para <strong id="b-dest">${h(destName)}</strong>`; $("#b-date").textContent = `${+d} ${["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"][+m-1]} ${y}`; }
   $("#b-week").textContent = `semana ${Math.min(calWeek(),planWeeks())} de ${planWeeks()} · tema ${curWeek()}`;
   $("#b-pax").innerHTML = `<i></i>${h((me().name||"").slice(0,14))}`;
   const fig=$("#hero-photo"); if(fig && typeof PHOTOS_ON!=="undefined" && PHOTOS_ON){ const list=(THEMES.es.photos||[]); const pick=list.length ? list[todayN()%list.length] : null;
@@ -4632,13 +4638,13 @@ function renderHoje(){
       </div>
       <p class="small muted">${newTier(1) ? `Ainda há ${newTier(1)} frases do plano liberadas até a semana ${curWeek()}, mais ${newTier(2)} extras.` : newTier(2) ? `Você já viu as frases do plano até a semana ${curWeek()}. Restam ${newTier(2)} frases extra desta semana.` : `Você já viu tudo até a semana ${curWeek()}. Pode adiantar a próxima.`} O extra não quebra a rotina: amanhã volta ao normal.</p></div>` : ""}
     <div class="steps">${stepsHtml}<div class="stepfoot"><span>${doneN} de ${steps.length} · uns ${S.minutes||15} min no total</span><button class="btn soft" style="min-height:30px;padding:4px 10px;font-size:12px" data-act="settings">mudar tempo</button></div></div>
-    ${behind ? `<button class="card tint-s small" style="text-align:left;width:100%" data-act="settings"><b>No ritmo atual você não vê tudo antes da viagem.</b> Faltam ${fz.left} frases do plano em ${daysLeft} dias: precisaria de ${fz.need} novas por dia (hoje: ${S.daily}). Toque para ajustar os minutos por dia.</button>`:""}
+    ${behind ? `<button class="card tint-s small" style="text-align:left;width:100%" data-act="settings"><b>No ritmo atual você não vê tudo antes ${goalDa()}.</b> Faltam ${fz.left} frases do plano em ${daysLeft} dias: precisaria de ${fz.need} novas por dia (hoje: ${S.daily}). Toque para ajustar os minutos por dia.</button>`:""}
     <button class="prog" data-act="progreso" aria-label="Ver progresso e conquistas">
       <div><div class="nums"><div><b>${streak()>=3?'<span class="flame">'+ICON.flame+'</span>':""}${streak()}</b><span>dias seguidos</span></div><div><b>${learnedCount()}</b><span>frases</span></div><div><b>${spokenTotal()}</b><span>falas</span></div></div>
       <div class="lv">Nível ${lv.i+1} · ${h(lv.title)}${lv.hi?` · faltam ${lv.hi-lv.x} XP`:""}<div class="meter"><span style="width:${lvPct}%"></span></div></div></div>
       <span class="chev">›</span>
     </button>
-    ${PR.list.length>1 ? rankCard() : `<button class="card tint-g" style="text-align:left;width:100%;cursor:pointer" data-act="pasajeros"><p class="small"><b>Quer competir com alguém?</b> Toque no seu nome, no topo, e compartilhe seu placar.</p></button>`}
+    ${PR.list.length>1 ? rankCard() : ""}
     <div class="mini">
       ${fdd ? `<div class="card stack" style="gap:6px"><div class="eyebrow">Frase do dia</div><div class="es">${W(fdd.es)}</div><div class="pt small">${h(fdd.pt)}</div>${sayBtn(fdd.es)}</div>`:""}
       <div class="card tint-c stack" style="gap:6px"><div class="eyebrow">¿Sabías que…?</div><p class="fact small">${daily(FACTS)}</p></div>
@@ -4665,13 +4671,14 @@ function openProgreso(){
   el.hidden=false;
 }
 function obPlanText(){
-  const t=$("#ob-trip"), st=$("#ob-start"), mn=$("#ob-min");
+  const t=$("#ob-trip"), st=$("#ob-start"), mn=$("#ob-min"), g=$("#ob-goal"), mo=$("#ob-months");
+  const isTime = g ? g.value==="time" : goalTime();
   const trip = t && /^\d{4}-\d{2}-\d{2}$/.test(t.value) ? t.value : S.trip, start = st && /^\d{4}-\d{2}-\d{2}$/.test(st.value) ? st.value : S.start, m = mn ? +mn.value : (S.minutes||15);
-  const weeks=Math.max(2, Math.min(52, Math.round((numOf(trip)-numOf(start))/7)||14)); const daily=dailyFor(m);
+  const weeks = isTime ? Math.max(2, Math.min(52, Math.round((mo?+mo.value:(S.months||3))*4.345))) : Math.max(2, Math.min(52, Math.round((numOf(trip)-numOf(start))/7)||14)); const daily=dailyFor(m);
   const perWeek=TOTAL_WEEKS/weeks; const ritmo = perWeek>1.5 ? `${Math.round(perWeek*10)/10} temas por semana` : perWeek<0.75 ? `cada tema dura ${Math.round(10/perWeek)/10} semanas` : "um tema por semana";
   const total=CARDS.filter(c=>c.tier===1).length; const studyDays=Math.round(weeks*6); const covered=Math.min(total, daily*studyDays);
   const ok = covered>=total;
-  return `<b>Seu plano:</b> ${TOTAL_WEEKS} temas em ${weeks} semanas (${ritmo}), ${daily} frases novas por dia. ${ok ? "Dá para ver tudo antes da viagem." : `Com ${m} min/dia você cobre uns ${Math.round(100*covered/total)}% das frases antes da viagem; os temas mais úteis vêm primeiro. Mais minutos = mais cobertura.`}`;
+  return `<b>Seu plano:</b> ${TOTAL_WEEKS} temas em ${weeks} semanas (${ritmo}), ${daily} frases novas por dia. ${ok ? "Dá para ver tudo antes "+goalDa()+"." : `Com ${m} min/dia você cobre uns ${Math.round(100*covered/total)}% das frases antes ${goalDa()}; os temas mais úteis vêm primeiro. Mais minutos = mais cobertura.`}`;
 }
 function openOnboarding(){
   const el=$("#sheet"); setTimeout(loadPhotos, 50);
@@ -4683,7 +4690,9 @@ function openOnboarding(){
     <div class="pt-step"><span class="n">3</span><div><b>Toque numa palavra para traduzir</b><span>Qualquer palavra em espanhol no app abre o dicionário. E a aba Viaje monta o roteiro das cidades.</span></div></div>
     <div class="field"><label for="ob-name">Como posso te chamar?</label><input id="ob-name" maxlength="20" placeholder="Seu nome" value="${h(S.name && S.name!=="Jogador 1" ? S.name : "")}"></div>
     <div class="route" style="background:var(--paper);border-radius:16px;padding:12px">
-      <label><span class="eyebrow">Quando é a viagem?</span><input type="date" id="ob-trip" value="${h(S.trip)}"></label>
+      <label class="full"><span class="eyebrow">Meu objetivo</span><select id="ob-goal"><option value="trip" ${!goalTime()?"selected":""}>Tenho viagem marcada: quero chegar falando</option><option value="time" ${goalTime()?"selected":""}>Quero aprender num prazo, sem viagem marcada</option></select></label>
+      <label id="ob-trip-wrap" ${goalTime()?"hidden":""}><span class="eyebrow">Quando é a viagem?</span><input type="date" id="ob-trip" value="${h(S.trip)}"></label>
+      <label id="ob-months-wrap" ${goalTime()?"":"hidden"}><span class="eyebrow">Em quanto tempo?</span><select id="ob-months">${MONTH_OPTS.map(([n,l])=>`<option value="${n}" ${(S.months||3)===n?"selected":""}>${l}</option>`).join("")}</select></label>
       <label><span class="eyebrow">Começo a estudar em</span><input type="date" id="ob-start" value="${h(S.start)}"></label>
       <label class="full"><span class="eyebrow">Quanto tempo por dia?</span><select id="ob-min">${MIN_OPTS.map(n=>`<option value="${n}" ${(S.minutes||15)===n?"selected":""}>${n} minutos · ${n<=5?"só o essencial":n<=10?"sessão + conversa":n<=15?"sessão, conversa e pronúncia":n<=20?"rotina completa + quiz":"rotina completa + extras"}</option>`).join("")}</select></label>
       <p class="small full" id="ob-plan" style="margin:0">${obPlanText()}</p>
@@ -4731,7 +4740,7 @@ function renderPlano(){
   const pw=planWeeks(); const perWeek = TOTAL_WEEKS/pw; const ritmoTxt = perWeek>1.5 ? `${Math.round(perWeek*10)/10} temas por semana` : perWeek>1.05 ? "pouco mais de um tema por semana" : perWeek<0.75 ? `cada tema dura ${Math.round(10/perWeek)/10} semanas` : "um tema por semana";
   const fz=feasibility();
   $("#v-plano").innerHTML = `<div><h2 style="font-size:24px">Seu plano de estudo</h2><p class="muted small" style="margin-top:4px">${TOTAL_WEEKS} temas em <b>${pw} semanas</b> (${fmtShort(numOf(S.start))} a ${fmtShort(numOf(S.start)+pw*7-1)}): ${ritmoTxt}. <b>${S.minutes||15} min por dia</b>, ${S.daily} frases novas por dia. As primeiras semanas são o que você mais vai usar: pedir ajuda, aeroporto, café, comida e direções.</p></div>
-    <button class="card ${fz.ok?"tint-g":"tint-s"} small" style="text-align:left;width:100%" data-act="settings">${fz.left===0 ? "<b>Você já viu todas as frases do plano.</b> Agora é revisar e praticar as conversas." : fz.ok ? `<b>No ritmo certo:</b> faltam ${fz.left} frases e ${fz.days} dias até a viagem; sua meta de ${S.daily}/dia dá conta.` : `<b>Ritmo curto:</b> faltam ${fz.left} frases em ${fz.days} dias; precisaria de ${fz.need} por dia (hoje ${S.daily}).`} <span style="color:var(--cobalt);font-weight:700">Ajustar plano ›</span></button>
+    <button class="card ${fz.ok?"tint-g":"tint-s"} small" style="text-align:left;width:100%" data-act="settings">${fz.left===0 ? "<b>Você já viu todas as frases do plano.</b> Agora é revisar e praticar as conversas." : fz.ok ? `<b>No ritmo certo:</b> faltam ${fz.left} frases e ${fz.days} dias até ${goalA()}; sua meta de ${S.daily}/dia dá conta.` : `<b>Ritmo curto:</b> faltam ${fz.left} frases em ${fz.days} dias; precisaria de ${fz.need} por dia (hoje ${S.daily}).`} <span style="color:var(--cobalt);font-weight:700">Ajustar plano ›</span></button>
     ${items}${res}`;
 }
 
@@ -4747,7 +4756,7 @@ function renderTreino(){
       <button class="tile t-s" data-act="sons" ${canSpeak?"":"disabled"}><span class="ic">${ICON.mouth}</span><b>Sons difíceis</b><span>Os sons que denunciam o sotaque brasileiro</span></button>
       <button class="tile t-g" data-act="listen" ${canSpeak?"":"disabled"}><span class="ic">${ICON.ear}</span><b>Escuta</b><span>Ouça e escolha o significado</span></button>
       <button class="tile t-r" data-act="conv" data-pick="1"><span class="ic">${ICON.talk}</span><b>Outras conversas</b><span>Repita os diálogos das semanas anteriores</span></button>
-      <button class="tile t-s" data-act="duel"><span class="ic">${ICON.trophy}</span><b>Duelo</b><span>${locals().length>1?"Quiz a dois passando o celular":"Para duas pessoas no mesmo celular"}</span></button>
+
     </div>
     <div class="eyebrow" style="margin-top:4px">Montar frases</div>
     <div class="tiles">
@@ -5592,12 +5601,14 @@ function openSettings(){
   el.innerHTML = `<div class="sheet" role="dialog" aria-label="Ajustes">
     <div class="spread"><h2 style="font-size:22px">Ajustes</h2><button class="x" data-act="closesheet" aria-label="Fechar">${ICON.x}</button></div>
     <div class="field"><label for="s-name">Seu nome (passageiro ativo)</label><input id="s-name" maxlength="20" value="${h(S.name||"")}" placeholder="Seu nome ou apelido"></div>
-    <div class="field"><label for="s-trip">Data da viagem</label><input type="date" id="s-trip" value="${h(S.trip)}"></div>
+    <div class="field"><label for="s-goal">Objetivo</label><select id="s-goal"><option value="trip" ${!goalTime()?"selected":""}>Viagem marcada: chegar falando</option><option value="time" ${goalTime()?"selected":""}>Aprender num prazo, sem viagem</option></select></div>
+    <div class="field" id="s-trip-wrap" ${goalTime()?"hidden":""}><label for="s-trip">Data da viagem</label><input type="date" id="s-trip" value="${h(S.trip)}"></div>
+    <div class="field" id="s-months-wrap" ${goalTime()?"":"hidden"}><label for="s-months">Em quanto tempo quero aprender</label><select id="s-months">${MONTH_OPTS.map(([n,l])=>`<option value="${n}" ${(S.months||3)===n?"selected":""}>${l}</option>`).join("")}</select><span class="hint">O plano distribui os 14 temas nesse prazo, a partir do começo do estudo.</span></div>
     <div class="field"><label for="s-dest">Destino no painel</label><input id="s-dest" maxlength="14" value="${h(S.dest||"ESPAÑA")}"><span class="hint">Ex.: MADRID, BARCELONA, SEVILLA.</span></div>
     <div class="card tint-c stack" style="gap:10px">
       <b>Plano de estudo</b>
       <div class="field"><label for="s-start">Começo do estudo</label><input type="date" id="s-start" value="${h(S.start)}"></div>
-      <div class="field"><label for="s-weeks">Duração do plano</label><select id="s-weeks"><option value="0" ${!S.planWeeks?"selected":""}>Até a viagem (${(()=>{const w=Math.round((numOf(S.trip)-numOf(S.start))/7); return Math.max(2,Math.min(52,w||14));})()} semanas)</option>${[4,6,8,10,12,14,16,20,24,30,40,52].map(n=>`<option value="${n}" ${S.planWeeks===n?"selected":""}>${n} semanas</option>`).join("")}</select><span class="hint">Os ${TOTAL_WEEKS} temas se distribuem nessas semanas. Menos semanas = mais temas por semana.</span></div>
+      <div class="field" ${goalTime()?"hidden":""}><label for="s-weeks">Duração do plano</label><select id="s-weeks"><option value="0" ${!S.planWeeks?"selected":""}>Até a viagem (${(()=>{const w=Math.round((numOf(S.trip)-numOf(S.start))/7); return Math.max(2,Math.min(52,w||14));})()} semanas)</option>${[4,6,8,10,12,14,16,20,24,30,40,52].map(n=>`<option value="${n}" ${S.planWeeks===n?"selected":""}>${n} semanas</option>`).join("")}</select><span class="hint">Os ${TOTAL_WEEKS} temas se distribuem nessas semanas. Menos semanas = mais temas por semana.</span></div>
       <div class="field"><label for="s-minutes">Minutos por dia</label><select id="s-minutes">${MIN_OPTS.map(n=>`<option value="${n}" ${(S.minutes||15)===n?"selected":""}>${n} min · ${dailyFor(n)} frases novas · ${n<=5?"só a sessão":n<=10?"sessão + conversa":n<=15?"sessão, conversa e pronúncia":n<=20?"+ quiz":"+ quiz e frases extra"}</option>`).join("")}</select></div>
       <div class="field"><label for="s-daily">Frases novas por dia (ajuste fino)</label><select id="s-daily">${[3,4,5,6,8,10,12,15,16,20,24].map(n=>`<option value="${n}" ${S.daily===n?"selected":""}>${n}</option>`).join("")}</select></div>
       <p class="hint" id="s-feas">${(()=>{ const f=feasibility(); return f.left===0 ? "Todas as frases do plano já vistas." : f.ok ? `No ritmo: faltam ${f.left} frases e ${f.days} dias; ${S.daily}/dia dá conta.` : `Atenção: faltam ${f.left} frases em ${f.days} dias; precisaria de ${f.need}/dia.`; })()}</p>
@@ -5626,17 +5637,19 @@ function openSettings(){
   $("#s-rate").addEventListener("input", e=>{ $("#s-rate-v").textContent = (+e.target.value).toFixed(2); });
   const sp=$("#s-photos"); if(sp) sp.addEventListener("change", ()=>{ try{ localStorage.setItem("rumbo-photos", sp.checked?"on":"off"); }catch(e){} toast(sp.checked?"Fotos ligadas. Recarregando…":"Fotos desligadas. Recarregando…"); setTimeout(()=>location.reload(), 600); });
   const sm=$("#s-minutes"); if(sm) sm.addEventListener("change", ()=>{ S.minutes=+sm.value; S.daily=dailyFor(S.minutes); const sd=$("#s-daily"); if(sd) sd.value=String(S.daily); applySettings(); });
-  ["s-trip","s-start","s-daily","s-weeks","s-rate","s-dest","s-name","s-sound"].forEach(id=>{ const el=$("#"+id); if(el) el.addEventListener("change", applySettings); });
+  ["s-trip","s-start","s-daily","s-weeks","s-rate","s-dest","s-name","s-sound","s-months"].forEach(id=>{ const el=$("#"+id); if(el) el.addEventListener("change", applySettings); });
+  const sg=$("#s-goal"); if(sg) sg.addEventListener("change", ()=>{ applySettings(); openSettings(); });
   const sa=$("#s-audio"); if(sa) sa.addEventListener("change", ()=>{ AUDIO.on=sa.checked; try{ localStorage.setItem("rumbo-audio", sa.checked?"on":"off"); }catch(e){} toast(sa.checked?"Vozes gravadas ligadas.":"Vozes gravadas desligadas: usando a voz do celular."); });
   const sv=$("#s-voice"); if(sv) sv.addEventListener("change", ()=>{ S.voice=sv.value||""; save(); loadVoices(); speak(voiceIntro(esVoice())); });
   if(canSpeak) try{ speechSynthesis.addEventListener("voiceschanged", ()=>{ const el=$("#s-voice"); if(el && el.options.length<=1 && esVoices().length){ loadVoices(); const L=esVoices(); el.innerHTML=`<option value="system">Padrão do iPhone</option><option value="">Automática do app</option>`+L.map(v=>`<option value="${h(v.voiceURI)}" ${S.voice===v.voiceURI||S.voice===v.name?"selected":""}>${h(voiceLabel(v))}</option>`).join(""); } }, {once:true}); }catch(e){}
 }
 function applySettings(){
-  const trip=$("#s-trip").value, start=$("#s-start").value;
-  if(/^\d{4}-\d{2}-\d{2}$/.test(trip)) S.trip=trip;
+  const trip=$("#s-trip").value, start=$("#s-start").value; const g=$("#s-goal"), mo=$("#s-months");
   if(/^\d{4}-\d{2}-\d{2}$/.test(start)) S.start=start;
+  if(g && g.value==="time"){ setGoalTime(mo?+mo.value:(S.months||3), S.start); }
+  else { S.goal="trip"; if(/^\d{4}-\d{2}-\d{2}$/.test(trip)) S.trip=trip; }
   S.daily = +$("#s-daily").value || 8;
-  { const sw=$("#s-weeks"); if(sw) S.planWeeks = +sw.value || 0; }
+  { const sw=$("#s-weeks"); if(sw && !goalTime()) S.planWeeks = +sw.value || 0; }
   { const f=feasibility(); const fe=$("#s-feas"); if(fe) fe.textContent = f.left===0 ? "Todas as frases do plano já vistas." : f.ok ? `No ritmo: faltam ${f.left} frases e ${f.days} dias; ${S.daily}/dia dá conta.` : `Atenção: faltam ${f.left} frases em ${f.days} dias; precisaria de ${f.need}/dia.`; }
   S.rate = +$("#s-rate").value || 0.9;
   S.dest = ($("#s-dest").value || "ESPAÑA").slice(0,14);
@@ -5676,7 +5689,8 @@ document.addEventListener("click", e=>{
     case "pasajeros": openPasajeros(); break;
     case "progreso": openProgreso(); break;
     case "obdone": { const n=(($("#ob-name")||{}).value||"").trim().slice(0,20); if(n){ S.name=n; me().name=n; }
-      { const t=$("#ob-trip"), st=$("#ob-start"), mn=$("#ob-min"); if(t && /^\d{4}-\d{2}-\d{2}$/.test(t.value)) S.trip=t.value; if(st && /^\d{4}-\d{2}-\d{2}$/.test(st.value)) S.start=st.value; if(mn){ S.minutes=+mn.value; S.daily=dailyFor(S.minutes); } S.planWeeks=0; } PR.onboarded=true; saveProfiles(); save(); $("#sheet").hidden=true; renderAll(); toast(n?`¡Encantada, ${n}!`:"¡Vamos!"); break; }
+      { const t=$("#ob-trip"), st=$("#ob-start"), mn=$("#ob-min"), g=$("#ob-goal"), mo=$("#ob-months"); if(st && /^\d{4}-\d{2}-\d{2}$/.test(st.value)) S.start=st.value; if(mn){ S.minutes=+mn.value; S.daily=dailyFor(S.minutes); }
+        if(g && g.value==="time"){ setGoalTime(mo?+mo.value:3, S.start); } else { S.goal="trip"; if(t && /^\d{4}-\d{2}-\d{2}$/.test(t.value)) S.trip=t.value; S.planWeeks=0; } } PR.onboarded=true; saveProfiles(); save(); $("#sheet").hidden=true; renderAll(); toast(n?`¡Encantada, ${n}!`:"¡Vamos!"); break; }
     case "vdest": { if(e.target.closest('[data-act="vdelcustom"]')) break; toggleMiddle(el.dataset.id); saveProfiles(); renderViaje(); break; }
     case "vgo": { e.preventDefault(); if(el.disabled) break; vgo(el.dataset.s, el.dataset.city||null); break; }
     case "vaddcity": { const inp=$("#v-newcity"); const id=addCustomCity(inp&&inp.value); if(!id){ toast("Digite o nome da cidade."); break; } if(!V.dests.includes(id)) toggleMiddle(id); saveProfiles(); renderViaje(); toast(`${DEST[id].name} entrou na rota.`); setTimeout(()=>{ const i=$("#v-newcity"); if(i) i.scrollIntoView({block:"center"}); },50); break; }
@@ -5827,7 +5841,7 @@ document.addEventListener("click", e=>{
 });
 document.addEventListener("change", e=>{
   const el = e.target;
-  if(el.id==="ob-trip"||el.id==="ob-start"||el.id==="ob-min"){ const pp=$("#ob-plan"); if(pp) pp.innerHTML=obPlanText(); return; }
+  if(el.id==="ob-trip"||el.id==="ob-start"||el.id==="ob-min"||el.id==="ob-goal"||el.id==="ob-months"){ if(el.id==="ob-goal"){ const tw=$("#ob-trip-wrap"), mw=$("#ob-months-wrap"); if(tw) tw.hidden = el.value==="time"; if(mw) mw.hidden = el.value!=="time"; } const pp=$("#ob-plan"); if(pp) pp.innerHTML=obPlanText(); return; }
   if(el.dataset && el.dataset.act==="varr"){ setArrival(el.value); saveProfiles(); renderViaje(); return; }
   if(el.dataset && el.dataset.act==="vdep"){ setDeparture(el.value); saveProfiles(); renderViaje(); return; }
   if(el.dataset && el.dataset.act==="vtrip"){ if(/^\d{4}-\d{2}-\d{2}$/.test(el.value)){ S.trip=el.value; save(); renderAll(); renderViaje(); } return; }
@@ -5848,7 +5862,7 @@ setTimeout(()=>{ if(!PR.onboarded && $("#sheet").hidden) openOnboarding(); }, 40
   } else toast("Esse link de backup não é válido."); return; }
   const d=parseInvite(location.hash); if(d && receiveScore(d)){ try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} renderAll(); setTimeout(()=>{ toast(`Placar de ${d.name} recebido. Agora mande o seu!`); if(PR.onboarded) openPasajeros(); }, 600); } })();
 /* Atualização automática: quando sai versão nova, o app baixa e recarrega sozinho (fora de um treino). */
-const APP_VERSION = "2026.10.26-0110";
+const APP_VERSION = "2026.10.26-1447";
 let pendingReload = false;
 function maybeReload(){ if(!pendingReload) return; if(D || !$("#drill").hidden){ return; } pendingReload=false; toast("Atualizando o app…"); setTimeout(()=>location.reload(), 600); }
 if("serviceWorker" in navigator && !window.claude && location.protocol==="https:"){
