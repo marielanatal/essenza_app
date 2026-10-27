@@ -49,7 +49,7 @@ O app é a pasta `espanhol/` (um `index.html` + ícones + `sw.js` para funcionar
 1. Ative o GitHub Pages do repositório (Settings › Pages › Deploy from branch) **ou** suba a pasta em qualquer hospedagem estática (Netlify Drop, Cloudflare Pages).
 2. Abra o endereço `.../espanhol/` no celular.
 3. Android (Chrome): menu ⋮ › **Adicionar à tela inicial**. iPhone (Safari): botão compartilhar › **Adicionar à Tela de Início**.
-   No iPhone o ícone abre dentro do Safari de propósito (`manifest-ios.webmanifest`, `display: browser`): o WebKit não oferece reconhecimento de voz em apps da tela inicial ([bug 225298](https://bugs.webkit.org/show_bug.cgi?id=225298)), e assim o botão Falar funciona e o progresso é o mesmo do Safari. Um ícone antigo, do tipo app, mostra um aviso na tela Hoje com o passo a passo para reinstalar.
+   No iPhone, se o botão Falar não responder no app instalado, use Ajustes › Testar microfone: a mensagem diz o código do erro e onde liberar a permissão. O WebKit já não oferecia reconhecimento de voz em apps da tela inicial ([bug 225298](https://bugs.webkit.org/show_bug.cgi?id=225298)); em versões recentes do iOS funciona, com permissão pedida à parte para cada ícone.
 
 Depois disso ele abre como um app e funciona offline.
 

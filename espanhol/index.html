@@ -4,12 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#151b2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Rumbo a España">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest" id="mf">
-<script>/* No iPhone, o WebKit não oferece reconhecimento de voz dentro de apps da tela inicial (bug 225298). Por isso o ícone no iPhone abre no Safari: microfone, vozes e progresso iguais aos do Safari. */
-if(/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1)) document.getElementById("mf").href="manifest-ios.webmanifest";</script>
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
@@ -4500,9 +4499,7 @@ function speakTTS(t, slow, who, onstart, onend){ if(!canSpeak) return;
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const IS_IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
 const STANDALONE = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone===true;
-const IOS_STANDALONE = IS_IOS && STANDALONE;   /* app antigo da tela inicial do iPhone: sem microfone */
-let MIC = !!SR && !window.claude && window.isSecureContext && !IOS_STANDALONE;
-function iosMicCard(){ if(!IOS_STANDALONE) return ""; return `<div class="card tint-s" style="text-align:left"><p class="small"><b>Para usar o microfone no iPhone, reinstale o ícone.</b> O iPhone não permite reconhecimento de voz em apps abertos deste jeito; no Safari funciona. Faça assim: 1) toque em Fazer backup abaixo e guarde o link; 2) apague este ícone; 3) abra <b>marielanatal.github.io/cursodeidiomas</b> no Safari, restaure o backup em Ajustes e toque em Compartilhar › Adicionar à Tela de Início. O novo ícone abre no Safari, com o botão Falar.</p><div class="actions" style="margin-top:8px"><button class="btn soft wide" data-act="backup">Fazer backup agora</button></div></div>`; }
+let MIC = !!SR && !window.claude && window.isSecureContext;
 let REC=null;
 /* Ouve uma fala. Resolve com {alts:[...], partial:bool}. Nunca fica pendurado: tem tempo limite.
    onPartial recebe o texto parcial enquanto a pessoa fala. */
@@ -4530,6 +4527,7 @@ function hear(onPartial, maxMs){
         if(!best && !r.userStop && timeLeft()){ start(); return; }
         finish({alts: alts.length?alts:(best?[best]:[]), partial:true}); };
       r.onaudiostart=()=>{ if(onPartial) onPartial(""); };
+      stopAudio(); try{ if(AUDIO.el && AUDIO.el.src){ AUDIO.el.removeAttribute("src"); AUDIO.el.load(); } }catch(e){}
       try{ speechSynthesis.cancel(); r.start(); }catch(e){ fail("start"); }
     };
     const tAll=setTimeout(()=>{ try{ if(r) r.stop(); }catch(e){} setTimeout(()=>finish({alts: best?[best]:[], partial:true, timeout:true}), 800); }, limit);
@@ -4537,7 +4535,7 @@ function hear(onPartial, maxMs){
   });
 }
 function micHint(code){
-  if(code==="not-allowed" || code==="service-not-allowed") return "O celular bloqueou o microfone para este app. iPhone: Ajustes › Apps › Safari › Microfone › Permitir (ou Perguntar) e, se o site estiver na lista, toque em marielanatal.github.io › Microfone › Permitir. Android: toque no cadeado da barra de endereço › Permissões › Microfone.";
+  if(code==="not-allowed" || code==="service-not-allowed") return "O celular bloqueou o microfone para este app. iPhone: se o app foi adicionado à Tela de Início, procure-o em Ajustes › Apps (ou role a lista de Ajustes até o nome Rumbo) › Microfone; no Safari, Ajustes › Apps › Safari › Microfone › Permitir. Android: toque no cadeado da barra de endereço › Permissões › Microfone.";
   if(code==="network") return "O reconhecimento de voz precisa de internet neste aparelho. Conecte e tente de novo.";
   if(code==="language-not-supported") return "Este aparelho não tem reconhecimento de espanhol. No Android, instale 'Espanhol (Espanha)' em Configurações › Idioma › Digitação por voz.";
   if(code==="audio-capture") return "Nenhum microfone encontrado. Feche outros apps que estejam usando o microfone.";
@@ -4552,7 +4550,7 @@ async function micTest(){
     const r = await hear(t=>{ if(t) out.textContent="Ouvindo: "+t; }, 7000);
     if(r.alts.length){ out.textContent="Funcionou! Entendi: “"+r.alts[0]+"”"; out.className="verdict ok"; MIC=true; }
     else { out.textContent="Não ouvi nada em 7 segundos. Verifique a permissão do microfone e fale mais perto."; out.className="verdict bad"; }
-  }catch(code){ out.textContent="Erro: "+code+". "+micHint(code); out.className="verdict bad"; }
+  }catch(code){ out.textContent="Erro: "+code+" ("+(IS_IOS?(STANDALONE?"app da tela inicial do iPhone":"Safari do iPhone"):"navegador")+", áudio gravado "+(AUDIO.on?"ligado":"desligado")+"). "+micHint(code); out.className="verdict bad"; }
 }
 function lev(a,b){ const m=a.length,n=b.length; if(!m) return n; if(!n) return m; let prev=Array.from({length:n+1},(_,j)=>j), cur=[]; for(let i=1;i<=m;i++){ cur=[i]; for(let j=1;j<=n;j++){ cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1)); } prev=cur; } return prev[n]; }
 function wordsOf(x){ return norm(cleanSpeech(x)).replace(/[¿?¡!.,;:…«»"]/g," ").split(/\s+/).filter(Boolean); }
@@ -4642,7 +4640,6 @@ function renderHoje(){
   }).join("");
   $("#v-hoje").innerHTML = `
     <div class="lola"><div class="av">${LOLA}</div><button class="bubble" data-act="say" data-say="${h(lola.es)}"><div class="name">Lola · toque numa palavra</div><div class="es">${W(lola.es)}</div><div class="pt">${h(lola.pt)}</div></button></div>
-    ${iosMicCard()}
     <div class="todayhead"><h2>Hoje</h2><div class="wk">Tema ${w.n} de ${TOTAL_WEEKS} · <a href="#" data-act="goweek" data-week="${w.n}">${h(w.title)}</a></div></div>
     ${PHOTOS_ON ? photoEl(WP_WEEK[w.n], "banner", w.title) : ""}
     ${allDone && (backupAge()===null ? learnedCount()>=10 : backupAge()>=7) ? `<button class="card tint-s" style="text-align:left;width:100%" data-act="backup"><p class="small"><b>Faça um backup (leva 10 segundos).</b> ${IS_IOS?"No iPhone, apagar o app apaga o progresso. ":""}Toque aqui para gerar o link e guarde nas Notas ou no WhatsApp.</p></button>`:""}
@@ -5425,7 +5422,7 @@ function pickConv(){
     `<div class="stage" style="justify-content:flex-start"><div class="opts">${allDialogs(cw).map(d=>`<button class="opt" data-act="conv" data-week="${d.week}" data-which="${d.which}"><b>${String(d.week).padStart(2,"0")}${d.which}</b> · ${h(d.title)}${d.which==="B"?' <span class="pill soon" style="font-size:10px">2ª conversa</span>':""}<br><span class="muted small">${h(d.lines[0][1])}</span></button>`).join("")}</div></div>`;
 }
 function startPron(){
-  if(!MIC){ toast(window.claude ? "O microfone não funciona dentro do Claude. Use o app instalado." : IOS_STANDALONE ? "Neste ícone o iPhone não libera o microfone. Veja o aviso na tela Hoje. Vou abrir o Eco." : "Este navegador não permite microfone. Vou abrir o Eco."); startEco(); return; }
+  if(!MIC){ toast(window.claude ? "O microfone não funciona dentro do Claude. Use o app instalado." : "Este navegador não permite microfone. Vou abrir o Eco."); startEco(); return; }
   const w=curWeek(); let pool=seenCards(); if(pool.length<8) pool=unlockedCards();
   const soundWords = shuffle(SOUNDS.flatMap(x=>x.ex.filter(e=>!/\s/.test(e)))).slice(0,3);
   const cardWords = shuffle([...new Set(pool.flatMap(c=>wordsOf(c.es)).filter(x=>x.length>=4))]).slice(0,4).map(x=>{ const c=pool.find(c=>wordsOf(c.es).includes(x)); const orig=c ? c.es.replace(/[¿?¡!.,;:…]/g," ").split(/\s+/).find(o=>norm(o)===x) : x; return orig||x; });
@@ -5638,7 +5635,7 @@ function openSettings(){
     <div class="field"><label for="s-rate">Velocidade da voz: <span id="s-rate-v">${S.rate.toFixed(2)}</span>×</label><input type="range" id="s-rate" min="0.6" max="1.1" step="0.05" value="${S.rate}">${canSpeak?`<span class="hint">Sem som? Escolha "Automática" acima, confira o botão lateral de silêncio e o volume, feche o app por completo e abra de novo. Depois de baixar uma voz nova, o iPhone às vezes só a usa após reiniciar o aparelho.</span>`:`<span class="hint">Este navegador não oferece voz.</span>`}<span class="hint">${canSpeak ? (esVoice() ? "Voz em uso: "+h(esVoice().name) : "Nenhuma voz de espanhol instalada; o aparelho usará a voz padrão. No Android, instale 'Espanhol (Espanha)' em Configurações › Idioma › Conversão de texto em voz.") : ""}</span></div>
     <div class="field"><label>Microfone (botão Falar)</label>
       ${window.claude ? `<span class="hint">Dentro do Claude o microfone não está disponível. Use o app instalado pelo endereço do GitHub.</span>` :
-        (IOS_STANDALONE ? iosMicCard() : `<button class="btn soft" data-act="mictest">${ICON.mic} Testar microfone</button><div id="mic-test-out" class="hint">${SR ? "Toque para testar. Vou pedir permissão ao celular na primeira vez." : "Este navegador não tem reconhecimento de voz. Use Chrome (Android) ou Safari (iPhone)."}</div>`)}</div>
+        `<button class="btn soft" data-act="mictest">${ICON.mic} Testar microfone</button><div id="mic-test-out" class="hint">${SR ? "Toque para testar. Vou pedir permissão ao celular na primeira vez." : "Este navegador não tem reconhecimento de voz. Use Chrome (Android) ou Safari (iPhone)."}</div>`}</div>
     ${window.claude ? "" : `<div class="field"><label>Fotos dos lugares</label>
       <label class="row" style="gap:10px"><input type="checkbox" id="s-photos" style="width:22px;height:22px;accent-color:var(--cobalt)" ${PHOTOS_ON?"checked":""}> Mostrar fotos (vêm da Wikipédia, precisam de internet na 1ª vez)</label>
       <button class="btn soft" data-act="phototest">Testar fotos</button><div id="photo-test-out" class="hint">Se as fotos não aparecerem, toque aqui e me mande um print do resultado.</div></div>`}
