@@ -6201,7 +6201,11 @@ function renderViaje(){
   loadPhotos();
 }
 let tab = "hoje";
-function renderAll(){ renderBoard(); renderHoje(); renderPlano(); renderTreino(); if(tab==="frases") renderPhraseList(); checkBadges(); loadPhotos(); }
+/* O app fica aberto em segundo plano por dias no iPhone: ao voltar num dia novo, a tela Hoy é refeita (frase do dia, passos, conversa do dia). */
+let RENDER_DAY = "";
+function refreshIfNewDay(){ if(document.visibilityState!=="visible") return; if(RENDER_DAY && RENDER_DAY!==todayKey() && !D && $("#sheet").hidden){ renderAll(); toast("Novo dia: rotina atualizada."); } }
+document.addEventListener("visibilitychange", refreshIfNewDay); window.addEventListener("pageshow", refreshIfNewDay); window.addEventListener("focus", refreshIfNewDay);
+function renderAll(){ RENDER_DAY=todayKey(); renderBoard(); renderHoje(); renderPlano(); renderTreino(); if(tab==="frases") renderPhraseList(); checkBadges(); loadPhotos(); }
 function showTab(t){
   hideDict(); tab = t;
   ["hoje","plano","treino","frases","viaje"].forEach(k=>{ $("#v-"+k).hidden = k!==t; });
