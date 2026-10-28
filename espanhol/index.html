@@ -5721,10 +5721,17 @@ let MIC = !!SR && !window.claude && window.isSecureContext;
 let REC=null;
 /* Ouve uma fala. Resolve com {alts:[...], partial:bool}. Nunca fica pendurado: tem tempo limite.
    onPartial recebe o texto parcial enquanto a pessoa fala. */
+/* Antes de ouvir: pausa e solta o áudio gravado, fecha o contexto dos sons e, no iPhone, dispara uma fala muda pelo sintetizador (deixa a sessão de áudio no modo em que o reconhecimento funciona). */
+let MIC_TRIES=0;
+function micPrep(){
+  stopAudio(); try{ if(AUDIO.el){ AUDIO.el.pause(); if(AUDIO.el.src){ AUDIO.el.removeAttribute("src"); AUDIO.el.load(); } } }catch(e){}
+  try{ if(AC){ AC.close(); AC=null; } }catch(e){}
+  if(IS_IOS && canSpeak){ try{ const u=new SpeechSynthesisUtterance("a"); u.volume=0; u.rate=10; u.lang="es-ES"; speechSynthesis.speak(u); }catch(e){} }
+}
 function hear(onPartial, maxMs){
   return new Promise((res,rej)=>{
     let done=false, best="", alts=[], r=null, tSilence=null, restarting=false; const t0=Date.now(); const limit=maxMs||20000;
-    const finish = v => { if(done) return; done=true; clearTimeout(tAll); clearTimeout(tSilence); try{ if(r) r.abort(); }catch(e){} REC=null; MIC_END=Date.now(); res(v); };
+    const finish = v => { if(done) return; done=true; clearTimeout(tAll); clearTimeout(tSilence); try{ if(r) r.stop(); }catch(e){} REC=null; MIC_END=Date.now(); res(v); };
     const fail = c => { if(done) return; done=true; clearTimeout(tAll); clearTimeout(tSilence); REC=null; MIC_END=Date.now(); rej(c); };
     const armSilence = () => { clearTimeout(tSilence); tSilence=setTimeout(()=>{ try{ r.stop(); }catch(e){} setTimeout(()=>finish({alts: alts.length?alts:(best?[best]:[]), partial:true}), 600); }, 2500); };
     const timeLeft = () => Date.now()-t0 < limit-2500;
@@ -5740,13 +5747,15 @@ function hear(onPartial, maxMs){
       };
       r.onerror=e=>{ if(done) return;
         if(e.error==="no-speech" && !best && !r.userStop && timeLeft()){ restarting=true; setTimeout(()=>{ if(!done) start(); }, 120); return; }
+        if((e.error==="audio-capture" || e.error==="aborted" || e.error==="network") && !r.retried && Date.now()-t0<1500 && !best){ r.retried=true; restarting=true; try{ r.abort(); }catch(x){} setTimeout(()=>{ if(!done){ const rr=start(); if(rr) rr.retried=true; } }, 400); return; }
         if(e.error==="no-speech" || e.error==="aborted"){ finish({alts: best?[best]:[], partial:true}); } else fail(e.error||"error"); };
       r.onend=()=>{ if(done) return; if(restarting){ restarting=false; return; }
         if(!best && !r.userStop && timeLeft()){ start(); return; }
         finish({alts: alts.length?alts:(best?[best]:[]), partial:true}); };
       r.onaudiostart=()=>{ if(onPartial) onPartial(""); };
-      stopAudio(); try{ if(AUDIO.el && AUDIO.el.src){ AUDIO.el.removeAttribute("src"); AUDIO.el.load(); } }catch(e){}
+      micPrep();
       try{ speechSynthesis.cancel(); r.start(); }catch(e){ fail("start"); }
+      MIC_TRIES++; return r;
     };
     const tAll=setTimeout(()=>{ try{ if(r) r.stop(); }catch(e){} setTimeout(()=>finish({alts: best?[best]:[], partial:true, timeout:true}), 800); }, limit);
     start();
@@ -7002,7 +7011,7 @@ document.addEventListener("click", e=>{
         const alts=r.alts;
         if(!alts.length){
           it.micFail=(it.micFail||0)+1;
-          toast(IS_IOS && STANDALONE && it.micFail>=2 ? "No iPhone instalado o microfone costuma falhar. Abra o mesmo endereço no Safari." : "Não ouvi nada em 20 segundos. Toque numa lacuna para ver uma palavra, ou em Falar de novo quando estiver pronta.");
+          toast(IS_IOS && it.micFail>=2 ? "O microfone abriu mas não captou nada. Teste em Ajustes › Testar microfone e, se usar vozes gravadas, experimente desligá-las ali para comparar." : "Não ouvi nada em 20 segundos. Toque numa lacuna para ver uma palavra, ou em Falar de novo quando estiver pronta.");
           drawDrill(); return;
         }
         if(it.t==="pron"){
@@ -7018,7 +7027,7 @@ document.addEventListener("click", e=>{
       }).catch(code=>{
         it.listening=false;
         if(code==="not-allowed"||code==="service-not-allowed"||code==="start"||code==="language-not-supported") MIC=false;
-        toast(micHint(code));
+        toast(micHint(code)+" (código: "+code+(IS_IOS?", áudio gravado "+(AUDIO.on?"ligado":"desligado"):"")+")");
         if(D) drawDrill();
       });
       break; }
