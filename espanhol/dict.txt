@@ -18,7 +18,7 @@ saber=saber|sé,sabes,sabe,sabemos,sabéis,saben,sabía,supe,supo,sabido,sepa,se
 conocer=conhecer|conozco,conoces,conoce,conocemos,conocéis,conocen,conocí,conoció,conocido,conozca
 venir=vir|vengo,vienes,viene,venimos,venís,vienen,venía,vine,vinimos,venido,venga,vengan
 salir=sair|salgo,sales,sale,salimos,salís,salen,salí,salió,salido,sal,salga
-poner=pôr, colocar; servir (no bar)|pongo,pones,pone,ponemos,ponéis,ponen,puse,puso,puesto,pon,ponga,ponme,pusieron,pusimos,pusiste,ponía,ponían
+poner=pôr, colocar; servir (no bar)|pongo,pones,pone,ponemos,ponéis,ponen,puse,puso,puesto,pon,ponga,ponme,pusieron,pusimos,pusiste,ponía,ponían,pongamos,pongan,pongas
 seguir=seguir, continuar|sigo,sigues,sigue,seguimos,seguís,siguen,seguí,siguió,seguido,siga,sigan
 pedir=pedir|pido,pides,pide,pedimos,pedís,piden,pedí,pidió,pedido,pida
 servir=servir|sirvo,sirves,sirve,servimos,sirven,sirvió,servido,sirva
@@ -1676,3 +1676,771 @@ sierpes=Sierpes: rua de compras de Sevilha
 part=Part (catalão): parte; Part Alta é a cidade velha de Tarragona
 deber=dever, ter que|debo,debes,debe,debemos,deben,debía,debían,debería,deberías,deberían,debido
 gran=grande (antes do substantivo: una gran ciudad)
+
+## Níveis intermediário e avançado: verbos
+resultar=resultar; resulta que = acontece que
+merecer=merecer, valer (merece la pena = vale a pena)|merezco
+soler=costumar|suelo,sueles,suele,solemos,soléis,suelen,solía,solías,solíamos,solían
+agradecer=agradecer|agradezco
+conseguir=conseguir|consigo,consigues,consigue,conseguimos,consiguen,consiguió,consiguieron,consiguieras,conseguido
+convenir=convir|conviene,convienen,convenía,convendría
+proponer=propor|propongo,propone,proponen,propuso,proponga,propuesto
+existir=existir
+guste=forma de gustar (que te guste = que você goste)
+agotarse=esgotar-se|se agotan,se agotó,agotado,agotada,agotados
+decir=dizer|digo,dices,dice,decimos,decís,dicen,dije,dijiste,dijo,dijimos,dijisteis,dijeron,dicho,diré,dirás,dirá,diremos,dirán,diría,diga,digas,digan,dijera,dijeras,dime,dile,dígame
+llorar=chorar|lloró,lloraba,llora
+quemar=queimar|queman,quemó,quemado
+convivir=conviver|conviven,convivía
+admitir=admitir, aceitar|admite,admiten,admita
+describir=descrever|describe,describió,descrito
+desear=desejar|deseaba,desea
+acostumbrarse=acostumar-se|me acostumbro,te acostumbras,se acostumbra,nos acostumbramos,se acostumbran,te acostumbrarás,acostumbrado,acostumbrada,acostumbrados
+cometer=cometer|cometo,comete,cometiendo
+cortarse=cortar-se; travar, ficar sem jeito|me corto,te cortes,se corta
+mudarse=mudar-se|me mudo,nos mudamos,mudarnos,me mudé
+empadronarse=fazer o cadastro de morador na prefeitura|empadronarme,empadronarse,empadronado
+animarse=animar-se|anímate,me animo,animaos
+echarse=deitar-se, jogar-se (echarse una siesta = tirar uma soneca)|échate,me echo
+reconocer=reconhecer|reconozco,reconoce,reconoció,reconocido
+superar=superar|supera,superó,superado
+levantar=levantar, erguer|levanta,levantan,levantó,levantado
+salvar=salvar|salva,salvó,salvado
+constar=constar|consta,constaba
+arreglar=consertar, resolver|arreglo,arregla,arreglan,arreglado,arreglarlo
+lamentarse=lamentar-se|me lamento,te lamentes,se lamenta
+perdonar=perdoar|perdono,perdona,perdone,perdonado
+dudar=duvidar|dudo,dudas,duda,dudaba,dudamos,dudarlo
+renegociar=renegociar
+entregar=entregar|entrego,entrega,entregan,entregó,entregado
+destacar=destacar|destaca,destacan
+reducir=reduzir|reduce,reducen,redujo,reducido
+plantear=colocar, propor (uma questão)|planteo,plantea,plantearle
+cumplir=cumprir; fazer anos|cumplo,cumple,cumplen,cumplió,cumplido
+vacilar=zoar, brincar com alguém; hesitar|vacilo,vacilas,vacilando
+soltarse=soltar-se, ficar à vontade|me suelto,te sueltas,se suelta,suelto,suelta
+rogar=rogar, pedir com insistência|ruego,ruega,rogaría,ruegue
+solucionar=resolver|soluciono,soluciona,solucione,solucionaran,solucionado
+retirarse=afastar-se, desligar (no se retire = não desligue)|se retire,me retiro
+garantizar=garantir|garantizo,garantiza,garantizado
+arrepentirse=arrepender-se|me arrepiento,se arrepiente,se arrepentirá,arrepentido
+dispararse=disparar (preço), subir muito|se dispara,se ha disparado,disparado
+dividir=dividir|divide,dividen,dividido,dividida
+opinar=opinar|opino,opinas,opina
+clavar=pregar, fixar (dejar clavado = deixar sem reação)|clava,clavado,clavada
+pintar=pintar|pinto,pinta,pintan,pintó,pintaba,pintando,pintado
+destrozar=destruir, arrasar|destroza,destrozó,destrozado
+doblar=dublar; dobrar|dobla,doblamos,doblan,doblado,doblada
+enganchar=viciar, prender (engancha = vicia)|engancho,enganché,enganchado
+sufrir=sofrer|sufro,sufre,sufren,sufrió,sufrido
+madrugar=acordar cedo|madrugo,madruga,madrugamos,madrugan,madrugó,madrugué
+amanecer=amanhecer|amanece,amaneció,amanecido
+meter=meter, colocar|meto,mete,meten,metí,metió,metimos,metido
+imitar=imitar|imita,imitan,imitado
+callarse=calar-se|me callo,te callas,se calla,cállate
+pillar=pegar; entender (coloquial)|pillo,pillas,pilla,pillé,pillado
+petar=arrasar, bombar (coloquial)|peta,petó,petado
+apuntarse=inscrever-se, entrar (me apunto = tô dentro)|me apunto,se apunta,apuntado,apuntada
+jurar=jurar|juro,jura,juran,juró,juraban
+decidir=decidir|decido,decide,decidimos,decidí,decidió,decidido
+amar=amar|amo,ama,aman,amó
+acercarse=aproximar-se|me acerco,se acerca,se acercó,acercado
+ofrecer=oferecer|ofrezco,ofrece,ofrecen,ofreció,ofrecido
+fiarse=confiar (no me fío = não confio)|me fío,te fías,se fía
+alargar=alongar, esticar|alargo,alarga,alargaba,alargado
+escaparse=escapar|se escapa,se me escapa,se escapó
+emocionarse=emocionar-se|me emociono,se emociona,emocionado
+notar=notar, perceber|noto,notas,nota,notan,notó,notado
+delatar=delatar, denunciar|delata,delató
+discutir=discutir|discuto,discute,discuten,discutió,discutían,discutido
+interesar=interessar|interesa,interesan,interese,interesó
+medir=medir|mido,mide,miden,midió,medirá,medido
+añadir=acrescentar|añado,añade,añadió,añadido
+tapear=comer tapas|tapeo,tapea,tapeamos
+convencer=convencer|convenzo,convence,convenció,convencido,convencida
+provenir=provir|proviene,provienen
+criticar=criticar|critico,critica,critican,criticado
+atribuir=atribuir|atribuye,atribuido,atribuida
+superponer=sobrepor|superpone,superpuso,superpuesto
+colgar=pendurar|cuelgo,cuelga,cuelgan,colgó,colgado,colgada,colgadas
+asomar=aparecer, despontar|asoma,asomó
+pulir=polir|pule,pulido
+trinchar=trinchar, cortar a carne|trincha
+romper=quebrar|rompo,rompe,rompen,rompió,roto,rota,rompa
+demostrar=demonstrar|demuestro,demuestra,demostró,demostrado
+confesar=confessar|confieso,confiesa,confesó,confesado
+inspirar=inspirar|inspira,inspiró,inspirado
+presumir=gabar-se, exibir|presume,presumen
+luchar=lutar|lucho,lucha,luchan,luchó
+recorrer=percorrer|recorro,recorre,recorren,recorrió,recorrería,recorrido
+considerar=considerar|considero,considera,consideran,consideró,considere,considerarlo
+consultar=consultar|consulto,consulta,consultan
+compensar=compensar|compensa,compensan
+conmover=comover|conmueve,conmovió,conmovieron,conmovido
+asustar=assustar|asusta,asustó,asustaron,asustado
+abrochar=afivelar, prender (o cinto)|abrocha,abrochó
+negar=negar|niego,niega,negó,negarlo,negado
+corresponder=corresponder|corresponde,corresponden
+acostarse=deitar-se|me acuesto,te acuestas,se acuesta,nos acostamos,se acuestan,me acosté
+resolver=resolver|resuelvo,resuelve,resuelto,resuelta
+comprobar=conferir, verificar|compruebo,comprueba,comprobó,comprobado,comprobarlo
+descubrir=descobrir|descubro,descubre,descubrió,descubierto
+saludar=cumprimentar|saludo,saluda,saludan,saludó,saludado
+encogerse=encolher-se (encogerse de hombros = dar de ombros)|se encoge,se encogió
+imaginar=imaginar|imagino,imagina,imaginó
+sonreír=sorrir|sonrío,sonríe,sonrió,sonriendo
+pronunciar=pronunciar|pronuncio,pronuncia,pronunciado
+conversar=conversar|converso,conversa,conversan
+abusar=abusar|abuso,abusa
+marcharse=ir embora|me marcho,se marcha,nos marchamos,marcharse
+encender=acender|enciendo,enciende,encienden,encendió,enciendan,encendido
+despedirse=despedir-se|me despido,se despide,despedirse,despedido
+evitar=evitar|evito,evita,evitan,evitó
+reutilizar=reutilizar|reutiliza,reutilizado,reutilizadas
+resumir=resumir|resumo,resume,resumen,resumido
+sostenerse=sustentar-se|se sostiene,se sostienen
+tirar=jogar, atirar; puxar|tiro,tira,tiran,tiró,tirado
+dejarse=deixar-se|dejárselo,dejármelo
+tutear=tratar por tu|tuteo,tutea,tutean
+merendar=lanchar (à tarde)|meriendo,merienda,merendamos,meriendan
+almorzar=almoçar|almuerzo,almuerza,almorzamos,almuerzan,almorcé
+charlar=bater papo|charlo,charla,charlamos,charlan,charlé
+acompañar=acompanhar|acompaño,acompaña,acompañan,acompañó,acompañarme,acompañado
+apoyar=apoiar|apoyo,apoya,apoyan,apoyó,apoyado
+reiniciar=reiniciar|reinicia,reiniciarlo
+preparar=preparar|preparo,prepara,preparan,preparó,prepare,preparado
+caerse=cair|me caigo,te caes,se cae,se caen,me caí,se cayó,caído
+comparar=comparar|comparo,compara,comparamos,comparan,comparado
+aconsejar=aconselhar|aconsejo,aconseja,aconsejas,aconsejan,aconsejó
+incluir=incluir|incluyo,incluye,incluyen,incluido,incluida
+activar=ativar|activa,activado,activada
+recargar=recarregar|recargo,recarga,recargan,recargado
+encargarse=encarregar-se|me encargo,te encargas,se encarga,encargado
+regatear=regatear, negociar o preço|regateo,regatea,regateara,regateado
+ocupar=ocupar|ocupa,ocupan,ocupó,ocupado
+atropellar=atropelar|atropella,atropelló,atropellado
+ensayar=ensaiar|ensaya,ensayó,ensayado
+detenerse=parar, deter-se|se detiene,se detuvo
+defender=defender|defiendo,defiende,defienden,defendió,defendido
+representar=representar|representa,representan,representó
+temblar=tremer|tiembla,tiemblan,tembló
+premiar=premiar|premia,premiado
+convertir=converter|convierte,convirtió,convertido
+pertenecer=pertencer|pertenezco,pertenece,pertenecen,perteneció
+fundar=fundar|funda,fundó,fundado
+planear=planejar|planeo,planea,planeado
+torcer=torcer|tuerce,torcido
+grite=forma de gritar (que grite = que grite)
+descansar=descansar|descanso,descansa,descansan,descansé,descanses,descansado
+solicitar=solicitar|solicito,solicita,solicitado
+abonar=pagar (o valor)|abono,abona,abonado
+subsanar=corrigir, sanar (um erro)|subsana,subsanado
+tramitar=processar, dar andamento|tramito,tramita,tramitando,tramitado
+sobrevalorar=superestimar|sobrevalorado,sobrevalorada
+flipar=ficar impressionado, chocado (coloquial)|flipo,flipas,flipa,flipé,flipado,flipante
+liarse=enrolar-se, confundir-se; ficar com alguém|me lío,te lías,se lía,me he liado,liado
+rayarse=ficar pensando demais, se estressar|me rayo,te rayes,se raya,rayado
+pegar=grudar, colar; bater|pego,pega,pegan,pegó,pegado
+encajar=encaixar; servir (me encaja = me serve)|encaja,encajan,encajó
+prever=prever|prevé,previsto,prevista
+inquilino=inquilino|inquilina,inquilinos
+preocuparse=preocupar-se|me preocupo,te preocupes,se preocupe,preocupado
+reformar=reformar|reforma,reformado,reformada
+agradecerse=ser apreciado (se agradece = é bem-vindo)|se agradece
+aparecer=aparecer|aparezco,aparece,aparecen,apareció,aparecido
+situar=situar|sitúa,situado,situada
+ensayo=ensaio
+echar=jogar, botar (echar un cable = dar uma mão)|echo,echas,echa,echan,echó,echado
+quedarse=ficar|me quedo,te quedas,se queda,nos quedamos,quedaros,me quedé,quedaría
+conocerse=conhecer-se|nos conocemos,os conozcáis,se conocen,se conocían
+acuesta=forma de acostarse (se acuesta = deita-se)
+notarse=notar-se, perceber-se|se nota,se te nota
+destruir=destruir|destruyo,destruye,destruyó,destruido,destruiría
+seguir=seguir, continuar|sigo,sigues,sigue,seguimos,siguen,siguió,siguieron,siguiendo,seguido
+hacerse=fazer-se (hacerse cargo = encarregar-se)|me hago,se hace,hacerse,hagamos
+ir=ir|voy,vas,va,vamos,vais,van,fui,fuiste,fue,fuimos,fuisteis,fueron,iba,ibas,íbamos,iban,iré,irás,irá,iremos,irán,iría,irías,iríamos,irían,vaya,vayas,vayamos,vayáis,vayan,fuera,fueras,fuéramos,fueran,ido,yendo,vete,idos
+haber=haver, ter (auxiliar)|he,has,ha,hemos,habéis,han,había,habías,habíamos,habíais,habían,hubo,habrá,habría,haya,hayas,hayamos,hayáis,hayan,hubiera,hubieras,hubiéramos,hubieran,hubiese,habido
+tener=ter|tengo,tienes,tiene,tenemos,tenéis,tienen,tuve,tuviste,tuvo,tuvimos,tuvieron,tenía,tenías,teníamos,tenían,tendré,tendrás,tendrá,tendremos,tendrán,tendría,tendrías,tendríamos,tendrían,tenga,tengas,tengamos,tengáis,tengan,tuviera,tuvieras,tuviéramos,tuvieran,tenido,ten
+hacer=fazer|hago,haces,hace,hacemos,hacéis,hacen,hice,hiciste,hizo,hicimos,hicisteis,hicieron,hacía,hacíamos,hacían,haré,harás,hará,haremos,harán,haría,harías,haríamos,harían,haga,hagas,hagamos,hagan,hiciera,hicieras,hicieran,hecho,haz
+poder=poder|puedo,puedes,puede,podemos,podéis,pueden,pude,pudiste,pudo,pudimos,pudieron,podía,podías,podíamos,podían,podré,podrás,podrá,podremos,podrán,podría,podrías,podríamos,podrían,pueda,puedas,podamos,puedan,pudiera,pudieras,pudiéramos,pudieran,podido
+llegar=chegar|llego,llegas,llega,llegamos,llegáis,llegan,llegué,llegaste,llegó,llegasteis,llegaron,llegaba,llegaban,llegaré,llegará,llegaremos,llegue,llegues,lleguemos,lleguéis,lleguen,llegara,llegado,llegad
+casarse=casar-se|me caso,se casa,nos casamos,os casasteis,se casaron,casado,casada
+jugar=brincar; jogar|juego,juegas,juega,jugamos,jugáis,juegan,jugué,jugó,jugaba,jugabais,jugaban,jugado
+cruzar=atravessar|cruzo,cruzas,cruza,cruzamos,cruzan,crucé,cruzó,cruzad,crucéis,cruzado
+tomar=tomar, pegar|tomo,tomas,toma,tomamos,toman,tomé,tomó,tomad,tome,tomado
+comprar=comprar|compro,compras,compra,compramos,compran,compré,compró,compraron,comprad,compre,compres,compréis,compren,comprara,comprado
+olvidar=esquecer|olvido,olvidas,olvida,olvidamos,olvidan,olvidé,olvidó,olvidéis,olvidado
+pagar=pagar|pago,pagas,paga,pagamos,pagan,pagué,pagó,pagasteis,pagaron,paguemos,pagado
+pasarlo=passar (lo paséis bien = divirtam-se)|paséis,pasadlo
+reír=rir|río,ríe,reímos,ríen,rió,rían,riéndose,reído
+saber=saber|sé,sabes,sabe,sabemos,sabéis,saben,supe,supiste,supo,supimos,supieron,sabía,sabías,sabíamos,sabían,sabré,sabrá,sabría,sepa,sepas,sepan,supiera,sabido
+ver=ver|veo,ves,ve,vemos,veis,ven,vi,viste,vio,vimos,visteis,vieron,veía,veías,veíamos,veían,veré,verás,verá,veremos,verán,vería,vea,veas,vean,viera,visto,viendo,verlas
+querer=querer|quiero,quieres,quiere,queremos,queréis,quieren,quise,quisiste,quiso,quisimos,quisieron,quería,querías,queríamos,querían,querré,querrá,querría,querrías,quiera,quieras,quieran,quisiera,querido
+oír=ouvir|oigo,oyes,oye,oímos,oyen,oí,oyó,oyeron,oía,oiré,oirás,oirá,oiga,oído,oyendo
+dar=dar|doy,das,da,damos,dais,dan,di,diste,dio,dimos,dieron,daba,daban,daré,dará,daría,dé,des,den,diera,dieran,dado,dale,dame
+venir=vir|vengo,vienes,viene,venimos,venís,vienen,vine,viniste,vino,vinimos,vinieron,venía,venías,venían,vendré,vendrá,vendría,venga,vengas,vengamos,vengan,viniera,vinieras,venido,viniendo
+estar=estar|estoy,estás,está,estamos,estáis,están,estuve,estuviste,estuvo,estuvimos,estuvieron,estaba,estabas,estábamos,estaban,estaré,estarás,estará,estaremos,estarán,estaría,estarías,estaríamos,estarían,esté,estés,estemos,estén,estuviera,estuvieras,estado
+ser=ser|soy,eres,es,somos,sois,son,fui,fuiste,fue,fuimos,fueron,era,eras,éramos,erais,eran,seré,será,seremos,serán,sería,serías,seríamos,serían,sea,seas,seamos,seáis,sean,fuera,fueras,fuéramos,fueran,fuese,sido,siendo
+poner=pôr, colocar|pongo,pones,pone,ponemos,ponéis,ponen,puse,pusiste,puso,pusimos,pusieron,ponía,ponían,pondré,pondrá,pondría,ponga,pongas,pongan,pusiera,pusieran,puesto,pon
+volver=voltar|vuelvo,vuelves,vuelve,volvemos,volvéis,vuelven,volví,volviste,volvió,volvimos,volvisteis,volvieron,volvía,volvían,volveré,volverá,volvería,vuelva,vuelvas,vuelvan,volviera,vuelto
+morir=morrer|muero,mueres,muere,morimos,mueren,murió,murieron,moría,muerto,muerta,muertos
+caber=caber|quepo,cabe,caben,cupo,cabía,cabría,quepa
+prestar=emprestar; prestar (atenção)|presto,presta,prestan,prestó
+conducir=dirigir (carro)|conduzco,conduces,conduce,conducimos,conducen,condujo,conducido
+aparcar=estacionar|aparco,aparcas,aparca,aparcan,aparcó,aparcado
+devolver=devolver|devuelvo,devuelve,devuelven,devolví,devolvió,devuelvan,devolvieran,devuelto
+confirmar=confirmar|confirmo,confirma,confirman,confirmó,confirme,confirmara,confirmaran,confirmado,confirmada
+enviar=enviar|envío,envías,envía,enviamos,envían,envié,envió,envíe,enviara,enviaran,enviado
+avisar=avisar|aviso,avisa,avisan,avisé,avisó,avise,avisaran,avísame,avisado
+indicar=indicar|indico,indica,indican,indicó,indicara,indicado
+fumar=fumar|fumo,fuma,fuman,fumó,fumaran,fumado
+sentarse=sentar-se|me siento,te sientas,se sienta,nos sentamos,se sientan,me senté,siéntate,siéntese,sentarme,sentado
+dirigirse=dirigir-se|me dirijo,se dirige,dirigirse
+adjuntar=anexar|adjunto,adjunta,adjuntado
+negarse=recusar-se|me niego,se niega,se negó
+
+## Níveis intermediário e avançado: substantivos, adjetivos e expressões
+acento=sotaque; acento|acentos
+castellano=castelhano, o espanhol|castellana
+total=total; total que = resumindo
+definitiva=en definitiva = em suma
+siesta=sesta, soneca
+falta=falta; hacer falta = ser necessário
+alquiler=aluguel
+plan=plano; en plan = tipo (coloquial)|planes
+trato=acordo, trato (trato hecho = negócio fechado)
+plazo=prazo|plazos
+tema=tema, assunto|temas
+error=erro|errores
+consejo=conselho|consejos
+guía=guia (pessoa ou livro)|guías
+broma=brincadeira|bromas
+presupuesto=orçamento|presupuestos
+curro=trabalho (coloquial)
+opinión=opinião|opiniones
+antelación=antecedência
+comunidad=comunidade; condomínio (taxa); comunidad autónoma = região com governo próprio|comunidades
+contrato=contrato|contratos
+aparcamiento=estacionamento
+rastro=El Rastro, mercado de rua de Madri; rastro
+propio=próprio|propia,propios,propias
+adelante=adiante; prossiga
+primer=primeiro (antes do substantivo)|primero,primera
+cuestión=questão|cuestiones
+política=política|político,políticos
+vocal=vogal|vocales,vogales
+bloque=bloco|bloques
+árbol=árvore|árboles
+roto=quebrado|rota,rotos,rotas
+mío=meu|mía,míos,mías
+sobremesa=a conversa à mesa depois da refeição
+costumbre=costume|costumbres
+transporte=transporte|transportes
+luminoso=claro, iluminado|luminosa
+fianza=depósito, caução
+salón=sala de estar|salones
+europeo=europeu|europea,europeos
+repente=de repente = de repente
+precioso=lindo|preciosa,preciosos,preciosas
+norte=norte
+tradición=tradição|tradiciones
+ley=lei|leyes
+escenario=palco; cenário|escenarios
+falla=falla: figura gigante das Fallas de Valência|fallas
+pecho=peito (a lo hecho, pecho = o que está feito, está feito)
+embargo=sin embargo = no entanto
+limitado=limitado|limitada
+cliente=cliente|clienta,clientes
+serio=sério (en serio = sério)|seria
+relación=relação (en relación con = em relação a)|relaciones
+correo=e-mail; correio|correos
+pata=pata, perna (de animal ou de presunto)
+arma=arma; mi arma = minha alma (andaluz, carinho)
+andaluz=andaluz|andaluza,andaluces
+nota=nota (tomar nota = anotar)|notas
+cutre=de má qualidade, meia-boca (coloquial)
+finde=fim de semana (coloquial)
+dueño=dono|dueña,dueños
+monumento=monumento|monumentos
+acondicionado=aire acondicionado = ar-condicionado
+encargado=gerente, encarregado|encargada
+reclamación=reclamação|reclamaciones
+corregido=corrigido|corregida
+rapidez=rapidez
+moco=muco (tener mocos = estar com o nariz escorrendo)|mocos
+tobillo=tornozelo|tobillos
+hinchado=inchado|hinchada
+póliza=apólice
+manera=maneira (de otra manera = de outro jeito)|maneras
+sinceramente=sinceramente
+respeto=respeito
+convencido=convencido|convencida
+procesión=procissão|procesiones
+educación=educação|mala educación = falta de educação
+contable=contador(a)|contables
+teletrabajo=home office
+moda=moda (ponerse de moda = entrar na moda)
+estrés=estresse
+asignatura=matéria (da faculdade)|asignaturas
+máster=mestrado
+despacho=escritório (de advogados)|despachos
+disponible=disponível|disponibles
+exterior=com janela para a rua; exterior
+novecientos=novecentos|novecientas
+gasto=gasto, despesa (los gastos = as contas)|gastos
+aparte=à parte
+basura=lixo|basuras
+unión=união (Unión Europea)
+recarga=recarga
+original=original|originales
+autorización=autorização
+justificante=comprovante
+majo=simpático, agradável|maja,majísimo,majísima,majos
+jubilado=aposentado|jubilada,jubilados
+lavapiés=Lavapiés, bairro de Madri
+boda=casamento (a festa)|bodas
+cine=cinema|cines
+varios=vários|varias
+coste=custo|costes
+mendigo=mendigo
+silencio=silêncio
+montjuïc=Montjuïc, montanha de Barcelona
+teatro=teatro|teatros
+local=local, estabelecimento; local (adjetivo)|locales
+madera=madeira
+artista=artista|artistas
+voz=voz|voces
+demás=os demais, o resto (lo demás = o resto)
+guitarrista=violonista|guitarristas
+estilo=estilo|estilos
+palo=pau; estilo de flamenco|palos
+leyenda=lenda|leyendas
+suspiro=suspiro (Suspiro del Moro, lugar em Granada)
+moro=mouro|mora,moros
+vencedor=vencedor
+amparo=Amparo (nome)
+ninot=ninot: figura das Fallas (valenciano)
+indultat=indultado, salvo do fogo (valenciano)
+mascletà=mascletà: espetáculo de petardos das Fallas
+concierto=concerto, show|conciertos
+petardo=petardo, bombinha|petardos
+latín=latim
+texto=texto|textos
+giratorio=giratório|giratoria
+convivencia=convivência
+milagro=milagre|milagros
+diario=diário (trabajo diario = trabalho diário)|diaria
+fray=frei
+luis=Luis (nome)
+cárcel=cadeia, prisão|cárceles
+precisamente=justamente, precisamente
+faena=trabalho; contratempo (vaya faena = que chato)
+redondo=redondo; perfeito (salir redondo = sair perfeito)|redonda
+atasco=engarrafamento|atascos
+prometido=prometido
+caso=caso (en caso de que = caso; por si acaso = por precaução)|casos,acaso
+lástima=pena (es una lástima = é uma pena)
+actitud=atitude|actitudes
+obstante=no obstante = não obstante
+variedad=variedade|variedades
+margen=margem|márgenes
+realista=realista
+fase=fase|fases
+riesgo=risco|riesgos
+consciente=consciente, ciente
+opción=opção|opciones
+guasa=graça, ironia (tener guasa = ter graça)
+tela=tecido; vaya tela = que coisa, inacreditável
+superpoder=superpoder
+reembolso=reembolso|reembolsos
+disposición=disposição (a su disposición = à disposição)
+departamento=departamento|departamentos
+hábil=útil (día hábil = dia útil)|hábiles
+demora=demora
+importe=valor, montante|importes
+temporada=temporada (temporada alta/baja)|temporadas
+arreglo=conserto; solução (tiene arreglo = tem solução)|arreglos
+marca=marca; como marca la ley = como manda a lei|marcas
+depósito=tanque (de gasolina); depósito|depósitos
+vivienda=moradia, habitação|viviendas
+autónomo=autônomo (comunidad autónoma = região)|autónoma,autónomas,autónomos
+competencia=competência; concorrência|competencias
+juvenil=juvenil
+sanidad=saúde pública (sanidad pública)
+edad=idade|edades
+lección=lição|lecciones
+gobierno=governo|gobiernos
+página=página|páginas
+mariposa=borboleta (a otra cosa, mariposa = próximo assunto)
+quinto=quinto (en el quinto pino = longe demais)|quinta
+pelo=cabelo, pelo (no tener pelos en la lengua = não ter papas na língua)|pelos
+rama=galho (irse por las ramas = fugir do assunto)|ramas
+refrán=refrão, provérbio|refranes
+sincero=sincero|sincera,sinceros
+nivel=nível|niveles
+avanzado=avançado|avanzada
+suyo=seu, dele (cada uno tiene lo suyo = cada um tem o seu)|suya,suyos
+quillo=cara, mano (andaluz, de chiquillo)|illo
+fresquito=fresquinho
+madriz=como os madrilenos pronunciam Madrid
+cansao=cansado (pronúncia relaxada)
+correcto=correto|correcta,correctos,correctas
+mazo=muito, demais (Madri, coloquial)
+colega=amigo, colega|colegas
+chungo=ruim, difícil (coloquial)|chunga
+birra=cerveja (coloquial)|birras
+tope=super, muito (tope guay = super legal)
+literal=literalmente (muletilla jovem)
+expresión=expressão|expresiones
+colmo=para colmo = para completar
+loncha=fatia (de presunto, queijo)|lonchas
+moraleja=moral da história
+chupito=shot, dose pequena|chupitos
+susto=susto|sustos
+jabugo=Jabugo, vila famosa pelo presunto ibérico
+ritmo=ritmo|ritmos
+confianza=confiança
+contrario=contrário (al contrario = ao contrário)|contraria
+distinto=diferente|distinta,distintos,distintas
+directo=direto|directa,directos,directas
+mancha=mancha; La Mancha (região)|manchas
+puntual=pontual|puntuales
+revés=al revés = ao contrário
+ja=ha (risada)|jaja
+ave=AVE, o trem de alta velocidade espanhol; ave
+madrileño=madrileno, de Madri|madrileña,madrileños,madrileñas
+contradicción=contradição|contradicciones
+curso=curso|cursos
+boqueria=La Boqueria, mercado de Barcelona
+vendedor=vendedor|vendedora,vendedores
+jordi=Jordi (nome catalão, Jorge)
+dialecto=dialeto|dialectos
+ilusión=entusiasmo, alegria (hacer ilusión = dar alegria)|ilusiones
+cuchipanda=comilança entre amigos, sem hora para acabar
+jaspe=jaspe (pedra)
+visigodo=visigodo|visigodos,visigoda
+carlos=Carlos (nome); Carlos V, imperador
+v=V (cinco, em números romanos)
+imagen=imagem|imágenes
+viajero=viajante|viajera,viajeros
+civil=civil (Guerra Civil, 1936–1939)
+creyente=crente, religioso|creyentes
+argamasa=argamassa
+peso=peso|pesos
+precisión=precisão
+tierno=macio, tenro|tierna,tiernos
+gigante=gigante|gigantes
+castell=castell: torre humana catalã|castells
+humano=humano|humana,humanas,humanos
+definición=definição|definiciones
+merecido=merecido|merecida
+inolvidable=inesquecível|inolvidables
+solución=solução|soluciones
+culpa=culpa
+penicilina=penicilina
+tensión=pressão arterial; tensão
+exagerado=exagero, exagerado|exagerada
+necesario=necessário|necesaria,necesarios
+carrera=curso superior; carreira; corrida|carreras
+abogado=advogado|abogada,abogados
+amueblado=mobiliado|amueblada
+comunicado=bien comunicado = bem servido de transporte
+ático=cobertura (apartamento)|áticos
+portero=porteiro|portera,porteros
+previo=prévio (cita previa = agendamento)|previa
+trámite=procedimento burocrático|trámites
+sello=carimbo (sellar = carimbar)|sellar,sellado
+compulsado=autenticado (copia compulsada)|compulsada
+comisión=taxa, comissão|comisiones
+transferencia=transferência|transferencias
+bizum=Bizum: pagamento instantâneo pelo celular, o Pix espanhol
+gimnasio=academia|gimnasios
+nie=NIE: número de identificação de estrangeiro
+papeleo=papelada, burocracia
+orden=ordem (en orden = em ordem)
+lata=lata (dar la lata = incomodar)|latas
+increíble=incrível|increíbles
+feliz=feliz|felices
+bello=belo|bella,bellas,bellos
+veinticuatro=vinte e quatro
+estupendo=ótimo|estupenda
+interior=interno, interior
+adicional=adicional|adicionales
+cuerpo=corpo|cuerpos
+paracetamol=paracetamol
+jarabe=xarope|jarabes
+antihistamínico=anti-histamínico
+sanitario=de saúde (tarjeta sanitaria = cartão do convênio)|sanitaria
+doctor=doutor, médico|doctora,doctores
+enseguida=em seguida, logo
+distancia=distância|distancias
+semestre=semestre|semestres
+universitario=universitário|universitaria,universitarios
+animado=animado|animada,animadas,animados
+principio=começo (al principio = no começo)|principios
+alojamiento=alojamento, moradia|alojamientos
+torrija=torrija: rabanada espanhola|torrijas
+rabanada=rabanada (português)
+potaje=ensopado de legumes e grão (potaje de vigilia, sem carne)
+vigilia=vigília, jejum de carne
+internacional=internacional|internacionales
+contenedor=contêiner (de lixo)|contenedores
+dato=dado (datos = internet do celular)|datos
+ilimitado=ilimitado|ilimitada,ilimitadas
+frontera=fronteira|fronteras
+extra=extra
+activo=ativo|activa
+cansancio=cansaço
+comienzo=começo|comienzos
+tablao=tablao: casa de espetáculo de flamenco|tablaos
+marruecos=Marrocos
+xviii=XVIII (dezoito, séc.)|xii,xi,viii,xx,ii
+latina=La Latina, bairro de Madri
+disco=disco|discos
+aperitivo=aperitivo: bebida e petisco antes do almoço|aperitivos
+forma=forma, jeito|formas
+cocido=cozido madrilenho (grão-de-bico com carnes)|cocidos
+antoni=Antoni (Antônio, em catalão)
+maqueta=maquete|maquetas
+isabel=Isabel (nome)
+guadalquivir=Guadalquivir, o rio de Sevilha e Córdoba
+instrumento=instrumento|instrumentos
+turno=turno, vez (esperar su turno = esperar a sua vez)|turnos
+cubierto=coberto|cubierta,cubiertas,cubiertos
+poema=poema|poemas
+fino=fino|fina,finos,finas
+apenas=quase não, mal (apenas se oye = quase não se ouve)
+quieto=quieto, parado|quieta
+poeta=poeta|poetas
+loco=louco|loca,locos
+cartón=papelão
+humor=humor
+destruido=destruído|destruida
+voto=voto|votos
+artificial=artificial (fuegos artificiales = fogos de artifício)|artificiales
+desfile=desfile|desfiles
+astronomía=astronomia
+filosofía=filosofia
+escondido=escondido|escondida,escondidos
+católico=católico|católica,católicos
+vigilante=vigia, guarda|vigilantes
+convento=convento|conventos
+anochecer=anoitecer; al anochecer = ao anoitecer
+martín=Martín (nome); San Martín
+mezcla=mistura|mezclas
+cuello=pescoço|cuellos
+aula=sala de aula|aulas
+unamuno=Miguel de Unamuno, escritor e reitor de Salamanca
+rector=reitor
+tradicionalmente=tradicionalmente
+pascua=Páscoa
+cuaresma=Quaresma
+campo=campo|campos
+resumen=resumo (en resumen = em resumo)|resúmenes
+ello=isso (por ello = por isso)
+general=geral (por lo general = em geral)|generales
+salvo=exceto, salvo
+excepción=exceção|excepciones
+risa=riso (partirse de risa = morrer de rir)|risas
+muerto=morto; exausto (estoy muerta)|muerta,muertos,muertas
+montón=monte (un montón = um monte)|montones
+mogollón=um monte, demais (coloquial)
+gracioso=engraçado|graciosa
+pillado=pego (me has pillado = você me pegou)
+estimado=prezado|estimada
+garcía=García (sobrenome)
+cordial=cordial
+saludo=saudação (un cordial saludo)|saludos
+atentamente=atenciosamente
+entrega=entrega|entregas
+adelantado=por adelantado = adiantado
+solicitud=solicitação, pedido|solicitudes
+huelga=greve|huelgas
+manifestación=manifestação, protesto|manifestaciones
+elección=eleição|elecciones
+impuesto=imposto|impuestos
+jubilación=aposentadoria
+titular=manchete|titulares
+portada=capa (de jornal)|portadas
+noticia=notícia|noticias
+medida=medida|medidas
+maestro=mestre (obra maestra = obra-prima)|maestra
+versión=versão|versiones
+subtítulo=legenda|subtítulos
+trama=enredo|tramas
+complicado=complicado|complicada
+protagonista=protagonista|protagonistas
+librero=livreiro|librera,libreros
+lorca=Federico García Lorca, poeta de Granada
+quijote=Don Quijote, romance de Cervantes (1605)
+clásico=clássico|clásica,clásicos
+banda=banda (banda sonora = trilha sonora)|bandas
+sonoro=sonoro|sonora
+estreno=estreia|estrenos
+volando=voando (forma de volar)
+herrero=ferreiro
+mama=mama (quien no llora, no mama = quem não chora, não mama)
+cabra=cabra (estar como una cabra = ser maluco)|cabras
+bombón=bombom; gato(a), pessoa bonita|bombones
+aúpa=força! olá! (País Basco)
+guagua=ônibus (Canárias)|guaguas
+logo=¿e logo? = e então? (galego)
+plegar=sair do trabalho, fechar (Catalunha)
+musical=musical|musicales
+gallego=galego|gallega,gallegos
+flipante=impressionante, incrível (coloquial)
+luz=luz|luces
+consonante=consoante|consonantes
+acceso=acesso|accesos
+gratuito=gratuito|gratuita,gratuitos
+estambul=Istambul
+lágrima=lágrima|lágrimas
+agotado=exausto; esgotado|agotada,agotados,agotadas
+touché=touché (você me pegou)
+venta=venda; pousada de beira de estrada|ventas
+pedro=Pedro (nome)
+condición=condição|condiciones
+máximo=máximo (al máximo = ao máximo)|máxima
+proyecto=projeto|proyectos
+propuesta=proposta|propuestas
+ambos=ambos|ambas
+taxista=taxista|taxistas
+desesperación=desespero
+excursión=passeio, excursão|excursiones
+montserrat=Montserrat, montanha e monastério perto de Barcelona
+sandalia=sandália|sandalias
+lluvioso=chuvoso|lluviosa
+toque=toque; que te toque = que caia em você (sorteio)
+agricultor=agricultor|agricultores
+confirmación=confirmação|confirmaciones
+humedad=umidade
+fontanero=encanador|fontaneros
+básico=básico|básica,básicos
+independencia=independência
+espejo=espelho|espejos
+sordo=surdo|sorda,sordos
+almodóvar=Pedro Almodóvar, cineasta
+crimen=crime|crímenes
+penélope=Penélope Cruz, atriz
+ruiz=Ruiz (sobrenome)
+zafón=Carlos Ruiz Zafón, escritor
+excitante=excitante
+alma=alma|almas
+londres=Londres
+curioso=curioso|curiosa,curiosos
+vasco=basco|vasca,vascos
+canarias=Canárias (ilhas)
+cuba=Cuba
+caleta=praia da Caleta, em Cádiz
+web=site, web
+rayo=raio|rayos
+flexible=flexível|flexibles
+puta=puta (de puta madre = ótimo, vulgar mas comum)
+cinturón=cinto (cinturón de seguridad)|cinturones
+despedida=despedida (despedida de soltera = chá de lingerie / festa de solteira)|despedidas
+soltero=solteiro|soltera,solteros
+detalle=detalhe; gentileza (qué detalle = que gentileza)|detalles
+muito=muito (português; em espanhol: mucho)
+erre=a letra erre
+subjuntivo=subjuntivo
+miedo=medo|miedos
+santiago=Santiago de Compostela; o Caminho de Santiago
+grave=grave|graves
+prioridad=prioridade|prioridades
+cable=cabo (echar un cable = dar uma mão)|cables
+fama=fama
+realidad=realidade (en realidad = na verdade)|realidades
+malasaña=Malasaña, bairro boêmio de Madri
+pasión=paixão|pasiones
+institución=instituição|instituciones
+capacidad=capacidade|capacidades
+asombroso=assombroso, impressionante|asombrosa
+sutil=sutil|sutiles
+esfuerzo=esforço|esfuerzos
+huésped=hóspede|huéspedes
+bon=bom (catalão: bon dia = bom dia)
+hombro=ombro|hombros
+literatura=literatura
+identidad=identidade|identidades
+escalivada=escalivada: legumes assados, prato catalão
+culto=culto, instruído|culta,cultos
+diccionario=dicionário|diccionarios
+escena=cena|escenas
+marcha=en marcha = em andamento; marcha
+mantel=toalha de mesa|manteles
+miga=migalha|migas
+ternura=ternura
+climático=climático|climática
+farola=poste de luz|farolas
+oriente=Oriente
+occidente=Ocidente
+misa=missa|misas
+madrugador=madrugador|madrugadora,madrugadores
+mármol=mármore
+emperador=imperador|emperadores
+canónigo=cônego|canónigos
+debate=debate|debates
+italia=Itália
+común=comum|comunes
+conclusión=conclusão|conclusiones
+exactamente=exatamente
+casco=casco antiguo = centro histórico
+foro=fórum (romano)|foros
+barroco=barroco|barroca
+denso=denso|densa
+codazo=cotovelada|codazos
+grito=grito|gritos
+capilla=capela|capillas
+trozo=pedaço|trozos
+labio=lábio|labios
+naturalidad=naturalidade
+gota=gota|gotas
+granito=granito
+castaña=castanha|castañas
+orgullo=orgulho|orgullos
+borde=borda|bordes
+loza=louça
+suelo=chão|suelos
+demostración=demonstração|demostraciones
+disney=Disney
+guadarrama=Serra de Guadarrama, ao norte de Madri
+violeta=violeta
+corte=corte|cortes
+hispania=Hispania, nome romano da península
+citerior=Citerior (Hispania Citerior, província romana)
+fiera=fera|fieras
+espectador=espectador|espectadores
+arena=areia; arena|arenas
+arqueológico=arqueológico|arqueológica
+tramo=trecho|tramos
+augusto=Augusto, imperador romano
+tecla=Santa Tecla, festa de Tarragona; tecla
+nacional=nacional|nacionales
+cima=topo, cume|cimas
+particular=particular|particulares
+medieval=medieval|medievales
+pesca=pesca
+advertencia=advertência, aviso|advertencias
+cádiz=Cádiz
+portugal=Portugal
+lisboa=Lisboa
+boabdil=Boabdil, último rei nazarí de Granada
+rocío=Rocío (nome)
+pintor=pintor|pintora
+preciosa=linda
+ah=ah
+b=B (letra; segundo B = apartamento B do segundo andar)
+des=darse de alta / de baja: cadastrar-se / cancelar
+dime=me diga (forma de decir)
+muito=muito (em português; em espanhol é mucho)
+aunque=embora; mesmo que
+además=além disso
+atrás=atrás, para trás (dejar atrás = deixar para trás)
+lógico=lógico|lógica
+molar=ser legal, agradar (coloquial)|mola,molan,molaba,molaban,mole
+coger=pegar|cojo,coges,coge,cogemos,cogéis,cogen,cogí,cogiste,cogió,cogimos,cogisteis,cogieron,cogía,cogían,coja,cojas,cojan,cogido,coged
+perder=perder|pierdo,pierdes,pierde,perdemos,pierden,perdí,perdiste,perdió,perdimos,perdieron,perdía,perdían,pierda,pierdas,pierdan,perdido,perderse
+comer=comer; almoçar|como,comes,come,comemos,coméis,comen,comí,comiste,comió,comimos,comisteis,comieron,comía,comían,coma,comas,comamos,coman,comiera,comido,comed
+abrir=abrir|abro,abres,abre,abrimos,abren,abrí,abrió,abrieron,abría,abrían,abra,abras,abran,abierto,abierta
+pedir=pedir|pido,pides,pide,pedimos,pedís,piden,pedí,pediste,pidió,pedimos,pidieron,pedía,pedían,pida,pidas,pidan,pidiera,pidieran,pedido
+hablar=falar|hablo,hablas,habla,hablamos,habláis,hablan,hablé,hablaste,habló,hablaron,hablaba,hablaban,hablaré,hable,hables,hablemos,habléis,hablen,hablara,hablado,hablad
