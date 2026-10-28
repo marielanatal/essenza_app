@@ -3907,8 +3907,14 @@ function buildPlan(id, days, interests, ritmo){
 /* Tema visual do país: cabeçalho e pano de fundo. Cada pacote de país traz o seu. */
 const THEMES = {
   es: {name:"Espanha", heroA:"#8f0d19", heroB:"#d1202b", band:"#f6c453", paper:"#faf5ee", paperDark:"#15100f", surfaceDark:"#201818", lineDark:"#332727",
-       photos:["Puerta_de_Alcalá","Plaza_de_España_(Sevilla)","Templo_Expiatorio_de_la_Sagrada_Familia","Parque_Güell","Real_Alcázar_de_Sevilla","Plaza_Mayor_(Madrid)","Catedral_de_Sevilla"]}
+       photos:["Puerta_de_Alcalá","Plaza_de_España_(Sevilla)","Templo_Expiatorio_de_la_Sagrada_Familia","Parque_Güell","Real_Alcázar_de_Sevilla","Plaza_Mayor_(Madrid)","Catedral_de_Sevilla"]},
+  fr: {name:"França", heroA:"#1f3a93", heroB:"#3b5bd1", band:"#e8333b", paper:"#f3f5fb", paperDark:"#0d1120", surfaceDark:"#161c30", lineDark:"#272f4a",
+       photos:["Torre_Eiffel","Museo_del_Louvre","Mont_Saint-Michel","Arco_de_Triunfo_de_París","Palacio_de_Versalles"]},
+  it: {name:"Itália", heroA:"#0f6b3a", heroB:"#1f9a55", band:"#d8232a", paper:"#f4f8f3", paperDark:"#0d1510", surfaceDark:"#152018", lineDark:"#263329",
+       photos:["Coliseo","Fontana_di_Trevi","Basílica_de_San_Pedro","Duomo_de_Milán","Venecia"]}
 };
+/* Prévia do tema de outro país (só visual): guardada no aparelho até existir o pacote do idioma */
+function themeKey(){ try{ return localStorage.getItem("rumbo-theme")||"es"; }catch(e){ return "es"; } }
 /* Bandeira com balão de saudação, por curso: es (Espanha), fr (França), it (Itália) */
 const BRAND = { es:{hi:"¡Hola!", flag:'<rect x="2" y="10" width="60" height="44" rx="10" fill="#c60b1e"/><rect x="2" y="21" width="60" height="22" fill="#ffc400"/>'},
                 fr:{hi:"Salut!", flag:'<rect x="2" y="10" width="60" height="44" rx="10" fill="#fff"/><path d="M2 20a10 10 0 0 1 10-10h10v44H12A10 10 0 0 1 2 44z" fill="#0055a4"/><path d="M42 10h10a10 10 0 0 1 10 10v24a10 10 0 0 1-10 10H42z" fill="#ef4135"/>'},
@@ -3919,8 +3925,8 @@ function applyTheme(key){
   const m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute("content", getComputedStyle(document.documentElement).getPropertyValue("--paper").trim() || t.heroA);
   const b=document.getElementById("brand"); if(b) b.innerHTML=renderBrandIcon(key);
 }
-applyTheme("es");
-try{ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ()=>applyTheme("es")); }catch(e){}
+applyTheme(themeKey());
+try{ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ()=>applyTheme(themeKey())); }catch(e){}
 
 let TOTAL_WEEKS = WEEKS.length; let WP_WEEK = WP_WEEK_A1;
 const INTERVALS = [0,1,3,7,14,30,60];
@@ -5697,7 +5703,7 @@ function renderBoard(){
   else { $("#b-days").textContent = days; $("#b-lbl1").innerHTML = `dias para <strong id="b-dest">${h(destName)}</strong>`; $("#b-date").textContent = `${+d} ${["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"][+m-1]} ${y}`; }
   $("#b-week").textContent = `semana ${Math.min(calWeek(),planWeeks())} de ${planWeeks()} · tema ${curWeek()}`;
   $("#b-pax").innerHTML = `<i></i>${h((me().name||"").slice(0,14))}`;
-  const fig=$("#hero-photo"); if(fig && typeof PHOTOS_ON!=="undefined" && PHOTOS_ON){ const list=(THEMES.es.photos||[]); const pick=list.length ? list[todayN()%list.length] : null;
+  const fig=$("#hero-photo"); if(fig && typeof PHOTOS_ON!=="undefined" && PHOTOS_ON){ const list=((THEMES[themeKey()]||THEMES.es).photos||[]); const pick=list.length ? list[todayN()%list.length] : null;
     if(pick && fig.dataset.wp!==pick){ fig.innerHTML=""; fig.dataset.wp=pick; fig.dataset.label=""; delete fig.dataset.done; fig.hidden=false; } }
 }
 
@@ -6725,6 +6731,7 @@ function openSettings(){
       <p class="hint" id="s-feas">${(()=>{ const f=feasibility(); return f.left===0 ? "Todas as frases do plano já vistas." : f.ok ? `No ritmo: faltam ${f.left} frases e ${f.days} dias; ${S.daily}/dia dá conta.` : `Atenção: faltam ${f.left} frases em ${f.days} dias; precisaria de ${f.need}/dia.`; })()}</p>
     </div>
     <div class="field"><label for="s-voice">Voz do espanhol</label>${canSpeak ? (()=>{ loadVoices(); const L=esVoices(); const auto=esVoice(); return `<select id="s-voice"><option value="system" ${useSystemVoice()?"selected":""}>Padrão do iPhone: a voz marcada em Ajustes › Vozes (use esta para a aprimorada)</option><option value="" ${!useSystemVoice()&&!S.voice?"selected":""}>Automática do app (${auto?voiceLabel(auto):"a do celular"})</option>${L.map(v=>`<option value="${h(v.voiceURI)}" ${S.voice===v.voiceURI||S.voice===v.name?"selected":""}>${h(voiceLabel(v))}</option>`).join("")}</select><div class="row" style="gap:8px;margin-top:6px"><button class="btn soft" data-act="voicetest">Testar voz</button>${L.length>1?`<button class="btn ghost" data-act="voicecompare">Comparar as ${L.length} vozes</button>`:""}${IS_IOS?`<button class="btn ghost" data-act="voiceab">Comum × padrão</button>`:""}</div><span class="hint" id="s-voice-now" style="color:var(--cobalt);font-weight:700">${LAST_VOICE?"Falou agora com: "+h(LAST_VOICE):""}</span>
+    <div class="field"><label for="s-theme">Cores do app (prévia de outros países)</label><select id="s-theme">${Object.keys(THEMES).map(k=>`<option value="${k}" ${themeKey()===k?"selected":""}>${h(THEMES[k].name)}</option>`).join("")}</select><span class="hint">Só muda as cores e as fotos do cabeçalho. O conteúdo continua o curso de espanhol.</span></div>
     <label class="row" style="gap:8px;margin-top:8px;align-items:center"><input type="checkbox" id="s-audio" ${AUDIO.on?"checked":""} style="width:22px;height:22px;accent-color:var(--cobalt)"> <span><b>Vozes gravadas (Elvira e Álvaro)</b><br><span class="hint">${AUDIO.keys && AUDIO.keys.size ? `${AUDIO.keys.size} áudios disponíveis: frases, diálogos, fórmulas e leituras tocam com voz natural; o resto usa a voz do celular. Precisa de internet na primeira vez que cada frase toca.` : "Ainda sem áudios gravados neste endereço (a rotina do GitHub gera os arquivos). Até lá, usa a voz do celular."}</span></span></label><span class="hint">${L.length} ${L.length===1?"voz de espanhol instalada":"vozes de espanhol instaladas"} neste aparelho. ${IS_IOS ? "O Safari só mostra ao app as vozes comuns; a aprimorada não aparece nesta lista, mas funciona assim: em Ajustes do iPhone › Acessibilidade › Conteúdo Falado › Vozes › Espanhol, toque em Mónica (Aprimorada) para deixá-la marcada como a voz do espanhol; depois escolha aqui 'Padrão do iPhone' e toque em Testar voz: ela se apresenta como 'la voz mejorada'." : "No Android, em Configurações › Sistema › Idioma › Conversão de texto em voz › Google, instale a voz 'Espanhol (Espanha)' e volte aqui."}</span>`; })() : `<span class="hint">Este navegador não oferece voz.</span>`}</div>
     <div class="field"><label for="s-partner">Voz de quem conversa com você</label><select id="s-partner"><option value="auto" ${S.partner!=="m"&&S.partner!=="f"?"selected":""}>Conforme o personagem</option><option value="f" ${S.partner==="f"?"selected":""}>Sempre feminina (Elvira)</option><option value="m" ${S.partner==="m"?"selected":""}>Sempre masculina (Álvaro)</option></select><span class="hint">Vale para os personagens das conversas. A Lola e as frases do curso são sempre com a voz feminina.</span></div>
     <div class="field"><label for="s-rate">Velocidade da voz: <span id="s-rate-v">${S.rate.toFixed(2)}</span>×</label><input type="range" id="s-rate" min="0.6" max="1.1" step="0.05" value="${S.rate}">${canSpeak?`<span class="hint">Sem som? Escolha "Automática" acima, confira o botão lateral de silêncio e o volume, feche o app por completo e abra de novo. Depois de baixar uma voz nova, o iPhone às vezes só a usa após reiniciar o aparelho.</span>`:`<span class="hint">Este navegador não oferece voz.</span>`}<span class="hint">${canSpeak ? (esVoice() ? "Voz em uso: "+h(esVoice().name) : "Nenhuma voz de espanhol instalada; o aparelho usará a voz padrão. No Android, instale 'Espanhol (Espanha)' em Configurações › Idioma › Conversão de texto em voz.") : ""}</span></div>
@@ -6753,6 +6760,7 @@ function openSettings(){
   const sg=$("#s-goal"); if(sg) sg.addEventListener("change", ()=>{ applySettings(); openSettings(); });
   const slv=$("#s-level"); if(slv) slv.addEventListener("change", ()=>{ const id=slv.value; if(!COURSE[id] || id===curLevel().id) return; const started=id!=="basico" && S.startL && S.startL[id]; const restart = id!=="basico" && (!started || confirm(`Recomeçar o nível ${COURSE[id].name} do tema 1 a partir de hoje?\n\nOK: começa do tema 1 hoje.\nCancelar: continua de onde você parou nesse nível.`)); setLevel(id, restart); openSettings(); toast(`Nível ${COURSE[id].name}: tema ${curWeek()} de ${TOTAL_WEEKS}`); });
   const sa=$("#s-audio"); if(sa) sa.addEventListener("change", ()=>{ AUDIO.on=sa.checked; try{ localStorage.setItem("rumbo-audio", sa.checked?"on":"off"); }catch(e){} toast(sa.checked?"Vozes gravadas ligadas.":"Vozes gravadas desligadas: usando a voz do celular."); });
+  const sth=$("#s-theme"); if(sth) sth.addEventListener("change", ()=>{ try{ localStorage.setItem("rumbo-theme", sth.value); }catch(e){} applyTheme(sth.value); loadPhotos(); renderBoard(); toast(`Cores: ${THEMES[sth.value].name}`); });
   const spn=$("#s-partner"); if(spn) spn.addEventListener("change", ()=>{ S.partner=spn.value==="m"?"m":spn.value==="f"?"f":"auto"; save(); speak(spn.value==="m" ? "Hola, soy Álvaro. Hablaré contigo en las conversaciones." : "Hola, soy Elvira. Hablaré contigo en las conversaciones.", false, spn.value==="m"?"m":""); });
   const sv=$("#s-voice"); if(sv) sv.addEventListener("change", ()=>{ S.voice=sv.value||""; save(); loadVoices(); speak(voiceIntro(esVoice())); });
   if(canSpeak) try{ speechSynthesis.addEventListener("voiceschanged", ()=>{ const el=$("#s-voice"); if(el && el.options.length<=1 && esVoices().length){ loadVoices(); const L=esVoices(); el.innerHTML=`<option value="system">Padrão do iPhone</option><option value="">Automática do app</option>`+L.map(v=>`<option value="${h(v.voiceURI)}" ${S.voice===v.voiceURI||S.voice===v.name?"selected":""}>${h(voiceLabel(v))}</option>`).join(""); } }, {once:true}); }catch(e){}

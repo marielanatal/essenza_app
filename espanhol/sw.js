@@ -1,5 +1,5 @@
 // Guarda o app no aparelho para funcionar sem internet.
-const CACHE = "rumbo-v70";
+const CACHE = "rumbo-v71";
 const AUDIO_CACHE = "rumbo-audio"; // áudios gravados: cache próprio, que sobrevive às atualizações
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
 
