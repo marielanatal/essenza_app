@@ -5386,7 +5386,8 @@ function todaySteps(){
   const m=S.minutes||15;
   const all=[
     {id:"session", t:"Sessão", d: (nw===0&&due===0) ? "Frases de hoje em dia" : (due===0 && (l.n||0)>=S.daily) ? `Meta feita · extra: ${nw} novas à espera` : `${nw} novas · ${due} revisões · ≈ ${sessionMinutes(nw,due)} min`, done: due===0 && (nw===0 || (l.n||0)>=S.daily), started:(l.n||0)+(l.r||0)>0, act:"session", go:"Começar"},
-    {id:"conv", t:"Conversa falada", d:(l.c||0)>0 ? `${WEEKS[curWeek()-1].title} · conversa ${l.cw==="B"?2:1} feita${WEEKS[curWeek()-1].dialogB?` · amanhã a ${l.cw==="B"?1:2}`:""}` : `${WEEKS[curWeek()-1].title}${WEEKS[curWeek()-1].dialogB?` · conversa ${todayConv()==="B"?2:1}`:""}${(l.cl||0)>0?` · ${l.cl} ${l.cl===1?"fala feita":"falas feitas"}`:""} · ≈ 3 min`, done:(l.c||0)>0, started:(l.cl||0)>0, act:"conv", which:todayConv(), go:(l.cl||0)>0?"Continuar":"Conversar"},
+    (()=>{ const pl=convPlan(); const w=WEEKS[pl.week-1]; const name = pl.review ? pl.label : `${w.title} · conversa ${pl.which==="B"?2:1} · ${pl.label}`;
+      return {id:"conv", t:"Conversa falada", d:(l.c||0)>0 ? `${name} · feita` : `${name}${(l.cl||0)>0?` · ${l.cl} ${l.cl===1?"fala feita":"falas feitas"}`:""} · ≈ 3 min`, done:(l.c||0)>0, started:(l.cl||0)>0, act:"conv", plan:true, go:(l.cl||0)>0?"Continuar":"Conversar"}; })(),
     (todayN()%2===0 ? {id:"build", t:"Montar frases", d:"Coloque as palavras na ordem · 8 frases · ≈ 3 min", done:(l.b||0)>0, act:"build", go:"Montar"}
                     : {id:"build", t:"Fórmulas", d:"Molde + encaixe: diga a frase inteira · 10 frases · ≈ 3 min", done:(l.b||0)>0, act:"frames", go:"Montar"}),
     MIC ? {id:"eco", t:"Pronúncia no microfone", d:"5 palavras e 7 frases · ≈ 3 min", done:(l.e||0)>0, act:"pron", go:"Falar"}
@@ -5396,7 +5397,20 @@ function todaySteps(){
     {id:"extra", t:"Frases extra", d:`+${S.daily} além da meta · ≈ ${sessionMinutes(S.daily,0)} min`, done:(l.x||0)>0 && (l.n||0)>=S.daily*2, act:"extra", go:"Mais"}
   ];
   const n = m<=5 ? 1 : m<=10 ? 2 : m<=15 ? 4 : m<=20 ? 5 : 7;
-  return all.slice(0,n);
+  /* As etapas do meio giram a cada dia (montar, pronúncia, leitura, quiz), para a rotina não ser sempre igual */
+  const mid=all.slice(2,6); const k=todayN()%mid.length; const rot=mid.slice(k).concat(mid.slice(0,k));
+  return [all[0], all[1], ...rot, all[6]].slice(0,n);
+}
+/* Plano da conversa do dia: evolui ao longo da semana. Dias 1 e 2: guiada (conversa 1, conversa 2). Dias 3 e 4: de memória (o português só aparece se pedir).
+   Dias 5 e 6: papéis trocados (você faz o garçom, a recepcionista…). Dia 7: revisão de uma conversa de tema anterior. Sem conversa 2, a sequência se adapta. */
+function convPlan(){
+  const w=WEEKS[curWeek()-1]; const day=Math.max(0, todayN()-weekStart(w.n)); const hasB=!!w.dialogB;
+  const seq = hasB ? [["A",0],["B",0],["A",1],["B",1],["A",2],["B",2],["R",0]] : [["A",0],["A",1],["A",2],["R",0],["A",1],["A",2],["R",0]];
+  let [which, mode] = seq[day % seq.length];
+  if(which==="R"){ const prev=allDialogs(curWeek()-1); if(prev.length){ const d=prev[todayN()%prev.length]; return {week:d.week, which:d.which, role:null, hard:true, review:true, label:`revisão do tema ${d.week}: ${d.title}`}; } which="A"; mode=2; }
+  const lines = which==="B" ? w.dialogB : w.dialog; const me = which==="B" ? (w.meB||"A") : (w.me||"A");
+  const other = [...new Set(lines.map(l=>l[0]))].find(x=>x!==me) || null;
+  return {week:w.n, which, role: mode===2 ? other : null, hard: mode===1, review:false, label: mode===0 ? "guiada" : mode===1 ? "de memória" : "papéis trocados"};
 }
 /* Qual conversa do tema de hoje praticar: alterna entre a 1ª e a 2ª conforme a menos feita. */
 function todayConv(){ const w=WEEKS[curWeek()-1]; if(!w.dialogB) return "A"; const cv=S.conv||{}; const a=cv[lvKey(w.n+"A")]||0, b=cv[lvKey(w.n+"B")]||0;
@@ -5728,7 +5742,7 @@ function renderHoje(){
   /* Linha do tempo: o passo atual ganha o cartão e o botão grande; os feitos ficam apagados e riscados; os futuros só indicados */
   const stepsHtml = steps.map((st,i)=>{
     const cls = st.done ? "done" : (cur && cur.id===st.id ? "cur" : "todo");
-    const go = cls==="cur" ? `<button class="go" data-act="${st.act}"${st.which?` data-which="${st.which}"`:""}>${PLAY} ${st.started && st.id==="session" ? "Continuar agora" : "Começar agora"}</button>` : "";
+    const go = cls==="cur" ? `<button class="go" data-act="${st.act}"${st.which?` data-which="${st.which}"`:""}${st.plan?' data-plan="1"':""}>${PLAY} ${st.started && st.id==="session" ? "Continuar agora" : "Começar agora"}</button>` : "";
     return `<div class="step ${cls}"><span class="n">${st.done?CHECK:i+1}</span><div><b>${h(st.t)}</b><span class="d">${h(st.d)}</span></div>${go}</div>`;
   }).join("");
   $("#v-hoje").innerHTML = `
@@ -5745,6 +5759,9 @@ function renderExtraCards(w, allDone, daysLeft){
   const fz = feasibility(); const behind = !fz.ok && daysLeft>0 && fz.left>0;
   const lv = level(); const lvPct = lv.hi ? Math.round(100*(lv.x-lv.lo)/(lv.hi-lv.lo)) : 100;
   const pool = unlockedCards(); const fdd = pool[(todayN()*7) % pool.length];
+  const wpg=weekProgress(curWeek()); const cv=S.conv||{}; const convDone=(cv[lvKey(w.n+"A")]||0)>=1 && (!w.dialogB || (cv[lvKey(w.n+"B")]||0)>=1);
+  const advance = (curWeek()<TOTAL_WEEKS && wpg.total && wpg.seen>=wpg.total && convDone && unlockedLv()<=curWeek() && weekStart(curWeek()+1)>todayN())
+    ? `<div class="card tint-g stack" style="gap:8px"><b>Tema ${w.n} concluído: todas as frases vistas e as conversas feitas.</b><p class="small muted">Pelo plano, o tema ${w.n+1} abre em ${fmtDay(weekStart(w.n+1))}. Se quiser, adiante agora; as revisões deste tema continuam aparecendo.</p><button class="btn wide" data-act="unlocknext">Adiantar o tema ${w.n+1}</button></div>` : "";
   const extras = allDone ? `<div class="card tint-c stack" style="gap:10px"><div class="eyebrow">Quer mais? Extras de hoje</div>
       <div class="row" style="gap:8px">
         ${newTier(1) ? `<button class="btn soft" style="flex:1 1 46%" data-act="extra">+${S.daily} frases novas <span class="ct">≈ ${sessionMinutes(S.daily,0)} min</span></button>` : newTier(2) ? `<button class="btn soft" style="flex:1 1 46%" data-act="extra">+${Math.min(S.daily,newTier(2))} frases extra <span class="ct">da semana ${curWeek()} · ≈ ${sessionMinutes(Math.min(S.daily,newTier(2)),0)} min</span></button>` : `<button class="btn soft" style="flex:1 1 46%" data-act="unlocknext">Liberar próximo tema</button>`}
@@ -5753,7 +5770,7 @@ function renderExtraCards(w, allDone, daysLeft){
         <button class="btn soft" style="flex:1 1 46%" data-act="quiz">Quiz rápido</button>
       </div>
       <p class="small muted">${newTier(1) ? `Ainda há ${newTier(1)} frases do plano liberadas até a semana ${curWeek()}, mais ${newTier(2)} extras.` : newTier(2) ? `Você já viu as frases do plano até a semana ${curWeek()}. Restam ${newTier(2)} frases extra desta semana.` : `Você já viu tudo até a semana ${curWeek()}. Pode adiantar a próxima.`} O extra não quebra a rotina: amanhã volta ao normal.</p></div>` : `<p class="small muted" style="padding:0 4px">Quer mais depois da rotina? Os extras aparecem aqui quando terminar, ou na aba Practicar.</p>`;
-  return `${extras}
+  return `${advance}${extras}
     ${behind ? `<button class="card tint-s small" style="text-align:left;width:100%" data-act="settings"><b>No ritmo atual você não vê tudo antes ${goalDa()}.</b> Faltam ${fz.left} frases do plano em ${daysLeft} dias: precisaria de ${fz.need} novas por dia (hoje: ${S.daily}). Toque para ajustar os minutos por dia.</button>`:""}
     <button class="prog" data-act="progreso" aria-label="Ver progresso e conquistas">
       <div><div class="nums"><div><b>${streak()>=3?'<span class="flame">'+ICON.flame+'</span>':""}${streak()}</b><span>dias seguidos</span></div><div><b>${learnedCount()}</b><span>frases</span></div><div><b>${spokenTotal()}</b><span>falas</span></div></div>
@@ -6378,10 +6395,10 @@ function startWrite(){
   if(!pool.length){ toast("Veja algumas frases primeiro."); return; }
   openDrill({mode:"write", items:shuffle(pool).slice(0,8).map(c=>({t:"write",c,answer:null}))});
 }
-function startConv(week, role, which){
+function startConv(week, role, which, hard, label){
   const w = WEEKS[(week||curWeek())-1]; which = (which==="B" && w.dialogB) ? "B" : "A";
-  const lines = which==="B" ? w.dialogB : w.dialog; const me = role || (which==="B" ? (w.meB||"A") : (w.me||"A"));
-  openDrill({mode:"conv", week:w.n, which, me, items:lines.map((l,k)=>({t:l[0]===me?"mine":"theirs", line:l, prev:k?lines[k-1]:null}))});
+  const lines = which==="B" ? w.dialogB : w.dialog; const def = which==="B" ? (w.meB||"A") : (w.me||"A"); const me = role || def;
+  openDrill({mode:"conv", week:w.n, which, me, hard:!!hard, swap: me!==def, label:label||"", items:lines.map((l,k)=>({t:l[0]===me?"mine":"theirs", line:l, prev:k?lines[k-1]:null}))});
 }
 /* Ao terminar a última fala da conversa (antes da correção), registra a conversa como feita no dia. */
 function convMaybeDone(){ if(!D || D.mode!=="conv" || D.convDone) return; const left=D.items.slice(D.i).some(x=>!x.fix && (x.t==="mine"||x.t==="theirs")); if(left) return;
@@ -6599,13 +6616,13 @@ function drawDrill(){
       ? `<div class="actions three"><button class="btn bad" data-act="grade" data-g="bad">Não saiu</button><button class="btn soft" data-act="grade" data-g="mid">Quase</button><button class="btn ok" data-act="grade" data-g="good">${oral?"Falei bem":"Entendi"}</button></div>`
       : `<div class="actions${MIC&&oral?" duo":""}">${MIC&&oral?micBtn(it):""}<button class="btn wide" data-act="reveal">${oral?"Já falei: ouvir a resposta":"Mostrar significado"}</button></div>`;
   } else if(it.t==="theirs"){
-    if(!it.played){ it.played=true; speak(it.line[1], false, partnerWho(D.week, D.which)); }
+    if(!it.played){ it.played=true; speak(it.line[1], false, D.swap ? "" : partnerWho(D.week, D.which)); }
     const nextMine = D.items[D.i+1] && D.items[D.i+1].t==="mine";
     stage = `${convLog(it)}<div class="flash"><span class="kind">${h(it.line[0])} fala${it.fix?"":` · fala ${convPos(it)}`}</span><div class="big">${W(it.line[1])}</div><div class="row" style="justify-content:center">${canSpeak?`<button class="say lg" data-act="say" data-say="${h(it.line[1])}" data-who="m" aria-label="Ouvir">${ICON.say}</button>`:""}${slowBtn(it.line[1])}</div><hr><div class="pt">${h(it.line[2])}</div></div>`;
     actions = `<div class="actions"><button class="btn wide" data-act="next">${nextMine?"Sua vez de responder":"Continuar"}</button></div>`;
   } else if(it.t==="mine"){
     const hint = it.hinted && !D.revealed;
-    stage = `${convLog(it)}<div class="flash"><span class="kind">${it.fix?"Correção · ":`Fala ${convPos(it)} · `}Sua vez · diga em espanhol</span><div class="big pt">${h(it.line[2])}</div>${hint?`<hr><div class="ans">${W(it.line[1])}</div>${sayRow(it.line[1])}<p class="small muted">Leia em voz alta quantas vezes quiser. Depois toque em ${MIC?"Falar":"Já falei"}.</p>`:(D.revealed?"":`<hr>`+blanksHtml(it, it.line[1]))}${heardHtml(it)}${D.revealed?`<hr><div class="ans">${W(it.line[1])}</div>${sayRow(it.line[1])}<p class="small muted">${it.hinted?"Esta volta na correção, no fim da conversa.":"Repita imitando a entonação."}</p>`:""}</div>`;
+    stage = `${convLog(it)}<div class="flash"><span class="kind">${it.fix?"Correção · ":`Fala ${convPos(it)} · `}Sua vez · diga em espanhol${D.hard?" · de memória":""}${D.swap?" · papéis trocados":""}</span>${D.hard && !it.fix && it.prev && !it.peek && !hint && !D.revealed ? `<div class="big pt" style="color:var(--muted);font-size:17px">Responda ao que acabou de ouvir, sem ler.</div><div class="actions" style="margin-top:8px"><button class="btn ghost wide" data-act="peek">Ver em português</button></div>` : `<div class="big pt">${h(it.line[2])}</div>`}${hint?`<hr><div class="ans">${W(it.line[1])}</div>${sayRow(it.line[1])}<p class="small muted">Leia em voz alta quantas vezes quiser. Depois toque em ${MIC?"Falar":"Já falei"}.</p>`:(D.revealed?"":`<hr>`+blanksHtml(it, it.line[1]))}${heardHtml(it)}${D.revealed?`<hr><div class="ans">${W(it.line[1])}</div>${sayRow(it.line[1])}<p class="small muted">${it.hinted?"Esta volta na correção, no fim da conversa.":"Repita imitando a entonação."}</p>`:""}</div>`;
     actions = D.revealed ? (it.hinted || (it.heard && it.heard.score>=.5) || it.fix ? `<div class="actions"><button class="btn wide" data-act="next">Próxima fala</button></div>`
           : `<div class="actions duo"><button class="btn soft" data-act="convbad">Não saiu</button><button class="btn wide" data-act="next">Saiu bem</button></div>`)
       : `<div class="actions${MIC?" duo":""}">${MIC?micBtn(it):""}<button class="btn wide" data-act="reveal">Já falei: ouvir o certo</button></div>${hint?"":`<div class="actions" style="margin-top:8px"><button class="btn ghost wide" data-act="hint">Não sei: ver a frase escrita</button></div>`}`;
@@ -6856,7 +6873,8 @@ document.addEventListener("click", e=>{
     case "addprofile": { const id=addProfile(($("#s-newp")||{}).value); if(!id){ toast("Digite um nome"); break; } openPasajeros(); toast("Passageiro adicionado. Toque em Usar para trocar."); break; }
     case "duel": startDuel(); break;
     case "again": { const m=D.mode, wk=D.week, me=D.me, wh=D.which, rc=D.city, ri=D.ri; closeDrill(); if(m==="read"){ startRead(rc, ri); break; } if(m==="build"){ startBuild(); break; } if(m==="frames"){ startFrames(10); break; } if(m==="write") startWrite(); else if(m==="falsos") startFalsos(); else if(m==="conv") startConv(wk,me,wh); else if(m==="duel") startDuel(); else if(m==="eco") startEco(); else if(m==="pron") startPron(); else if(m==="sons") startSons(); else startQuiz(m); break; }
-    case "conv": { if(el.dataset.pick){ pickConv(); break; } const wk = el.dataset.week ? +el.dataset.week : null; const wh=el.dataset.which||"A"; if(D) closeDrill(); startConv(wk, null, wh); break; }
+    case "conv": { if(el.dataset.pick){ pickConv(); break; } if(D) closeDrill(); if(el.dataset.plan){ const pl=convPlan(); startConv(pl.week, pl.role, pl.which, pl.hard, pl.label); break; } const wk = el.dataset.week ? +el.dataset.week : null; const wh=el.dataset.which||"A"; startConv(wk, null, wh); break; }
+    case "peek": { const it=D.items[D.i]; it.peek=true; drawDrill(); break; }
     case "convswap": { const wk=D.week, me=D.me, wh=D.which||"A"; const lines = wh==="B" ? WEEKS[wk-1].dialogB : WEEKS[wk-1].dialog; const other=[...new Set(lines.map(l=>l[0]))].find(x=>x!==me); closeDrill(); startConv(wk, other, wh); break; }
     case "eco": startEco(); break;
     case "sons": startSons(); break;

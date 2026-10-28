@@ -45,6 +45,8 @@ Configurações › Sistema › Idioma › Conversão de texto em voz. No iPhone
 
 **Visual (outubro de 2026)**: a tela Hoy é montada por `renderLolaBubble`, `renderDailyPath` (linha do tempo: o passo atual em cartão com botão largo "Começar", os feitos apagados com check) e `renderExtraCards` (extras só depois da rotina). Em Viaje, a edição da rota abre na folha `#sheet` por cima da tela (`V.screen==="rota"`, com `V.back` para voltar), as cidades ficam em cartões horizontais (`.citystrip`) e a legenda de ingressos é uma grade (`.legend`). O tema do país é o atributo `html[data-course]` (es, fr, it) com as variáveis no CSS; `applyTheme()` só troca o atributo e `renderBrandIcon()` desenha a bandeira com a saudação.
 
+**Conversa que evolui na semana** (`convPlan`): dia 1 e 2 guiada (conversa 1 e 2), dia 3 e 4 de memória (o português só aparece em "Ver em português"), dia 5 e 6 com papéis trocados (a pessoa faz o garçom, a recepcionista…; `startConv(week, role, which, hard, label)`), dia 7 revisão de uma conversa de tema anterior. As etapas do meio da rotina (montar, pronúncia, leitura, quiz) giram a cada dia. Quando todas as frases do tema foram vistas e as conversas feitas, a tela Hoy oferece "Adiantar o tema N+1".
+
 ## Como instalar no celular
 
 O app é a pasta `espanhol/` (um `index.html` + ícones + `sw.js` para funcionar offline). Precisa estar num endereço `https`:
