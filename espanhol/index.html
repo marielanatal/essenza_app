@@ -3600,15 +3600,21 @@ function loadPhotos(){
       if(!list.length) throw new Error("no src");
       let k=0;
       const tryNext=()=>{
-        if(k>=list.length){ fig.hidden=true; PHOTO_ERR.push(`${title}: imagem não carregou (${list.length} endereços)`); return; }
+        if(k>=list.length){ PHOTO_ERR.push(`${title}: imagem não carregou (${list.length} endereços)`); photoFail(fig); return; }
         const u=list[k++]; const img=new Image(); img.alt=fig.dataset.label||info.title; img.decoding="async"; img.referrerPolicy="no-referrer";
         img.onload=()=>{ fig.appendChild(img); const cap=document.createElement("figcaption"); cap.innerHTML = `<b>${h(fig.dataset.label||"")}</b><a href="${h(info.url)}" target="_blank" rel="noopener">Foto: Wikipedia ↗</a>`; fig.appendChild(cap); };
         img.onerror=()=>{ PHOTO_ERR.push(`${title}: falhou ${u.split("/")[2]}`); tryNext(); };
         img.src=u;
       };
       tryNext();
-    }catch(e){ fig.hidden=true; PHOTO_ERR.push(`${title}: ${e && e.message || e}`); }
+    }catch(e){ PHOTO_ERR.push(`${title}: ${e && e.message || e}`); photoFail(fig); }
   });
+}
+/* Foto que falhou: a do cabeçalho tenta a próxima da lista do tema; as outras somem */
+function photoFail(fig){
+  if(fig.id==="hero-photo"){ const list=((THEMES[themeKey()]||THEMES.es).photos||[]); const i=(+fig.dataset.i||0)+1;
+    if(i<list.length){ fig.dataset.i=i; fig.dataset.wp=list[(todayN()+i)%list.length]; fig.innerHTML=""; delete fig.dataset.done; fig.hidden=false; setTimeout(loadPhotos, 0); return; } }
+  fig.hidden=true;
 }
 /* Para ver e ouvir: links da missão de cada semana (buscas no YouTube e sites oficiais; funcionam sempre) */
 const yt = q => "https://www.youtube.com/results?search_query="+encodeURIComponent(q);
@@ -5704,7 +5710,7 @@ function renderBoard(){
   $("#b-week").textContent = `semana ${Math.min(calWeek(),planWeeks())} de ${planWeeks()} · tema ${curWeek()}`;
   $("#b-pax").innerHTML = `<i></i>${h((me().name||"").slice(0,14))}`;
   const fig=$("#hero-photo"); if(fig && typeof PHOTOS_ON!=="undefined" && PHOTOS_ON){ const list=((THEMES[themeKey()]||THEMES.es).photos||[]); const pick=list.length ? list[todayN()%list.length] : null;
-    if(pick && fig.dataset.wp!==pick){ fig.innerHTML=""; fig.dataset.wp=pick; fig.dataset.label=""; delete fig.dataset.done; fig.hidden=false; } }
+    if(pick && fig.dataset.base!==pick){ fig.innerHTML=""; fig.dataset.base=pick; fig.dataset.wp=pick; fig.dataset.i=0; fig.dataset.label=""; delete fig.dataset.done; fig.hidden=false; } }
 }
 
 /* RENDER: Hoy */
