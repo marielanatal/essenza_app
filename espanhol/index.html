@@ -546,6 +546,22 @@ nav.tabs button.on svg{stroke-width:2.4}
 .field input:focus,.field select:focus,.field textarea:focus,.search:focus,.kitsearch:focus,.tr textarea:focus,.answer:focus{outline:none;border-color:var(--cobalt);box-shadow:0 0 0 3px var(--cobalt-soft)}
 .field textarea{min-height:90px;font-family:var(--f-mono);font-size:16px}
 .field input[type=range]{padding:0;accent-color:var(--cobalt)}
+/* Timeline da rotina (tela Hoy) */
+.steps.timeline{background:transparent;border:0;box-shadow:none;padding:0;overflow:visible;display:flex;flex-direction:column}
+.timeline .step{display:grid;grid-template-columns:44px 1fr;gap:10px 12px;align-items:center;padding:12px 16px;position:relative}
+.timeline .step+.step::before{content:"";position:absolute;left:37px;top:-16px;height:16px;width:2px;background:var(--line)}
+.timeline .step .n{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:17px;background:var(--paper);color:var(--muted)}
+.timeline .step.cur{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:16px;margin:4px 0}
+.timeline .step.cur .n{background:var(--cobalt);color:var(--on-cobalt);box-shadow:0 0 0 5px var(--cobalt-soft)}
+.timeline .step.cur .go{grid-column:1 / -1;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:54px;font-size:17px;font-weight:800;border:0;border-radius:14px;background:var(--cobalt);color:var(--on-cobalt);margin-top:4px;letter-spacing:-.01em}
+.timeline .step.cur .go svg{width:20px;height:20px}
+.timeline .step.done{opacity:.45}
+.timeline .step.done b{text-decoration:line-through;text-decoration-thickness:2px}
+.timeline .step.done .n{background:transparent;color:var(--ok);border:2px solid var(--ok)}
+.timeline .step.done .n svg{width:18px;height:18px}
+.timeline .step.todo{opacity:.7}
+.timeline .step.todo .n{background:transparent;border:2px dashed var(--line);color:var(--muted)}
+
 /* iPhone: campo com letra menor que 16px faz o Safari dar zoom ao focar e a folha de ajustes sair do lugar */
 input:not([type=range]):not([type=checkbox]):not([type=radio]),select,textarea{font-size:16px!important}
 .hint{font-size:13px;color:var(--muted)}
@@ -5690,29 +5706,23 @@ function renderHoje(){
   const nothing = steps[0].done;
   const daysLeft = Math.max(0, numOf(S.trip)-todayN());
   const lola = lolaSays({nothing, daysLeft, allDone, cur: cur && cur.id});
+  const doneN = steps.filter(x=>x.done).length;
+  const CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`;
+  const PLAY = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>`;
+  /* Linha do tempo: o passo atual ganha o cartão e o botão grande; os feitos ficam apagados e riscados; os futuros só indicados */
+  const stepsHtml = steps.map((st,i)=>{
+    const cls = st.done ? "done" : (cur && cur.id===st.id ? "cur" : "todo");
+    const go = cls==="cur" ? `<button class="go" data-act="${st.act}"${st.which?` data-which="${st.which}"`:""}>${PLAY} ${st.started && st.id==="session" ? "Continuar agora" : "Começar agora"}</button>` : "";
+    return `<div class="step ${cls}"><span class="n">${st.done?CHECK:i+1}</span><div><b>${h(st.t)}</b><span class="d">${h(st.d)}</span></div>${go}</div>`;
+  }).join("");
   $("#v-hoje").innerHTML = `
-    ${renderLolaBubble(lola)}
+    <div class="lola"><div class="av">${LOLA}</div><button class="bubble" data-act="say" data-say="${h(lola.es)}"><div class="name">Lola · toque numa palavra</div><div class="es">${W(lola.es)}</div><div class="pt">${h(lola.pt)}</div></button></div>
     <div class="todayhead"><h2>Hoje</h2><div class="wk">${isBasic()?"":h(curLevel().name)+" · "}Tema ${w.n} de ${TOTAL_WEEKS} · <a href="#" data-act="goweek" data-week="${w.n}">${h(w.title)}</a></div></div>
     ${PHOTOS_ON ? photoEl(WP_WEEK[w.n], "banner", w.title) : ""}
     ${allDone && (backupAge()===null ? learnedCount()>=10 : backupAge()>=7) ? `<button class="card tint-s" style="text-align:left;width:100%" data-act="backup"><p class="small"><b>Faça um backup (leva 10 segundos).</b> ${IS_IOS?"No iPhone, apagar o app apaga o progresso. ":""}Toque aqui para gerar o link e guarde nas Notas ou no WhatsApp.</p></button>`:""}
     ${allDone ? `<div class="alldone"><div class="av" style="width:64px;height:64px;background:rgba(255,255,255,.2)">${LOLA}</div><div><div class="big">Feito por hoje. ¡Hasta mañana!</div><p>Rotina completa em ${streak()} ${streak()===1?"dia seguido":"dias seguidos"}.</p></div></div>` : ""}
-    ${renderDailyPath(steps, cur)}
+    <div class="steps timeline">${stepsHtml}<div class="stepfoot"><span>${doneN} de ${steps.length} · uns ${S.minutes||15} min no total</span><button class="btn soft" style="min-height:30px;padding:4px 10px;font-size:12px" data-act="settings">mudar minutos</button></div></div>
     ${renderExtraCards(w, allDone, daysLeft)}`;
-}
-/* Balão da Lola: toque numa palavra abre o dicionário; toque no balão ouve a frase */
-function renderLolaBubble(lola){
-  return `<div class="lola"><div class="av">${LOLA}</div><button class="bubble" data-act="say" data-say="${h(lola.es)}"><div class="name">Lola · toque numa palavra</div><div class="es">${W(lola.es)}</div><div class="pt">${h(lola.pt)}</div></button></div>`;
-}
-/* Trilha do dia: linha do tempo vertical. O passo atual ganha o cartão e o botão largo; os feitos ficam apagados com um check. */
-function renderDailyPath(steps, cur){
-  const CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`;
-  const doneN = steps.filter(x=>x.done).length;
-  const items = steps.map((st,i)=>{
-    const cls = st.done ? "done" : (cur && cur.id===st.id ? "cur" : "todo");
-    const go = cls==="cur" ? `<button class="go" data-act="${st.act}"${st.which?` data-which="${st.which}"`:""}>${st.started && st.id==="session" ? "Continuar" : "Começar"} · ${h(st.t)}</button>` : "";
-    return `<div class="step ${cls}"><span class="n">${st.done?CHECK:i+1}</span><div><b>${h(st.t)}</b><span class="d">${h(st.d)}</span></div>${go}</div>`;
-  }).join("");
-  return `<div class="steps">${items}<div class="stepfoot"><span>${doneN} de ${steps.length} · uns ${S.minutes||15} min no total</span><button class="btn soft" style="min-height:30px;padding:4px 10px;font-size:12px" data-act="settings">mudar minutos</button></div></div>`;
 }
 /* Cartões secundários, em tom plano para não competir com o botão principal. Os extras só aparecem com a rotina feita. */
 function renderExtraCards(w, allDone, daysLeft){
