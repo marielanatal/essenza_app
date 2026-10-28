@@ -43,6 +43,8 @@ Funciona sem internet e guarda o progresso no próprio aparelho.
 O áudio do celular (quando não há gravação) usa a voz de espanhol do próprio aparelho; em Ajustes › Voz do espanhol dá para escolher entre as vozes instaladas (a escolha fica salva e toca uma amostra). No Android, se a voz soar estranha, instale "Espanhol (Espanha)" em
 Configurações › Sistema › Idioma › Conversão de texto em voz. No iPhone, em Ajustes › Acessibilidade › Conteúdo Falado › Vozes.
 
+**Visual (outubro de 2026)**: a tela Hoy é montada por `renderLolaBubble`, `renderDailyPath` (linha do tempo: o passo atual em cartão com botão largo "Começar", os feitos apagados com check) e `renderExtraCards` (extras só depois da rotina). Em Viaje, a edição da rota abre na folha `#sheet` por cima da tela (`V.screen==="rota"`, com `V.back` para voltar), as cidades ficam em cartões horizontais (`.citystrip`) e a legenda de ingressos é uma grade (`.legend`). O tema do país é o atributo `html[data-course]` (es, fr, it) com as variáveis no CSS; `applyTheme()` só troca o atributo e `renderBrandIcon()` desenha a bandeira com a saudação.
+
 ## Como instalar no celular
 
 O app é a pasta `espanhol/` (um `index.html` + ícones + `sw.js` para funcionar offline). Precisa estar num endereço `https`:

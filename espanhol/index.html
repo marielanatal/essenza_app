@@ -33,6 +33,18 @@
   --r:16px; --r-sm:12px;
   --shadow:0 1px 2px rgba(21,27,46,.05), 0 6px 18px -8px rgba(21,27,46,.12);
 }
+/* Tema do país: cada curso define as cores do cabeçalho e do papel. O JS só troca o atributo. */
+html[data-course="es"]{--hero-a:#8f0d19;--hero-b:#d1202b;--hero-band:#f6c453;--board:#8f0d19;--paper:#faf5ee}
+html[data-course="fr"]{--hero-a:#1f3a93;--hero-b:#3b5bd1;--hero-band:#e8333b;--board:#1f3a93;--paper:#f3f5fb}
+html[data-course="it"]{--hero-a:#0f6b3a;--hero-b:#1f9a55;--hero-band:#d8232a;--board:#0f6b3a;--paper:#f4f8f3}
+html[data-course="es"][data-theme="dark"]{--paper:#15100f;--surface:#201818;--line:#332727}
+html[data-course="fr"][data-theme="dark"]{--paper:#0d1120;--surface:#161c30;--line:#272f4a}
+html[data-course="it"][data-theme="dark"]{--paper:#0d1510;--surface:#152018;--line:#263329}
+@media (prefers-color-scheme: dark){
+  html[data-course="es"]:not([data-theme="light"]){--paper:#15100f;--surface:#201818;--line:#332727}
+  html[data-course="fr"]:not([data-theme="light"]){--paper:#0d1120;--surface:#161c30;--line:#272f4a}
+  html[data-course="it"]:not([data-theme="light"]){--paper:#0d1510;--surface:#152018;--line:#263329}
+}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --paper:#0c111e; --surface:#151c2e; --ink:#e6eaf4; --muted:#9aa3b9; --line:#262f47;
   --cobalt:#8ea7ff; --cobalt-soft:#1c2750; --on-cobalt:#0c111e;
@@ -281,16 +293,19 @@ button.card{border:0;font:inherit;color:inherit}
 .res p{font-size:14px;color:var(--muted)}
 
 /* Rotina de hoje */
-.steps{display:flex;flex-direction:column;gap:0;background:var(--surface);border-radius:var(--r);padding:6px 0;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow)}
-.step{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;padding:14px 16px;position:relative}
-.step+.step::before{content:"";position:absolute;left:37px;top:-14px;height:14px;width:2px;background:var(--line)}
+.steps{display:flex;flex-direction:column;gap:0;background:transparent;border-radius:var(--r);padding:0;overflow:visible;border:0;box-shadow:none}
+.step{display:grid;grid-template-columns:44px 1fr;gap:10px 12px;align-items:center;padding:12px 16px;position:relative}
+.step.cur{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:16px;margin:4px 0}
+.step.cur .go{grid-column:1 / -1;width:100%;min-height:50px;font-size:16px;font-weight:700;border-radius:12px;margin-top:4px}
+.step+.step::before{content:"";position:absolute;left:37px;top:-16px;height:16px;width:2px;background:var(--line)}
 .step .n{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:17px;background:var(--paper);color:var(--muted)}
 .step.cur .n{background:var(--cobalt);color:var(--on-cobalt);box-shadow:0 0 0 5px var(--cobalt-soft)}
-.step.done .n{background:var(--ok);color:#fff}
-.step.done .n svg{width:20px;height:20px}
+.step.done{opacity:.55}
+.step.done .n{background:transparent;color:var(--ok);border:2px solid var(--ok)}
+.step.done .n svg{width:18px;height:18px}
 .step b{font-family:var(--f-display);font-size:16px;font-weight:700;display:block;letter-spacing:-.01em}
 .step .d{font-size:13px;color:var(--muted)}
-.step.todo{opacity:.6}
+.step.todo{opacity:.7}
 .step .go{border:0;border-radius:10px;padding:10px 14px;font-weight:600;background:var(--cobalt);color:var(--on-cobalt);min-height:42px;white-space:nowrap}
 .step.done .go{background:transparent;color:var(--ok);padding:0;min-height:0}
 .step.todo .go{background:var(--paper);color:var(--muted)}
@@ -302,7 +317,7 @@ button.card{border:0;font:inherit;color:inherit}
 .alldone{background:var(--ok);color:#fff;border-radius:var(--r);padding:22px 18px;display:flex;gap:14px;align-items:center}
 .alldone .big{font-family:var(--f-display);font-size:24px;font-weight:800;line-height:1.1}
 .alldone p{opacity:.9;font-size:14px;margin-top:4px}
-.prog{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:var(--r);padding:14px 16px;width:100%;text-align:left;font:inherit;color:inherit}
+.prog{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--paper);border:1px solid var(--line);box-shadow:none;border-radius:var(--r);padding:14px 16px;width:100%;text-align:left;font:inherit;color:inherit}
 .prog .nums{display:flex;gap:16px}
 .prog .nums b{font-family:var(--f-display);font-size:22px;font-weight:800;color:var(--cobalt);display:block;line-height:1}
 .prog .nums span{font-size:11px;color:var(--muted)}
@@ -329,6 +344,16 @@ button.card{border:0;font:inherit;color:inherit}
 .menu b{font-family:var(--f-display);font-size:16px;font-weight:700;display:block;letter-spacing:-.01em}
 .menu span{font-size:13px;color:var(--muted);display:block;margin-top:2px}
 .menu .chev{color:var(--muted);font-size:22px}
+.citystrip{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 4px 12px;margin:0 -4px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.citystrip::-webkit-scrollbar{display:none}
+.citystrip .citycard{flex:0 0 184px;scroll-snap-align:start;display:flex;flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden;text-align:left}
+.citystrip .citycard .photo,.citystrip .citycard .emoji{width:100%;aspect-ratio:4/3;border-radius:0;height:auto}
+.citystrip .citycard .cc{display:flex;flex-direction:column;gap:2px;padding:10px 12px 12px;min-width:0}
+.citystrip .citycard .cc b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.citystrip .citycard .cc span{font-size:12px;line-height:1.3}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;align-items:center;padding:12px 14px}
+.legend .eyebrow{grid-column:1 / -1}
+.legend .bk{white-space:normal;line-height:1.25;justify-self:start}
 .citycard{display:grid;grid-template-columns:72px 1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:var(--r);padding:10px 12px 10px 10px;text-align:left;width:100%;color:var(--ink)}
 .citycard .photo{aspect-ratio:1;width:72px;border-radius:12px}
 .citycard .photo figcaption{display:none}
@@ -511,9 +536,11 @@ nav.tabs button.on svg{stroke-width:2.4}
 .done-box .big{font-family:var(--f-display);font-weight:800;font-size:44px;color:var(--cobalt);letter-spacing:-.03em}
 
 /* Ajustes */
-.sheet-bg{position:fixed;inset:0;z-index:50;overscroll-behavior:contain;background:rgba(5,8,15,.55);display:flex;align-items:flex-end;justify-content:center}
-.sheet{background:var(--surface);width:100%;max-width:560px;max-height:88vh;max-height:88dvh;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;border-radius:20px 20px 0 0;padding:20px max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:16px}
-.field{display:flex;flex-direction:column;gap:6px}
+.sheet-bg{position:fixed;inset:0;z-index:50;overscroll-behavior:contain;overflow:hidden;background:rgba(5,8,15,.55);display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:100%;min-width:0;max-width:min(560px,100%);max-height:88vh;max-height:88dvh;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;border-radius:20px 20px 0 0;padding:20px max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:16px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.sheet .row,.sheet label,.sheet .stack{min-width:0}
+.sheet select,.sheet input,.sheet textarea{min-width:0;max-width:100%;text-overflow:ellipsis}
 .field label{font-weight:700;font-size:15px}
 .field input,.field select,.field textarea{border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:11px 12px;font-size:16px;width:100%}
 .field input:focus,.field select:focus,.field textarea:focus,.search:focus,.kitsearch:focus,.tr textarea:focus,.answer:focus{outline:none;border-color:var(--cobalt);box-shadow:0 0 0 3px var(--cobalt-soft)}
@@ -548,7 +575,7 @@ input:not([type=range]):not([type=checkbox]):not([type=radio]),select,textarea{f
   <header class="board" aria-label="Contagem regressiva">
     <figure class="photo hero-photo" id="hero-photo" hidden></figure>
     <div class="board-top">
-      <span class="brand" aria-label="Rumbo a España"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="2" y="10" width="60" height="44" rx="10" fill="#c60b1e"/><rect x="2" y="21" width="60" height="22" fill="#ffc400"/><path d="M14 18h36a6 6 0 0 1 6 6v14a6 6 0 0 1-6 6H30l-9 7v-7h-7a6 6 0 0 1-6-6V24a6 6 0 0 1 6-6z" fill="#fff"/><text x="32" y="38" text-anchor="middle" font-family="DejaVu Sans, Arial, sans-serif" font-weight="700" font-size="15" fill="#151b2e">¡Hola!</text></svg><span>Rumbo</span></span>
+      <span class="brand" id="brand" aria-label="Rumbo a España"></span>
       <button class="pax" data-act="pasajeros" id="b-pax">—</button>
       <button class="gear" data-act="settings" aria-label="Ajustes">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
@@ -3862,13 +3889,15 @@ const THEMES = {
   es: {name:"Espanha", heroA:"#8f0d19", heroB:"#d1202b", band:"#f6c453", paper:"#faf5ee", paperDark:"#15100f", surfaceDark:"#201818", lineDark:"#332727",
        photos:["Puerta_de_Alcalá","Plaza_de_España_(Sevilla)","Templo_Expiatorio_de_la_Sagrada_Familia","Parque_Güell","Real_Alcázar_de_Sevilla","Plaza_Mayor_(Madrid)","Catedral_de_Sevilla"]}
 };
+/* Bandeira com balão de saudação, por curso: es (Espanha), fr (França), it (Itália) */
+const BRAND = { es:{hi:"¡Hola!", flag:'<rect x="2" y="10" width="60" height="44" rx="10" fill="#c60b1e"/><rect x="2" y="21" width="60" height="22" fill="#ffc400"/>'},
+                fr:{hi:"Salut!", flag:'<rect x="2" y="10" width="60" height="44" rx="10" fill="#fff"/><path d="M2 20a10 10 0 0 1 10-10h10v44H12A10 10 0 0 1 2 44z" fill="#0055a4"/><path d="M42 10h10a10 10 0 0 1 10 10v24a10 10 0 0 1-10 10H42z" fill="#ef4135"/>'},
+                it:{hi:"Ciao!", flag:'<rect x="2" y="10" width="60" height="44" rx="10" fill="#fff"/><path d="M2 20a10 10 0 0 1 10-10h10v44H12A10 10 0 0 1 2 44z" fill="#009246"/><path d="M42 10h10a10 10 0 0 1 10 10v24a10 10 0 0 1-10 10H42z" fill="#ce2b37"/>'} };
+function renderBrandIcon(code){ const b=BRAND[code]||BRAND.es; return `<svg viewBox="0 0 64 64" aria-hidden="true">${b.flag}<path d="M14 18h36a6 6 0 0 1 6 6v14a6 6 0 0 1-6 6H30l-9 7v-7h-7a6 6 0 0 1-6-6V24a6 6 0 0 1 6-6z" fill="#fff"/><text x="32" y="38" text-anchor="middle" font-family="DejaVu Sans, Arial, sans-serif" font-weight="700" font-size="15" fill="#151b2e">${b.hi}</text></svg><span>Rumbo</span>`; }
 function applyTheme(key){
-  const t=THEMES[key]||THEMES.es; const st=document.documentElement.style;
-  st.setProperty("--hero-a",t.heroA); st.setProperty("--hero-b",t.heroB); st.setProperty("--hero-band",t.band); st.setProperty("--board",t.heroA);
-  const dark = document.documentElement.dataset.theme==="dark" || (document.documentElement.dataset.theme!=="light" && matchMedia("(prefers-color-scheme: dark)").matches);
-  st.setProperty("--paper", dark ? t.paperDark : t.paper);
-  if(dark){ st.setProperty("--surface", t.surfaceDark); st.setProperty("--line", t.lineDark); } else { st.removeProperty("--surface"); st.removeProperty("--line"); }
+  const t=THEMES[key]||THEMES.es; document.documentElement.dataset.course = THEMES[key] ? key : "es";
   const m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute("content", t.heroA);
+  const b=document.getElementById("brand"); if(b) b.innerHTML=renderBrandIcon(key);
 }
 applyTheme("es");
 try{ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ()=>applyTheme("es")); }catch(e){}
@@ -5659,37 +5688,46 @@ function renderHoje(){
   const cur = steps.find(x=>!x.done);
   const allDone = !cur;
   const nothing = steps[0].done;
-  const t = todayN();
-  const daysLeft = Math.max(0, numOf(S.trip)-t);
-  const fz = feasibility();
-  const behind = !fz.ok && daysLeft>0 && fz.left>0;
+  const daysLeft = Math.max(0, numOf(S.trip)-todayN());
   const lola = lolaSays({nothing, daysLeft, allDone, cur: cur && cur.id});
-  const lv = level();
-  const lvPct = lv.hi ? Math.round(100*(lv.x-lv.lo)/(lv.hi-lv.lo)) : 100;
-  const pool = unlockedCards();
-  const fdd = pool[(t*7) % pool.length];
-  const doneN = steps.filter(x=>x.done).length;
-  const CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`;
-  const stepsHtml = steps.map((st,i)=>{
-    const cls = st.done ? "done" : (cur && cur.id===st.id ? "cur" : "todo");
-    const go = st.done ? `<span class="go">Feito</span>` : (cls==="cur" ? `<button class="go" data-act="${st.act}"${st.which?` data-which="${st.which}"`:""}>${st.started && st.id==="session" ? "Continuar" : st.go}</button>` : `<span class="go">depois</span>`);
-    return `<div class="step ${cls}"><span class="n">${st.done?CHECK:i+1}</span><div><b>${h(st.t)}</b><span class="d">${h(st.d)}</span></div>${go}</div>`;
-  }).join("");
   $("#v-hoje").innerHTML = `
-    <div class="lola"><div class="av">${LOLA}</div><button class="bubble" data-act="say" data-say="${h(lola.es)}"><div class="name">Lola · toque numa palavra</div><div class="es">${W(lola.es)}</div><div class="pt">${h(lola.pt)}</div></button></div>
+    ${renderLolaBubble(lola)}
     <div class="todayhead"><h2>Hoje</h2><div class="wk">${isBasic()?"":h(curLevel().name)+" · "}Tema ${w.n} de ${TOTAL_WEEKS} · <a href="#" data-act="goweek" data-week="${w.n}">${h(w.title)}</a></div></div>
     ${PHOTOS_ON ? photoEl(WP_WEEK[w.n], "banner", w.title) : ""}
     ${allDone && (backupAge()===null ? learnedCount()>=10 : backupAge()>=7) ? `<button class="card tint-s" style="text-align:left;width:100%" data-act="backup"><p class="small"><b>Faça um backup (leva 10 segundos).</b> ${IS_IOS?"No iPhone, apagar o app apaga o progresso. ":""}Toque aqui para gerar o link e guarde nas Notas ou no WhatsApp.</p></button>`:""}
-    ${allDone ? `<div class="alldone"><div class="av" style="width:64px;height:64px;background:rgba(255,255,255,.2)">${LOLA}</div><div><div class="big">Feito por hoje. ¡Hasta mañana!</div><p>Rotina completa em ${streak()} ${streak()===1?"dia seguido":"dias seguidos"}.</p></div></div>
-    <div class="card stack" style="gap:10px"><div class="eyebrow">Quer mais? Extras de hoje</div>
+    ${allDone ? `<div class="alldone"><div class="av" style="width:64px;height:64px;background:rgba(255,255,255,.2)">${LOLA}</div><div><div class="big">Feito por hoje. ¡Hasta mañana!</div><p>Rotina completa em ${streak()} ${streak()===1?"dia seguido":"dias seguidos"}.</p></div></div>` : ""}
+    ${renderDailyPath(steps, cur)}
+    ${renderExtraCards(w, allDone, daysLeft)}`;
+}
+/* Balão da Lola: toque numa palavra abre o dicionário; toque no balão ouve a frase */
+function renderLolaBubble(lola){
+  return `<div class="lola"><div class="av">${LOLA}</div><button class="bubble" data-act="say" data-say="${h(lola.es)}"><div class="name">Lola · toque numa palavra</div><div class="es">${W(lola.es)}</div><div class="pt">${h(lola.pt)}</div></button></div>`;
+}
+/* Trilha do dia: linha do tempo vertical. O passo atual ganha o cartão e o botão largo; os feitos ficam apagados com um check. */
+function renderDailyPath(steps, cur){
+  const CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`;
+  const doneN = steps.filter(x=>x.done).length;
+  const items = steps.map((st,i)=>{
+    const cls = st.done ? "done" : (cur && cur.id===st.id ? "cur" : "todo");
+    const go = cls==="cur" ? `<button class="go" data-act="${st.act}"${st.which?` data-which="${st.which}"`:""}>${st.started && st.id==="session" ? "Continuar" : "Começar"} · ${h(st.t)}</button>` : "";
+    return `<div class="step ${cls}"><span class="n">${st.done?CHECK:i+1}</span><div><b>${h(st.t)}</b><span class="d">${h(st.d)}</span></div>${go}</div>`;
+  }).join("");
+  return `<div class="steps">${items}<div class="stepfoot"><span>${doneN} de ${steps.length} · uns ${S.minutes||15} min no total</span><button class="btn soft" style="min-height:30px;padding:4px 10px;font-size:12px" data-act="settings">mudar minutos</button></div></div>`;
+}
+/* Cartões secundários, em tom plano para não competir com o botão principal. Os extras só aparecem com a rotina feita. */
+function renderExtraCards(w, allDone, daysLeft){
+  const fz = feasibility(); const behind = !fz.ok && daysLeft>0 && fz.left>0;
+  const lv = level(); const lvPct = lv.hi ? Math.round(100*(lv.x-lv.lo)/(lv.hi-lv.lo)) : 100;
+  const pool = unlockedCards(); const fdd = pool[(todayN()*7) % pool.length];
+  const extras = allDone ? `<div class="card tint-c stack" style="gap:10px"><div class="eyebrow">Quer mais? Extras de hoje</div>
       <div class="row" style="gap:8px">
         ${newTier(1) ? `<button class="btn soft" style="flex:1 1 46%" data-act="extra">+${S.daily} frases novas <span class="ct">≈ ${sessionMinutes(S.daily,0)} min</span></button>` : newTier(2) ? `<button class="btn soft" style="flex:1 1 46%" data-act="extra">+${Math.min(S.daily,newTier(2))} frases extra <span class="ct">da semana ${curWeek()} · ≈ ${sessionMinutes(Math.min(S.daily,newTier(2)),0)} min</span></button>` : `<button class="btn soft" style="flex:1 1 46%" data-act="unlocknext">Liberar próximo tema</button>`}
         <button class="btn soft" style="flex:1 1 46%" data-act="conv" data-pick="1">Outra conversa</button>
         <button class="btn soft" style="flex:1 1 46%" data-act="${MIC?"pron":"eco"}">${MIC?"Pronúncia de novo":"Eco de novo"}</button>
         <button class="btn soft" style="flex:1 1 46%" data-act="quiz">Quiz rápido</button>
       </div>
-      <p class="small muted">${newTier(1) ? `Ainda há ${newTier(1)} frases do plano liberadas até a semana ${curWeek()}, mais ${newTier(2)} extras.` : newTier(2) ? `Você já viu as frases do plano até a semana ${curWeek()}. Restam ${newTier(2)} frases extra desta semana.` : `Você já viu tudo até a semana ${curWeek()}. Pode adiantar a próxima.`} O extra não quebra a rotina: amanhã volta ao normal.</p></div>` : ""}
-    <div class="steps">${stepsHtml}<div class="stepfoot"><span>${doneN} de ${steps.length} · uns ${S.minutes||15} min no total</span><button class="btn soft" style="min-height:30px;padding:4px 10px;font-size:12px" data-act="settings">mudar tempo</button></div></div>
+      <p class="small muted">${newTier(1) ? `Ainda há ${newTier(1)} frases do plano liberadas até a semana ${curWeek()}, mais ${newTier(2)} extras.` : newTier(2) ? `Você já viu as frases do plano até a semana ${curWeek()}. Restam ${newTier(2)} frases extra desta semana.` : `Você já viu tudo até a semana ${curWeek()}. Pode adiantar a próxima.`} O extra não quebra a rotina: amanhã volta ao normal.</p></div>` : `<p class="small muted" style="padding:0 4px">Quer mais depois da rotina? Os extras aparecem aqui quando terminar, ou na aba Practicar.</p>`;
+  return `${extras}
     ${behind ? `<button class="card tint-s small" style="text-align:left;width:100%" data-act="settings"><b>No ritmo atual você não vê tudo antes ${goalDa()}.</b> Faltam ${fz.left} frases do plano em ${daysLeft} dias: precisaria de ${fz.need} novas por dia (hoje: ${S.daily}). Toque para ajustar os minutos por dia.</button>`:""}
     <button class="prog" data-act="progreso" aria-label="Ver progresso e conquistas">
       <div><div class="nums"><div><b>${streak()>=3?'<span class="flame">'+ICON.flame+'</span>':""}${streak()}</b><span>dias seguidos</span></div><div><b>${learnedCount()}</b><span>frases</span></div><div><b>${spokenTotal()}</b><span>falas</span></div></div>
@@ -5979,7 +6017,7 @@ function viajeSearch(q){
   });
   return out.slice(0,40);
 }
-function vgo(screen, city){ V.screen=screen; if(city) V.city=city; saveProfiles(); renderViaje(); window.scrollTo(0,0); }
+function vgo(screen, city){ if(screen==="rota" && V.screen!=="rota") V.back=V.screen||"home"; if(screen!=="rota") $("#sheet").hidden=true; V.screen=screen; if(city) V.city=city; saveProfiles(); renderViaje(); if(screen!=="rota") window.scrollTo(0,0); }
 function routeSummary(){ const sel=V.dests.filter(id=>DEST[id]); const total=sel.reduce((a,id)=>a+(V.days[id]||0),0); return {sel,total,text: sel.map(id=>`${DEST[id].name} ${V.days[id]||1}d`).join(" → ") + (V.dep===arrivalId() && sel.length>1 ? ` → ${DEST[arrivalId()].name}` : "")}; }
 function renderViaje(){
   const sel = V.dests.filter(id=>DEST[id]);
@@ -5998,16 +6036,16 @@ function renderViaje(){
   }
   const CD=cityDates(); const arr=arrivalId(), dep=V.dep; const {total:totalDays, text:routeText}=routeSummary();
   const back = (title) => `<div class="vbar"><button class="back" data-act="vgo" data-s="home">← Viaje</button><h2>${title}</h2></div>`;
-  let html="";
-
-  if(V.screen==="home"){
+  let html="", rotaHtml="";
+  const under = V.screen==="rota" ? (V.back||"home") : V.screen;   // a rota abre numa folha por cima da tela anterior
+  if(under==="home"){
     const av=availableDays(); const mismatch = av!==null && av>=1 && av!==totalDays;
     html = `<div><h2 style="font-size:24px">Tu viaje</h2><p class="muted small" style="margin-top:4px">${fmtShort(numOf(S.trip))} a ${V.ret?fmtShort(numOf(V.ret)):fmtShort(numOf(S.trip)+totalDays-1)} · ${av!==null&&av>=1?av:totalDays} dias${mismatch?` · <span style="color:var(--bad);font-weight:700">cidades somam ${totalDays}</span>`:""}</p></div>
       ${searchBox}
       <button class="menu" data-act="vgo" data-s="rota"><span class="ic" style="background:var(--ok-soft);color:var(--ok)">${ICON.plane}</span><span><b>Sua rota</b><span>${h(routeText)}</span><span style="color:var(--cobalt);font-weight:700;margin-top:4px">Editar chegada, volta, cidades e dias</span></span><span class="chev">›</span></button>
       <div class="sec-h"><h3>Cidades</h3></div>
       <p class="small muted" style="padding:0 4px;margin-top:-6px">O que cada lugar tem: curiosidades, imperdíveis com ingressos, bate-voltas e transporte. Toque numa cidade.</p>
-      ${sel.map((id,i)=>{ const d=DEST[id]; const cd=CD[id]; return `<button class="citycard" data-act="vgo" data-s="cidade" data-city="${id}">${PHOTOS_ON?photoEl(WP_CITY[id]||d.name,"",d.name):`<span class="emoji">${h(d.name.charAt(0))}</span>`}<span><b>${h(d.name)}</b><span>${V.days[id]||1} ${V.days[id]===1?"dia":"dias"} · ${fmtDay(cd[0])}${cd[1]>cd[0]?" a "+fmtDay(cd[1]):""}</span><span>${d.must.length} imperdíveis · ${d.daytrips.length} bate-voltas</span></span><span class="chev">›</span></button>`; }).join("")}
+      <div class="citystrip">${sel.map((id,i)=>{ const d=DEST[id]; const cd=CD[id]; return `<button class="citycard" data-act="vgo" data-s="cidade" data-city="${id}">${PHOTOS_ON?photoEl(WP_CITY[id]||d.name,"",d.name):`<span class="emoji">${h(d.name.charAt(0))}</span>`}<span class="cc"><b>${h(d.name)}</b><span>${V.days[id]||1} ${V.days[id]===1?"dia":"dias"} · ${fmtDay(cd[0])}${cd[1]>cd[0]?" a "+fmtDay(cd[1]):""}</span><span>${d.must.length} imperdíveis · ${d.daytrips.length} bate-voltas</span></span></button>`; }).join("")}</div>
       ${sel.filter(id=>!DEST[id].custom).map((id,i)=>sabiasCard(id, 20+i)).join("")}
       ${(()=>{ const ids=sel.filter(id=>foodList(id).length); if(!ids.length) return ""; const id=ids[todayN()%ids.length]; const f=foodOfDay(id, todayN()); return f.length?`<div class="sabias food"><span class="eyebrow">Para provar · ${h(DEST[id].name)}</span>${f.map(x=>`<p><b>${h(x.t)}</b> <span class="bk ${FOOD_K[x.k][1]}"><i></i>${x.k}</span><br><span class="small">${x.d} <span class="muted">Onde: ${h(x.w)}</span></span></p>`).join("")}</div>`:""; })()}
       <div class="sec-h"><h3>Roteiro dia a dia</h3></div>
@@ -6016,10 +6054,10 @@ function renderViaje(){
       <button class="menu" data-act="gokit" style="margin-top:8px"><span class="ic" style="background:var(--bad-soft);color:var(--bad)">${ICON.sos}</span><span><b>Kit de sobrevivência</b><span>${SURV_CARDS.length} frases por situação, telefones, embaixada, dinheiro. Offline.</span></span><span class="chev">›</span></button>
       <div class="card tint-g small"><b>Outras cidades?</b> Adicione em Sua rota. Toda cidade nova ganha um guia automático (Wikipédia + Wikivoyage) na hora; ${packNames().length} cidades têm pacote completo (${packNames().join(", ")}). Me peça o pacote das que faltarem.</div>`;
   }
-  else if(V.screen==="rota"){
+  if(V.screen==="rota"){
     const selOpt = cur => Object.keys(DEST).map(id=>`<option value="${id}" ${id===cur?"selected":""}>${h(DEST[id].name)}</option>`).join("");
     const middles = Object.keys(DEST).filter(id=>id!==arr && id!==dep);
-    html = back("Sua rota") + `<div class="card stack" style="gap:14px">
+    rotaHtml = `<div class="sheet" role="dialog" aria-label="Sua rota"><div class="spread"><h2 style="font-size:22px">Sua rota</h2><button class="x" data-act="closesheet" aria-label="Fechar">${ICON.x}</button></div><div class="stack" style="gap:14px">
       <div class="route">
         <label><span class="eyebrow" style="color:var(--ok)">Chego em</span><select id="v-arr" data-act="varr">${selOpt(arr)}</select></label>
         <label><span class="eyebrow" style="color:var(--bad)">Volto de</span><select id="v-dep" data-act="vdep">${selOpt(dep)}</select></label>
@@ -6038,9 +6076,9 @@ function renderViaje(){
         return `<div class="cityrow"><span class="pos ${role}">${role==="a"?ICON.plane:role==="d"?ICON.back:i+1}</span><div style="min-width:0"><b>${h(DEST[id].name)}</b><span class="sub">${fmtDay(cd[0])}${cd[1]>cd[0]?` → ${fmtDay(cd[1])}`:""}${role==="a"?" · chegada":role==="d"?" · volta":""}${canMove?` <button class="x" style="width:24px;height:22px;border-radius:6px;display:inline-grid;vertical-align:middle;margin-left:4px" data-act="vmove" data-id="${id}" data-d="-1" ${i<=1?"disabled":""} aria-label="subir">↑</button><button class="x" style="width:24px;height:22px;border-radius:6px;display:inline-grid;vertical-align:middle" data-act="vmove" data-id="${id}" data-d="1" ${(i>=sel.length-2 && dep!==arr)||(i>=sel.length-1)?"disabled":""} aria-label="descer">↓</button>`:""}</span></div><div class="stepper"><button data-act="vdays" data-id="${id}" data-d="-1" aria-label="menos um dia">−</button><b>${V.days[id]||1}</b><button data-act="vdays" data-id="${id}" data-d="1" aria-label="mais um dia">+</button></div></div>`; }).join("")}
       ${dep===arr && sel.length>1 ? `<p class="small muted" style="margin-top:6px">Chega e volta por ${h(DEST[arr].name)}: os dias de ${h(DEST[arr].name)} ficam no começo e o roteiro termina com o trecho de volta para o voo.</p>`:""}
       <div class="spread small muted" style="padding-top:8px;border-top:1px solid var(--line);margin-top:6px"><span>Total</span><b>${totalDays} ${totalDays===1?"dia":"dias"} · ${fmtShort(numOf(S.trip))} a ${fmtShort(numOf(S.trip)+totalDays-1)}</b></div></div>
-      <button class="btn wide" data-act="vgo" data-s="home">Pronto</button></div>`;
+      <button class="btn wide" data-act="closesheet">Pronto</button></div></div>`;
   }
-  else if(V.screen==="cidade"){
+  if(under==="cidade"){
     const id=V.city, d=DEST[id], i=sel.indexOf(id), cd=CD[id];
     const prev=sel[i-1], next=sel[i+1];
     if(d.custom){ html = back(h(d.name)) + `${PHOTOS_ON ? photoEl(d.name, "banner", d.name) : ""}
@@ -6067,7 +6105,7 @@ function renderViaje(){
         return `<div class="card" style="padding:6px 16px">${first.map(c=>`<p class="curio">${c.t}</p>`).join("")}${rest.length?`<details class="more"><summary>Mais ${rest.length} curiosidades</summary>${rest.map(c=>`<p class="curio">${c.t}</p>`).join("")}</details>`:""}</div>
         <p class="small muted" style="padding:0 4px">${tied ? `Mais ${tied} curiosidades aparecem junto de cada imperdível e bate-volta, logo abaixo.` : ""}</p>`; })()}
       <div class="sec-h"><h3>Imperdíveis e ingressos</h3></div>
-      <div class="card tint-c small"><b>Legenda:</b> ${bkTag("s")} ${bkTag("d")} ${bkTag("h")} ${bkTag("g")}</div>
+      <div class="card tint-c legend"><span class="eyebrow">Legenda dos ingressos</span>${bkTag("s")}${bkTag("d")}${bkTag("h")}${bkTag("g")}</div>
       <div class="card" style="padding:4px 16px">${d.must.slice().sort((a,b)=>"sdhg".indexOf(a.pay?a.book:"g")-"sdhg".indexOf(b.pay?b.book:"g")).map(m=>itemHtml(m,id)).join("")}</div>
       ${sabiasCard(id, 1)}
       ${foodSection(id)}
@@ -6079,7 +6117,7 @@ function renderViaje(){
       <div class="citynav"><button data-act="vgo" data-s="cidade" data-city="${prev||""}" ${prev?"":"disabled"}>${prev?"← "+h(DEST[prev].name):"← início"}</button><button data-act="vgo" data-s="cidade" data-city="${next||""}" ${next?"":"disabled"}>${next?h(DEST[next].name)+" →":"fim →"}</button></div>
       <button class="btn ghost wide" data-act="vgo" data-s="home">← Voltar para Viaje</button>`;
   }
-  else {
+  if(under==="roteiro"){
     const parts=[];
     sel.forEach((id,i)=>{
       if(i===0){ const ap=DEST[id].transit.find(t=>/Aeroporto/i.test(t.t)); if(ap) parts.push(`<div class="leg"><b>${h(fmtDay(CD[id][0]))} · Chegada em ${h(DEST[id].name)}</b><span>Do aeroporto ao centro: ${ap.o.map(o=>`${h(o[0])} (${h(o[1])})`).join(" · ")}</span><span class="muted">Detalhes em Cidades › ${h(DEST[id].name)} › Transporte.</span></div>`); }
@@ -6110,12 +6148,13 @@ function renderViaje(){
       <div><div class="eyebrow" style="margin-bottom:6px">O que vocês curtem</div><div class="row" style="gap:8px">${INTERESES.map(([k,l])=>`<button class="ichip${V.interests.includes(k)?" on":""}" data-act="vint" data-k="${k}">${l}</button>`).join("")}</div></div>
       <div class="row" style="gap:8px"><span class="eyebrow" style="flex:1">Ritmo</span><button class="ichip${V.ritmo!=="tranquilo"?" on":""}" data-act="vritmo" data-k="normal">Ver bastante</button><button class="ichip${V.ritmo==="tranquilo"?" on":""}" data-act="vritmo" data-k="tranquilo">Tranquilo</button></div></div>
       <p class="muted small" style="padding:0 4px">${totalDays} dias, de ${fmtShort(numOf(S.trip))} a ${fmtShort(numOf(S.trip)+totalDays-1)}: chega em ${h(DEST[arr].name)}, volta de ${h(DEST[dep].name)}. Toque num item para abrir o site oficial. Dias e ordem: em <a href="#" data-act="vgo" data-s="rota" style="color:var(--cobalt);font-weight:700;text-decoration:none">Sua rota</a>.</p>
-      <div class="card tint-c small"><b>Legenda:</b> ${bkTag("s")} ${bkTag("d")} ${bkTag("h")} ${bkTag("g")}</div>
+      <div class="card tint-c legend"><span class="eyebrow">Legenda dos ingressos</span>${bkTag("s")}${bkTag("d")}${bkTag("h")}${bkTag("g")}</div>
       ${toBook.length?`<div class="card tint-s small"><b>Reserve já, esgota:</b><br>${toBook.join("<br>")}</div>`:""}
       ${parts.join("")}
       <button class="btn ghost wide" data-act="vgo" data-s="home">← Voltar para Viaje</button>`;
   }
-  $("#v-viaje").innerHTML = html + (PHOTOS_ON && V.screen!=="rota" ? `<p class="small muted" style="padding:0 4px">Fotos: artigos da Wikipédia em espanhol (Wikimedia Commons, licenças livres).</p>` : "");
+  if(V.screen==="rota"){ const sh=$("#sheet"); const inner0=sh.firstElementChild; const keep=inner0?inner0.scrollTop:0; sh.innerHTML=rotaHtml; sh.hidden=false; const inner=sh.firstElementChild; if(inner) inner.scrollTop=keep; }
+  $("#v-viaje").innerHTML = html + (PHOTOS_ON && under!=="rota" ? `<p class="small muted" style="padding:0 4px">Fotos: artigos da Wikipédia em espanhol (Wikimedia Commons, licenças livres).</p>` : "");
   loadPhotos();
 }
 let tab = "hoje";
@@ -6673,7 +6712,7 @@ function openSettings(){
     </div>
     <div class="field"><label for="s-voice">Voz do espanhol</label>${canSpeak ? (()=>{ loadVoices(); const L=esVoices(); const auto=esVoice(); return `<select id="s-voice"><option value="system" ${useSystemVoice()?"selected":""}>Padrão do iPhone: a voz marcada em Ajustes › Vozes (use esta para a aprimorada)</option><option value="" ${!useSystemVoice()&&!S.voice?"selected":""}>Automática do app (${auto?voiceLabel(auto):"a do celular"})</option>${L.map(v=>`<option value="${h(v.voiceURI)}" ${S.voice===v.voiceURI||S.voice===v.name?"selected":""}>${h(voiceLabel(v))}</option>`).join("")}</select><div class="row" style="gap:8px;margin-top:6px"><button class="btn soft" data-act="voicetest">Testar voz</button>${L.length>1?`<button class="btn ghost" data-act="voicecompare">Comparar as ${L.length} vozes</button>`:""}${IS_IOS?`<button class="btn ghost" data-act="voiceab">Comum × padrão</button>`:""}</div><span class="hint" id="s-voice-now" style="color:var(--cobalt);font-weight:700">${LAST_VOICE?"Falou agora com: "+h(LAST_VOICE):""}</span>
     <label class="row" style="gap:8px;margin-top:8px;align-items:center"><input type="checkbox" id="s-audio" ${AUDIO.on?"checked":""} style="width:22px;height:22px;accent-color:var(--cobalt)"> <span><b>Vozes gravadas (Elvira e Álvaro)</b><br><span class="hint">${AUDIO.keys && AUDIO.keys.size ? `${AUDIO.keys.size} áudios disponíveis: frases, diálogos, fórmulas e leituras tocam com voz natural; o resto usa a voz do celular. Precisa de internet na primeira vez que cada frase toca.` : "Ainda sem áudios gravados neste endereço (a rotina do GitHub gera os arquivos). Até lá, usa a voz do celular."}</span></span></label><span class="hint">${L.length} ${L.length===1?"voz de espanhol instalada":"vozes de espanhol instaladas"} neste aparelho. ${IS_IOS ? "O Safari só mostra ao app as vozes comuns; a aprimorada não aparece nesta lista, mas funciona assim: em Ajustes do iPhone › Acessibilidade › Conteúdo Falado › Vozes › Espanhol, toque em Mónica (Aprimorada) para deixá-la marcada como a voz do espanhol; depois escolha aqui 'Padrão do iPhone' e toque em Testar voz: ela se apresenta como 'la voz mejorada'." : "No Android, em Configurações › Sistema › Idioma › Conversão de texto em voz › Google, instale a voz 'Espanhol (Espanha)' e volte aqui."}</span>`; })() : `<span class="hint">Este navegador não oferece voz.</span>`}</div>
-    <div class="field"><label for="s-partner">Voz de quem conversa com você</label><select id="s-partner"><option value="auto" ${S.partner!=="m"&&S.partner!=="f"?"selected":""}>Conforme o personagem (Carmen fala com voz de mulher, o garçom com voz de homem)</option><option value="f" ${S.partner==="f"?"selected":""}>Sempre feminina (Elvira)</option><option value="m" ${S.partner==="m"?"selected":""}>Sempre masculina (Álvaro)</option></select><span class="hint">Vale para os personagens das conversas. A Lola e as frases do curso são sempre com a voz feminina.</span></div>
+    <div class="field"><label for="s-partner">Voz de quem conversa com você</label><select id="s-partner"><option value="auto" ${S.partner!=="m"&&S.partner!=="f"?"selected":""}>Conforme o personagem</option><option value="f" ${S.partner==="f"?"selected":""}>Sempre feminina (Elvira)</option><option value="m" ${S.partner==="m"?"selected":""}>Sempre masculina (Álvaro)</option></select><span class="hint">Vale para os personagens das conversas. A Lola e as frases do curso são sempre com a voz feminina.</span></div>
     <div class="field"><label for="s-rate">Velocidade da voz: <span id="s-rate-v">${S.rate.toFixed(2)}</span>×</label><input type="range" id="s-rate" min="0.6" max="1.1" step="0.05" value="${S.rate}">${canSpeak?`<span class="hint">Sem som? Escolha "Automática" acima, confira o botão lateral de silêncio e o volume, feche o app por completo e abra de novo. Depois de baixar uma voz nova, o iPhone às vezes só a usa após reiniciar o aparelho.</span>`:`<span class="hint">Este navegador não oferece voz.</span>`}<span class="hint">${canSpeak ? (esVoice() ? "Voz em uso: "+h(esVoice().name) : "Nenhuma voz de espanhol instalada; o aparelho usará a voz padrão. No Android, instale 'Espanhol (Espanha)' em Configurações › Idioma › Conversão de texto em voz.") : ""}</span></div>
     <div class="field"><label>Microfone (botão Falar)</label>
       ${window.claude ? `<span class="hint">Dentro do Claude o microfone não está disponível. Use o app instalado pelo endereço do GitHub.</span>` :
@@ -6892,7 +6931,7 @@ document.addEventListener("click", e=>{
     case "frames": startFrames(10); break;
     case "acc": { const a=$("#ans"); if(a){ const s=a.selectionStart??a.value.length, en=a.selectionEnd??a.value.length; a.value=a.value.slice(0,s)+el.dataset.a+a.value.slice(en); a.focus(); a.setSelectionRange(s+1,s+1); } break; }
     case "settings": openSettings(); break;
-    case "closesheet": $("#sheet").hidden=true; break;
+    case "closesheet": $("#sheet").hidden=true; if(V.screen==="rota"){ V.screen=V.back||"home"; saveProfiles(); renderViaje(); } break;
     case "backup": shareBackup(); break;
     case "import": { const bk=parseBackup(($("#s-io")||{}).value); if(!bk){ toast("Não reconheci. Cole o link de backup inteiro."); break; }
       if(bk.legacy){ S=normalize(bk.legacy); save(); renderAll(); $("#sheet").hidden=true; toast("Progresso restaurado"); break; }
@@ -7593,9 +7632,9 @@ const LECTURAS_B2 = {
 
 function buildLevelCards(weeks, p){ const out=[]; weeks.forEach(w=>w.cards.forEach((c,i)=>out.push({id:`${p}${w.n}-${i}`, es:c[0], pt:c[1], note:c[2]||"", week:w.n, kind:"v", tier:1, ord:w.n*100+i}))); weeks.forEach(w=>(w.extra||[]).forEach((c,i)=>out.push({id:`${p}x${w.n}-${i}`, es:c[0], pt:c[1], note:c[2]||"", week:w.n, kind:"v", tier:2, ord:w.n*100+70+i}))); return out; }
 const COURSE = {
-  basico:     { id:"basico",     name:"Básico",        cefr:"A1–A2", short:"para a viagem: pedir, perguntar, entender",      weeks:WEEKS_A1, cards:CARDS, frames:FRAMES, peg:PEGADINHAS, lect:LECTURAS, wp:WP_WEEK_A1, p:"w" },
-  intermedio: { id:"intermedio", name:"Intermediário", cefr:"B1",    short:"contar, opinar, resolver problemas",             weeks:WEEKS_B1, cards:buildLevelCards(WEEKS_B1,"i"), frames:FRAMES_B1, peg:PEGADINHAS_B1, lect:LECTURAS_B1, wp:WP_WEEK_B1, p:"i" },
-  avanzado:   { id:"avanzado",   name:"Avançado",      cefr:"B2–C1", short:"argumentar, negociar, soar como local",          weeks:WEEKS_B2, cards:buildLevelCards(WEEKS_B2,"a"), frames:FRAMES_B2, peg:PEGADINHAS_B2, lect:LECTURAS_B2, wp:WP_WEEK_B2, p:"a" }
+  basico:     { id:"basico",     name:"Básico",        cefr:"A1–A2", short:"para a viagem",      weeks:WEEKS_A1, cards:CARDS, frames:FRAMES, peg:PEGADINHAS, lect:LECTURAS, wp:WP_WEEK_A1, p:"w" },
+  intermedio: { id:"intermedio", name:"Intermediário", cefr:"B1",    short:"contar e opinar",             weeks:WEEKS_B1, cards:buildLevelCards(WEEKS_B1,"i"), frames:FRAMES_B1, peg:PEGADINHAS_B1, lect:LECTURAS_B1, wp:WP_WEEK_B1, p:"i" },
+  avanzado:   { id:"avanzado",   name:"Avançado",      cefr:"B2–C1", short:"soar como local",          weeks:WEEKS_B2, cards:buildLevelCards(WEEKS_B2,"a"), frames:FRAMES_B2, peg:PEGADINHAS_B2, lect:LECTURAS_B2, wp:WP_WEEK_B2, p:"a" }
 };
 function curLevel(){ return COURSE[S && S.level] || COURSE.basico; }
 function isBasic(){ return curLevel().id==="basico"; }
