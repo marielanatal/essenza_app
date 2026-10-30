@@ -6669,9 +6669,9 @@ function pickConv(){
 function startPron(){
   if(!MIC){ toast(window.claude ? "O microfone não funciona dentro do Claude. Use o app instalado." : "Este navegador não permite microfone. Vou abrir o Eco."); startEco(); return; }
   const w=curWeek(); let pool=seenCards(); if(pool.length<8) pool=unlockedCards();
-  const soundWords = shuffle(SOUNDS.flatMap(x=>x.ex.filter(e=>!/\s/.test(e)))).slice(0,3);
-  const cardWords = shuffle([...new Set(pool.flatMap(c=>wordsOf(c.es)).filter(x=>x.length>=4))]).slice(0,4).map(x=>{ const c=pool.find(c=>wordsOf(c.es).includes(x)); const orig=c ? c.es.replace(/[¿?¡!.,;:…]/g," ").split(/\s+/).find(o=>norm(o)===x) : x; return orig||x; });
-  const words=[...new Set([...soundWords, ...cardWords])].slice(0,5).map(t=>({t:"pron",kind:"word",txt:t,tries:0}));
+  /* Palavra isolada o reconhecedor quase nunca entende: usa frases curtas (as dos sons difíceis e as do curso) */
+  const soundPhrases = shuffle(SOUNDS.flatMap(x=>x.ex.filter(e=>/\s/.test(e)))).slice(0,3).map(t=>({t:"pron",kind:"word",txt:t,tries:0}));
+  const words=soundPhrases;
   const phrases=shuffle(pool.filter(c=>!/[\/…]/.test(c.es) && c.es.split(" ").length>=2 && c.es.length<=40)).slice(0,7).map(c=>({t:"pron",kind:"phrase",txt:c.es,pt:c.pt,tries:0}));
   openDrill({mode:"pron", items:[...words,...phrases], firstTry:0});
 }
@@ -6751,16 +6751,16 @@ function drawDrill(){
   } else if(it.t==="pron"){
     if(!it.played){ it.played=true; speak(it.txt); }
     const hd=it.heard;
-    stage = `<div class="flash"><span class="kind">${it.kind==="word"?"Palavra":"Frase"} · ouça e repita no microfone</span>
+    stage = `<div class="flash"><span class="kind">${it.kind==="word"?"Som difícil":"Frase"} · ouça e repita no microfone</span>
       ${hd ? `<div class="marks">${hd.marks.map(m=>`<span class="wm ${m.ok?"ok":"bad"}">${h(m.w)}</span>`).join("")}</div>` : `<div class="big">${W(it.txt)}</div>`}
       ${it.pt?`<div class="pt">${h(it.pt)}</div>`:""}
       ${sayRow(it.txt,true)}
-      ${hd ? `<div class="verdict ${hd.score>=.99?"ok":hd.score>=.5?"mid":"bad"}">${h(hd.msg[0])} <span class="muted" style="font-weight:400">${hd.score>=.99?"Perfeito.":hd.score>=.5?"Quase: repita as palavras em vermelho.":"Não entendi bem. Ouça de novo e fale mais devagar."} Entendi: “${h(hd.text)}”</span></div>` : ""}
+      ${hd ? `<div class="verdict ${hd.score>=.7?"ok":hd.score>=.4?"mid":"bad"}">${h(hd.msg[0])} <span class="muted" style="font-weight:400">${hd.score>=.99?"Perfeito.":hd.score>=.7?"Muito bem. As palavras em vermelho podem melhorar.":hd.score>=.4?"Quase: repita as palavras em vermelho.":"Não entendi bem. Ouça de novo e fale mais devagar."} Entendi: “${h(hd.text)}”</span></div>` : ""}
       ${it.tries>1?`<span class="tries">tentativa ${it.tries}</span>`:""}
     </div>`;
     actions = hd
-      ? `<div class="actions${hd.score<.99?" duo":""}">${hd.score<.99?`<button class="btn saff" data-act="pronretry">${ICON.mic} De novo</button>`:""}<button class="btn wide" data-act="next">Próxima</button></div>`
-      : `<div class="actions duo">${micBtn(it)}<button class="btn ghost" data-act="next">Pular</button></div>`;
+      ? `<div class="actions${hd.score<.7?" duo":""}">${hd.score<.7?`<button class="btn saff" data-act="pronretry">${ICON.mic} De novo</button>`:""}<button class="btn wide" data-act="next">Próxima</button></div>`
+      : `<div class="actions duo">${micBtn(it)}<button class="btn ghost" data-act="next">Pular</button></div><div class="actions" style="margin-top:8px"><button class="btn ghost wide" data-act="eco" style="min-height:40px">Hoje sem microfone: fazer o Eco</button></div>`;
   } else if(it.t==="eco"){
     if(!it.played){ it.played=true; speak(c.es); }
     stage = `<div class="flash"><span class="kind">Eco · ouça e repita junto</span><div class="big">${W(c.es)}</div>${sayRow(c.es,true)}<hr><div class="pt">${h(c.pt)}</div><p class="small muted">Repita 3 vezes: devagar, no ritmo normal e de olhos fechados.</p></div>`;
@@ -7009,20 +7009,20 @@ document.addEventListener("click", e=>{
       const it=D.items[D.i]; if(it.listening) break;
       const target = it.txt || (it.c ? it.c.es : it.line[1]);
       it.listening=true; drawDrill(); heardLive("");
-      hear(heardLive, 20000).then(r=>{
+      hear(heardLive, it.t==="pron" ? 9000 : 20000).then(r=>{
         it.listening=false;
         if(!D || D.items[D.i]!==it) return;
         const alts=r.alts;
         if(!alts.length){
           it.micFail=(it.micFail||0)+1;
-          toast(IS_IOS && it.micFail>=2 ? "O microfone abriu mas não captou nada. Teste em Ajustes › Testar microfone e, se usar vozes gravadas, experimente desligá-las ali para comparar." : "Não ouvi nada em 20 segundos. Toque numa lacuna para ver uma palavra, ou em Falar de novo quando estiver pronta.");
+          toast(IS_IOS && it.micFail>=2 ? "O microfone abriu mas não captou nada. Teste em Ajustes › Testar microfone." : it.t==="pron" ? "Não ouvi nada. Toque em Falar e fale logo em seguida, perto do celular; ou pule." : "Não ouvi nada em 20 segundos. Toque numa lacuna para ver uma palavra, ou em Falar de novo quando estiver pronta.");
           drawDrill(); return;
         }
         if(it.t==="pron"){
           const ps=pronScore(alts, target); it.tries++;
-          it.heard={text:alts[0], score:ps.score, marks:ps.marks, msg: ps.score>=.99 ? rnd(PRAISE) : rnd(CHEER)};
-          if(ps.score>=.99 && it.tries===1) D.firstTry++;
-          tone(ps.score>=.99?"ok":"bad"); if(ps.score>=.99) buzz(15); logToday().s++; save(); drawDrill(); if(ps.score<.99) speak(target, true);
+          it.heard={text:alts[0], score:ps.score, marks:ps.marks, msg: ps.score>=.7 ? rnd(PRAISE) : rnd(CHEER)};
+          if(ps.score>=.7 && it.tries===1) D.firstTry++;
+          tone(ps.score>=.7?"ok":"bad"); if(ps.score>=.7) buzz(15); logToday().s++; save(); drawDrill(); if(ps.score<.7) speak(target, true);
           return;
         }
         it.heard={text:alts[0], score:Math.max(...alts.map(a=>similarity(a,target)))}; tone(it.heard.score>=.5?"ok":"bad"); if(it.heard.score>=.8) buzz(15);
