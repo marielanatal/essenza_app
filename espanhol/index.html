@@ -5500,13 +5500,15 @@ function todaySteps(){
     {id:"quiz", t:"Quiz", d:"10 perguntas, com 'o que responder?' · ≈ 3 min", done:(l.q||0)>=10, act:"quiz", go:"Jogar"},
     {id:"listen", t:"Só de ouvido", d:"10 frases: ouça e escolha o sentido · ≈ 3 min", done:(l.li||0)>0, act:"listen", go:"Ouvir"},
     {id:"write", t:"Escrita", d:"Escreva a frase em espanhol · 8 frases · ≈ 3 min", done:(l.w||0)>0, act:"write", go:"Escrever"},
-    {id:"gram", t:"Gramática explicada", d:`${gramNext().t} · leitura curta em português · ≈ 2 min`, done:(l.g||0)>0, act:"gram", go:"Ler"},
+    {id:"gram", t:"Gramática explicada", d:`${gramNext().t} · explicação, exemplos e ${gramNext().q.length} exercícios · ≈ 4 min`, done:(l.g||0)>0, act:"gram", go:"Ler"},
     {id:"extra", t:"Frases extra", d:`+${S.daily} além da meta · ≈ ${sessionMinutes(S.daily,0)} min`, done:(l.x||0)>0 && (l.n||0)>=S.daily*2, act:"extra", go:"Mais"}
   ];
   const n = m<=5 ? 1 : m<=10 ? 2 : m<=15 ? 4 : m<=20 ? 5 : 7;
   /* As etapas do meio giram a cada dia (montar, pronúncia, leitura, quiz), para a rotina não ser sempre igual */
-  const mid=all.slice(2,9); const k=todayN()%mid.length; const rot=mid.slice(k).concat(mid.slice(0,k));
-  return [all[0], all[1], ...rot, all[9]].slice(0,n);
+  /* Gramática é passo fixo (3º) enquanto houver lição por ler; depois entra no rodízio como revisão */
+  const gram=all[8]; const unread=GRAMATICA.some(g=>!(S.gram||{})[g.id]);
+  const pool=unread ? all.slice(2,8) : all.slice(2,9); const k=todayN()%pool.length; const rot=pool.slice(k).concat(pool.slice(0,k));
+  return (unread ? [all[0], all[1], gram, ...rot, all[9]] : [all[0], all[1], ...rot, all[9]]).slice(0,n);
 }
 /* Plano da conversa do dia: evolui ao longo da semana. Dias 1 e 2: guiada (conversa 1, conversa 2). Dias 3 e 4: de memória (o português só aparece se pedir).
    Dias 5 e 6: papéis trocados (você faz o garçom, a recepcionista…). Dia 7: revisão de uma conversa de tema anterior. Sem conversa 2, a sequência se adapta. */
@@ -6525,13 +6527,129 @@ function openGramList(){ const done=S.gram||{}; const el=$("#sheet");
     <p class="small muted">Lições curtas, em português, do que mais confunde quem fala português. Leia uma por dia; os exemplos têm áudio. ${Object.keys(done).length} de ${GRAMATICA.length} lidas.</p>
     <div class="opts">${GRAMATICA.map((g,i)=>`<button class="opt" data-act="gramopen" data-id="${g.id}"><b>${i+1}.</b> ${h(g.t)}${done[g.id]?' <span class="pill ok" style="font-size:10px">lida</span>':""}</button>`).join("")}</div></div>`;
   el.hidden=false; }
-function openGram(id){ const g=GRAMATICA.find(x=>x.id===id)||gramNext(); const i=GRAMATICA.indexOf(g); const done=S.gram||{}; const el=$("#sheet");
-  el.innerHTML=`<div class="sheet" role="dialog" aria-label="${h(g.t)}"><div class="spread"><span class="eyebrow">Gramática ${i+1} de ${GRAMATICA.length}</span><button class="x" data-act="closesheet" aria-label="Fechar">${ICON.x}</button></div>
-    <h2 style="font-size:22px">${h(g.t)}</h2><div class="tip stack" style="gap:8px">${g.body}</div>
-    <div class="eyebrow">Exemplos: toque para ouvir, toque numa palavra para traduzir</div>
-    <div class="list">${g.ex.map(([es,pt])=>`<div class="phrase"><div><div class="es">${W(es)}</div><div class="pt small">${h(pt)}</div></div>${sayBtn(es)}</div>`).join("")}</div>
-    <div class="actions duo"><button class="btn ghost" data-act="gramlist">Todas as lições</button><button class="btn wide" data-act="gramdone" data-id="${g.id}">${done[g.id]?"Lida de novo":"Entendi"}</button></div></div>`;
-  el.hidden=false; el.firstElementChild.scrollTop=0; }
+/* Exercícios de cada lição de gramática: frase com lacuna (q), opções (o), índice da certa (a), frase completa para ouvir (s) e o porquê (why). */
+const GRAM_Q = {
+ "el-la":[
+  {q:"___ leche está fría.", o:["El","La"], a:1, s:"La leche está fría.", why:"Leche é feminino em espanhol: la leche."},
+  {q:"___ viaje es largo.", o:["El","La"], a:0, s:"El viaje es largo.", why:"Palavras em -aje são masculinas: el viaje, el garaje."},
+  {q:"___ agua está buena.", o:["El","La"], a:0, s:"El agua está buena.", why:"Agua é feminino, mas leva el no singular porque começa com 'a' forte."},
+  {q:"___ estación está cerca.", o:["El","La"], a:1, s:"La estación está cerca.", why:"Palavras em -ción são femininas."},
+  {q:"Me gusta ___ color rojo.", o:["el","la"], a:0, s:"Me gusta el color rojo.", why:"Color é masculino: el color."},
+  {q:"___ sal, por favor.", o:["El","La"], a:1, s:"La sal, por favor.", why:"Sal é feminino: la sal."}
+ ],
+ "un-una":[
+  {q:"Quiero ___ café con leche.", o:["un","una"], a:0, s:"Quiero un café con leche.", why:"Café é masculino: un café."},
+  {q:"Hay ___ farmacia en la esquina.", o:["un","una","la"], a:1, s:"Hay una farmacia en la esquina.", why:"Depois de hay usa-se un/una, e farmacia é feminino."},
+  {q:"Son ___ veinte minutos.", o:["unos","unas"], a:0, s:"Son unos veinte minutos.", why:"Unos + número = mais ou menos; minutos é masculino."},
+  {q:"Soy ___ contable.", o:["una","(nada)"], a:1, s:"Soy contable.", why:"Profissão vai sem artigo: soy contable."},
+  {q:"Necesito ___ habitación doble.", o:["un","una"], a:1, s:"Necesito una habitación doble.", why:"Habitación, em -ción, é feminino."},
+  {q:"Tengo ___ problema.", o:["un","una"], a:0, s:"Tengo un problema.", why:"Problema é masculino, como em português: un problema."}
+ ],
+ "lo":[
+  {q:"___ importante es llegar.", o:["Lo","El"], a:0, s:"Lo importante es llegar.", why:"Lo + adjetivo = 'o que é importante': ideia, não coisa."},
+  {q:"No ___ sé.", o:["lo","el"], a:0, s:"No lo sé.", why:"Lo substitui 'isso': não sei isso."},
+  {q:"Quiero ___ coche rojo.", o:["lo","el"], a:1, s:"Quiero el coche rojo.", why:"Antes de substantivo é el, nunca lo."},
+  {q:"___ siento mucho.", o:["Lo","El"], a:0, s:"Lo siento mucho.", why:"Lo siento = sinto isso = sinto muito."},
+  {q:"Pide ___ que quieras.", o:["lo","el"], a:0, s:"Pide lo que quieras.", why:"Lo que = o que (aquilo que)."},
+  {q:"¿El jamón? ___ quiero para llevar.", o:["Lo","El"], a:0, s:"Lo quiero para llevar.", why:"Pronome que substitui o presunto: lo."}
+ ],
+ "ser-estar-hay":[
+  {q:"¿___ un cajero cerca?", o:["Hay","Está","Es"], a:0, s:"¿Hay un cajero cerca?", why:"Existência: hay (tem, há)."},
+  {q:"¿Dónde ___ la estación?", o:["es","está","hay"], a:1, s:"¿Dónde está la estación?", why:"Lugar é sempre estar, mesmo de coisas fixas."},
+  {q:"___ de Brasil.", o:["Soy","Estoy","Hay"], a:0, s:"Soy de Brasil.", why:"Origem define quem você é: ser."},
+  {q:"El museo ___ cerrado hoy.", o:["es","está","hay"], a:1, s:"El museo está cerrado hoy.", why:"Estado passageiro: estar."},
+  {q:"___ las dos de la tarde.", o:["Son","Están","Hay"], a:0, s:"Son las dos de la tarde.", why:"Horas com ser: son las dos."},
+  {q:"___ mucha gente en la plaza.", o:["Es","Está","Hay"], a:2, s:"Hay mucha gente en la plaza.", why:"Tem gente = existência: hay."}
+ ],
+ "haber":[
+  {q:"Hoy ___ comido muy bien.", o:["he","tengo","hay"], a:0, s:"Hoy he comido muy bien.", why:"Ação feita hoje: he + particípio."},
+  {q:"¿___ estado en Sevilla?", o:["Has","Tienes","Hay"], a:0, s:"¿Has estado en Sevilla?", why:"Experiência de vida: has estado."},
+  {q:"El tren ___ salido.", o:["ha","tiene","a"], a:0, s:"El tren ha salido.", why:"Ha (verbo haber) + salido; 'a' sem h é preposição."},
+  {q:"___ dos hijos.", o:["He","Tengo","Hay"], a:1, s:"Tengo dos hijos.", why:"Posse: tener, não haber."},
+  {q:"___ llegado esta mañana.", o:["Hemos","Tenemos"], a:0, s:"Hemos llegado esta mañana.", why:"Nós + ação feita hoje: hemos llegado."},
+  {q:"Ana ___ ido ___ Madrid.", o:["ha / a","a / ha","ha / ha"], a:0, s:"Ana ha ido a Madrid.", why:"Ha = verbo (foi); a = preposição (para)."}
+ ],
+ "pronomes":[
+  {q:"¿___ eres de aquí? (informal)", o:["Tú","Usted","Vosotros"], a:0, s:"¿Tú eres de aquí?", why:"Informal, uma pessoa: tú."},
+  {q:"¿___ habla portugués, señor?", o:["Tú","Usted","Vosotros"], a:1, s:"¿Usted habla portugués, señor?", why:"Formal com uma pessoa: usted, verbo na 3ª pessoa."},
+  {q:"¿___ venís mañana? (vocês, informal)", o:["Ustedes","Vosotros","Ellos"], a:1, s:"¿Vosotros venís mañana?", why:"Vocês informal na Espanha: vosotros + venís."},
+  {q:"___ somos de Brasil.", o:["Nosotras","Vosotras","Ellas"], a:0, s:"Nosotras somos de Brasil.", why:"Somos = nós."},
+  {q:"Carmen y Ana son amigas. ___ viven en Madrid.", o:["Ellos","Ellas","Ustedes"], a:1, s:"Ellas viven en Madrid.", why:"Duas mulheres: ellas."},
+  {q:"(Yo) ___ un café, por favor.", o:["quiero","quieres","quiere"], a:0, s:"Quiero un café, por favor.", why:"Eu: quiero. O pronome 'yo' pode sumir, o verbo já diz."}
+ ],
+ "presente":[
+  {q:"Yo ___ un poco de español.", o:["hablo","hablas","habla"], a:0, s:"Hablo un poco de español.", why:"-ar, eu: hablo."},
+  {q:"Nosotros ___ a las dos.", o:["come","comemos","comen"], a:1, s:"Comemos a las dos.", why:"-er, nós: comemos."},
+  {q:"Ellos ___ en Madrid.", o:["vive","viven","vivimos"], a:1, s:"Ellos viven en Madrid.", why:"Eles: terminação -n (viven), não -m."},
+  {q:"¿Tú ___ café?", o:["tomo","tomas","toma"], a:1, s:"¿Tú tomas café?", why:"Tu/você: -as."},
+  {q:"Usted ___ muy bien.", o:["hablas","habla","hablan"], a:1, s:"Usted habla muy bien.", why:"Usted vai com a 3ª pessoa: habla."},
+  {q:"Yo ___ ir, pero no ___.", o:["quiero / puedo","quiere / puede","queremos / podemos"], a:0, s:"Quiero ir, pero no puedo.", why:"Troca de vogal no meio: quiero, puedo."}
+ ],
+ "irregulares":[
+  {q:"¿___ ayudarme, por favor?", o:["Puede","Puedo","Hace"], a:0, s:"¿Puede ayudarme, por favor?", why:"Pedido educado: ¿puede + infinitivo?"},
+  {q:"___ a pagar con tarjeta.", o:["Voy","Vas","Va"], a:0, s:"Voy a pagar con tarjeta.", why:"Futuro próximo: voy a + infinitivo."},
+  {q:"___ que ir a la estación.", o:["Tengo","Hago","Soy"], a:0, s:"Tengo que ir a la estación.", why:"Obrigação: tener que + infinitivo."},
+  {q:"___ mucho calor hoy.", o:["Hace","Es","Tiene"], a:0, s:"Hace mucho calor hoy.", why:"Tempo e clima: hace calor, hace frío."},
+  {q:"___ hambre.", o:["Tengo","Soy","Estoy"], a:0, s:"Tengo hambre.", why:"Fome, sede, sono, frio: tener."},
+  {q:"¿Qué ___ usted mañana?", o:["hace","hago","hacen"], a:0, s:"¿Qué hace usted mañana?", why:"Usted: hace (3ª pessoa)."}
+ ],
+ "perguntas":[
+  {q:"¿___ está el baño?", o:["Dónde","Qué","Cuándo"], a:0, s:"¿Dónde está el baño?", why:"Lugar: dónde."},
+  {q:"¿___ cuesta?", o:["Cuánto","Cuántos","Cómo"], a:0, s:"¿Cuánto cuesta?", why:"Quanto custa: cuánto (singular)."},
+  {q:"¿___ te llamas?", o:["Cuál","Cómo","Qué"], a:1, s:"¿Cómo te llamas?", why:"'Qual é seu nome' em espanhol é ¿cómo te llamas?"},
+  {q:"¿___ personas sois?", o:["Cuánto","Cuántas","Cuántos"], a:1, s:"¿Cuántas personas sois?", why:"Personas é feminino plural: cuántas."},
+  {q:"¿___ hora es?", o:["Qué","Cuál","Cómo"], a:0, s:"¿Qué hora es?", why:"Qué antes de substantivo: qué hora."},
+  {q:"¿___ está cerrado?", o:["Porque","Por qué","Porqué"], a:1, s:"¿Por qué está cerrado?", why:"Pergunta: por qué, separado e com acento."}
+ ],
+ "gustar":[
+  {q:"Me ___ el jamón.", o:["gusta","gustan","gusto"], a:0, s:"Me gusta el jamón.", why:"Uma coisa: gusta."},
+  {q:"Me ___ las tapas.", o:["gusta","gustan"], a:1, s:"Me gustan las tapas.", why:"Várias coisas: gustan."},
+  {q:"¿___ gusta Madrid? (você)", o:["Me","Te","Le"], a:1, s:"¿Te gusta Madrid?", why:"Você gosta: te gusta."},
+  {q:"A mi madre ___ encanta viajar.", o:["le","la","se"], a:0, s:"A mi madre le encanta viajar.", why:"Ela: le encanta."},
+  {q:"Me ___ la cabeza.", o:["duele","duelen","dolor"], a:0, s:"Me duele la cabeza.", why:"Doler funciona como gustar: me duele."},
+  {q:"___ gusta mucho este barrio. (nós)", o:["Nos","Os","Les"], a:0, s:"Nos gusta mucho este barrio.", why:"Nós: nos gusta."}
+ ],
+ "objeto":[
+  {q:"¿___ puede ayudar? (a mim)", o:["Me","Te","Le"], a:0, s:"¿Me puede ayudar?", why:"Me = a mim, antes do verbo conjugado."},
+  {q:"___ llamo mañana. (a você)", o:["Te","Me","Lo"], a:0, s:"Te llamo mañana.", why:"Te = a você."},
+  {q:"¿El vino? ___ quiero tinto.", o:["Lo","La","Le"], a:0, s:"Lo quiero tinto.", why:"Vino é masculino: lo."},
+  {q:"¿La cuenta? ___ pago yo.", o:["Lo","La","Le"], a:1, s:"La pago yo.", why:"Cuenta é feminino: la."},
+  {q:"___ doy las llaves a Carmen.", o:["Le","La","Lo"], a:0, s:"Le doy las llaves a Carmen.", why:"Dar algo a alguém: le (objeto indireto)."},
+  {q:"¿Puede ayudar___?", o:["me","mi","yo"], a:0, s:"¿Puede ayudarme?", why:"Com infinitivo o pronome gruda no fim: ayudarme."}
+ ],
+ "muy-mucho":[
+  {q:"Está ___ bueno.", o:["muy","mucho"], a:0, s:"Está muy bueno.", why:"Antes de adjetivo: muy."},
+  {q:"Hay ___ gente.", o:["muy","mucha","mucho"], a:1, s:"Hay mucha gente.", why:"Antes de substantivo feminino: mucha."},
+  {q:"___ gracias.", o:["Muy","Muchas","Mucho"], a:1, s:"Muchas gracias.", why:"Gracias é plural feminino: muchas gracias."},
+  {q:"Me gusta ___.", o:["muy","mucho"], a:1, s:"Me gusta mucho.", why:"Depois do verbo, sozinho: mucho."},
+  {q:"Hoy hace ___ frío.", o:["muy","mucho"], a:1, s:"Hoy hace mucho frío.", why:"Frío aqui é substantivo (faz frio): mucho frío."},
+  {q:"Yo ___ voy. (também não)", o:["también","tampoco"], a:1, s:"Yo tampoco voy.", why:"Também não = tampoco."}
+ ],
+ "preposicoes":[
+  {q:"Voy ___ centro en metro.", o:["al","a el","en el"], a:0, s:"Voy al centro en metro.", why:"A + el = al."},
+  {q:"Vengo ___ hotel.", o:["del","de el","do"], a:0, s:"Vengo del hotel.", why:"De + el = del."},
+  {q:"Veo ___ Carmen en la plaza.", o:["a","(nada)","la"], a:0, s:"Veo a Carmen en la plaza.", why:"Pessoa como objeto leva 'a': veo a Carmen."},
+  {q:"Gracias ___ todo.", o:["por","para"], a:0, s:"Gracias por todo.", why:"Agradecer: por."},
+  {q:"Es ___ llevar.", o:["por","para"], a:1, s:"Es para llevar.", why:"Finalidade: para."},
+  {q:"Vamos ___ tren.", o:["en","de","a"], a:0, s:"Vamos en tren.", why:"Meio de transporte: en tren, en coche."}
+ ],
+ "negacao":[
+  {q:"___ entiendo.", o:["No","Nada","Nunca"], a:0, s:"No entiendo.", why:"Negar o verbo: no antes dele."},
+  {q:"No tengo ___ que declarar.", o:["nada","algo","nadie"], a:0, s:"No tengo nada que declarar.", why:"Depois do verbo negado: nada (dupla negação é certa)."},
+  {q:"___ he estado aquí.", o:["Nunca","No nunca","Nada"], a:0, s:"Nunca he estado aquí.", why:"Nunca antes do verbo dispensa o 'no'."},
+  {q:"No hay ___ en la calle.", o:["nadie","alguien","nada"], a:0, s:"No hay nadie en la calle.", why:"Pessoa: nadie (ninguém)."},
+  {q:"No quiero ___ carne ___ pescado.", o:["ni / ni","y / y","o / o"], a:0, s:"No quiero ni carne ni pescado.", why:"Nem… nem: ni… ni."},
+  {q:"Yo ___ tengo hambre. (também não)", o:["tampoco","también","no"], a:0, s:"Yo tampoco tengo hambre.", why:"Também não: tampoco."}
+ ]
+};
+GRAMATICA.forEach(g=>{ g.q=GRAM_Q[g.id]||[]; });
+/* Lição de gramática como treino: 1) explicação com exemplos, 2) exercícios com o porquê, 3) correção dos erros no fim */
+function startGram(id){
+  const g=GRAMATICA.find(x=>x.id===id)||gramNext();
+  const items=[{t:"gramread", g}, ...g.q.map((q,n)=>({t:"mc", c:{es:q.q, pt:"", ans:q.o[q.a], full:q.s, note:q.why||""}, dir:"gramq", field:"ans", opts:q.o.slice(), picked:null, qn:n+1}))];
+  openDrill({mode:"gram", gid:g.id, gtitle:g.t, items});
+}
+function openGram(id){ startGram(id); }
 let PEGADINHAS = [
   {t:"O verbo já diz quem fala", r:"Em espanhol não se repete <b>yo, tú, usted</b>: a terminação do verbo mostra a pessoa. <b>-o</b> = eu (quiero, tengo), <b>-as/-es</b> = você/tu (quieres, tienes), <b>-a/-e</b> = o senhor, a senhora, ele, ela (quiere, tiene), <b>-amos/-emos</b> = nós, <b>-an/-en</b> = vocês, eles.",
    ex:[["Quiero un café.","Quero um café."],["¿Tienes hora?","Você tem horas?"],["¿Tiene una mesa libre?","O senhor tem uma mesa livre?"],["Vamos a la playa.","Vamos à praia."]], bad:"Yo quiero, tú quieres… repetido em toda frase soa estranho."},
@@ -6733,7 +6851,7 @@ function allSpeakables(){
     Object.values(L.lect).forEach(T=>T.forEach(x=>{ sentences(x.txt).forEach(sn=>add(sn)); x.q.forEach(q=>add(q.q)); }));
   });
   SOUNDS.forEach(x=>(x.ex||[]).forEach(e=>add(e)));
-  GRAMATICA.forEach(g=>g.ex.forEach(([es])=>add(es)));
+  GRAMATICA.forEach(g=>{ g.ex.forEach(([es])=>add(es)); (g.q||[]).forEach(q=>add(q.s)); });
   add("Hola, soy Elvira. Hablaré contigo en las conversaciones."); add("Hola, soy Álvaro. Hablaré contigo en las conversaciones.", true);
   return [...out.values()];
 }
@@ -6868,6 +6986,13 @@ function drawDrill(){
   } else if(it.t==="turn"){
     stage = `<div class="flash"><span class="kind">Duelo · ${D.dscore[D.players[0].id]} × ${D.dscore[D.players[1].id]}</span><div class="av" style="width:84px;height:84px">${faceOf(it.who.id)}</div><div class="big">Vez de ${h(it.who.name)}</div><p class="muted">Passe o celular. Vale 1 ponto por acerto.</p></div>`;
     actions = `<div class="actions"><button class="btn wide" data-act="next">¡Vamos!</button></div>`;
+  } else if(it.t==="gramread"){
+    const g=it.g, gi=GRAMATICA.indexOf(g);
+    stage = `<div class="flash" style="align-items:stretch;text-align:left"><span class="kind" style="text-align:center">Gramática ${gi+1} de ${GRAMATICA.length} · leia com calma</span><div class="big" style="text-align:center;font-size:24px">${h(g.t)}</div>
+      <div class="tip stack" style="gap:8px">${g.body}</div>
+      <div class="eyebrow">Exemplos: toque para ouvir, toque numa palavra para traduzir</div>
+      <div class="list">${g.ex.map(([es,pt])=>`<div class="phrase"><div><div class="es">${W(es)}</div><div class="pt small">${h(pt)}</div></div>${sayBtn(es)}</div>`).join("")}</div></div>`;
+    actions = `<div class="actions"><button class="btn wide" data-act="next">Fazer os ${g.q.length} exercícios</button></div>`;
   } else if(it.t==="read"){
     stage = `<div class="flash" style="align-items:stretch;text-align:left"><span class="kind" style="text-align:center">Leitura · ${h(DEST[it.city]?DEST[it.city].name:it.city)} · nível ${h(it.L.lvl)}</span><div class="big" style="text-align:center;font-size:24px">${h(it.L.t)}</div>
       <div class="row" style="justify-content:center;gap:8px">${canSpeak?`<button class="btn soft" data-act="readplay">${ICON.say} ${READ.playing?"Parar":"Ouvir"}</button><button class="slowbtn" data-act="readplay" data-slow="1">Devagar</button>`:""}<button class="slowbtn" data-act="readhide">${it.hide?"Mostrar texto":"Esconder texto"}</button></div>
@@ -6875,7 +7000,8 @@ function drawDrill(){
     actions = `<div class="actions"><button class="btn wide" data-act="next">Responder ${it.L.q.length} perguntas</button></div>`;
   } else if(it.t==="mc"){
     const fx = it.fix ? "Correção · " : "";
-    const prompt = it.dir==="readq" ? `<span class="kind">${fx}Pergunta ${it.qn} sobre o texto</span><div class="big" style="font-size:22px">${W(c.es)}</div>${sayBtn(c.es)}${it.showText?`<div class="lect small" style="max-height:38vh;overflow:auto;background:var(--paper);border-radius:12px;padding:10px 12px;font-size:16px;width:100%">${it.sents.map(sn=>W(sn)).join(" ")}</div>`:""}<button class="slowbtn" data-act="readshow">${it.showText?"Esconder o texto":"Ver o texto"}</button>`
+    const prompt = it.dir==="gramq" ? `<span class="kind">${fx}Exercício ${it.qn} · complete</span><div class="big" style="font-size:24px">${h(c.es)}</div>${it.picked!==null?`<div class="ans">${W(c.full)}</div>${sayRow(c.full)}`:""}`
+      : it.dir==="readq" ? `<span class="kind">${fx}Pergunta ${it.qn} sobre o texto</span><div class="big" style="font-size:22px">${W(c.es)}</div>${sayBtn(c.es)}${it.showText?`<div class="lect small" style="max-height:38vh;overflow:auto;background:var(--paper);border-radius:12px;padding:10px 12px;font-size:16px;width:100%">${it.sents.map(sn=>W(sn)).join(" ")}</div>`:""}<button class="slowbtn" data-act="readshow">${it.showText?"Esconder o texto":"Ver o texto"}</button>`
       : it.dir==="listen" ? `<span class="kind">${fx}Ouça e escolha</span>${sayBtn(c.es,true)}${it.picked!==null?`<div class="ans">${h(c.es)}</div>`:""}`
       : it.dir==="reply" ? `<span class="kind">${fx}Alguém diz… o que você responde?</span><div class="big">${W(c.es)}</div><div class="pt">${h(c.pt)}</div>${sayBtn(c.es)}`
       : `<span class="kind">${fx}${it.dir==="es"?"O que significa?":"Como se diz em espanhol?"}</span><div class="big ${it.dir==="pt"?"pt":""}">${h(it.dir==="es"?c.es:c.pt)}</div>${it.dir==="es"?sayBtn(c.es):""}`;
@@ -6907,6 +7033,7 @@ function drawDone(){
   if(D.mode==="duel") return drawDuelDone();
   if(D.mode==="conv") convMaybeDone();
   if(!D.logged){ D.logged=true; const lg=logToday(); if(D.mode==="read"){ lg.rd=(lg.rd||0)+1; S.reads=S.reads||{}; S.reads[lvKey(D.city+":"+D.ri)]=todayN(); save(); } if(D.mode==="build"||D.mode==="frames"){ lg.b=(lg.b||0)+1; save(); } if(D.mode==="eco"||D.mode==="sons"||D.mode==="pron"){ lg.e=(lg.e||0)+1; save(); } if(D.mode==="listen"){ lg.li=(lg.li||0)+1; save(); } if(D.mode==="write"){ lg.w=(lg.w||0)+1; save(); } }
+  if(D.mode==="gram" && !D.gramLogged){ D.gramLogged=true; S.gram=S.gram||{}; S.gram[D.gid]=todayN(); const lg=logToday(); lg.g=(lg.g||0)+1; save(); }
   const good = D.mode==="session" || D.mode==="conv" || D.mode==="eco" || D.mode==="sons" || D.score>=D.total*0.7;
   const pr = good ? rnd(PRAISE) : rnd(CHEER);
   confetti_if(good); tone("done");
@@ -6918,13 +7045,15 @@ function drawDone(){
     build:["¡Muy bien!",`${D.score} de ${D.total} na ordem certa`,`${D.fixed ? `${D.fixed} ${D.fixed===1?"frase revista":"frases revistas"} na correção. ` : ""}Montar a frase é o passo entre decorar e falar: amanhã vêm outras.`],
     frames:["¡Eso es!",`${D.score} de ${D.total} fórmulas`,`${D.fixed ? `${D.fixed} ${D.fixed===1?"revista":"revistas"} na correção. ` : ""}Com 18 moldes e o encaixe certo você diz quase tudo que precisa numa viagem.`],
     pron:["¡Qué bien suena!","Pronúncia treinada",`${D.firstTry} de ${D.total} entendidas de primeira. As que falharam voltam amanhã.`],
-    sons:["¡Perfecto!","Sons revisados","Volte aqui sempre que algum som travar."]
+    sons:["¡Perfecto!","Sons revisados","Volte aqui sempre que algum som travar."],
+    gram:["¡Muy bien!",`${D.score} de ${D.items.filter(x=>x.t==="mc"&&!x.fix).length} exercícios`,`${D.fixed ? `${D.fixed} ${D.fixed===1?"revisto":"revistos"} na correção. ` : ""}${(()=>{ const nx=GRAMATICA.find(g=>!(S.gram||{})[g.id]); return nx ? `Próxima lição: ${nx.t}.` : "Você leu todas as lições. Elas ficam em Plan para rever."; })()}`]
   }[D.mode];
   const [, msg0, sub] = M || ["", `${D.score} de ${D.total}`, (D.fixed ? `${D.fixed} ${D.fixed===1?"erro revisto":"erros revistos"} na correção. ` : "") + (good ? "Você está mandando bem." : "Os erros voltam na sua próxima sessão de revisão.")];
   const big = pr[0], msg = msg0 ? `${msg0} · ${pr[1]}` : pr[1];
   const btns = D.mode==="session" ? `<button class="btn saff wide" data-act="conv" data-which="${todayConv()}">Praticar a conversa de hoje</button>`
     : D.mode==="conv" ? `<button class="btn saff wide" data-act="convswap">Trocar de papel</button>${WEEKS[D.week-1].dialogB ? `<button class="btn soft wide" data-act="conv" data-week="${D.week}" data-which="${D.which==="B"?"A":"B"}">${D.which==="B"?"Conversa 1 desta semana":"2ª conversa desta semana"}</button>`:""}<button class="btn ghost wide" data-act="again">De novo</button>`
     : D.mode==="read" ? `<button class="btn saff wide" data-act="read" data-pick="1">Outra leitura</button><button class="btn ghost wide" data-act="again">Ler de novo</button>`
+    : D.mode==="gram" ? `${GRAMATICA.find(g=>!(S.gram||{})[g.id]) ? `<button class="btn saff wide" data-act="gram">Próxima lição de gramática</button>` : ""}<button class="btn ghost wide" data-act="gramlist">Todas as lições</button>`
     : `<button class="btn soft wide" data-act="again">Mais uma rodada</button>`;
   $("#drill").innerHTML = drillTop() + `<div class="stage"><div class="done-box"><div class="av cheer" style="width:84px;height:84px">${LOLA}</div><div class="big">${h(big)}</div>${msg?`<p style="font-size:18px;font-weight:700">${h(msg)}</p>`:""}<p class="muted">${h(sub)}</p></div></div><div class="actions">${btns}<button class="btn ghost wide" data-act="closedrill">Voltar</button></div>`;
 }
@@ -7163,9 +7292,9 @@ document.addEventListener("click", e=>{
     case "bw": { const it=D.items[D.i]; const i=+el.dataset.i; const es = it.es || (it.line ? it.line[1] : (it.c ? it.c.es : "")); const toks=es.split(/\s+/).filter(Boolean); it.hints=it.hints||[]; if(!it.hints.includes(i)) it.hints.push(i);
       const n = toks.length; if((it.t==="mine"||it.t==="frame") && !it.hinted && it.hints.length >= Math.max(2, Math.ceil(n/2))){ it.hinted=true; miss(it); }
       drawDrill(); speak(toks[i].replace(/[¿¡?!.,;:…]/g,"")); break; }
-    case "gram": openGram(gramNext().id); break;
-    case "gramlist": openGramList(); break;
-    case "gramopen": openGram(el.dataset.id); break;
+    case "gram": if(D) closeDrill(); startGram(gramNext().id); break;
+    case "gramlist": if(D) closeDrill(); openGramList(); break;
+    case "gramopen": $("#sheet").hidden=true; startGram(el.dataset.id); break;
     case "gramdone": { S.gram=S.gram||{}; S.gram[el.dataset.id]=todayN(); const lg=logToday(); lg.g=(lg.g||0)+1; save(); const nx=GRAMATICA.find(g=>!S.gram[g.id]); $("#sheet").hidden=true; toast(nx ? `Lida. Próxima: ${nx.t}` : "Todas as lições lidas. Elas ficam em Plan para rever."); renderAll(); break; }
     case "read": { if(el.dataset.pick){ pickRead(); break; } if(D) closeDrill(); if(el.dataset.city){ startRead(el.dataset.city, +(el.dataset.i||0)); } else { const r=readOfDay(); if(r) startRead(r.id, r.i); else toast("Ainda não há leituras para as cidades da rota."); } break; }
     case "readplay": { const it=D.items[D.i]; if(READ.playing && !el.dataset.slow){ readStop(); break; } readPlay(it.sents, !!el.dataset.slow); break; }
@@ -7190,7 +7319,7 @@ document.addEventListener("click", e=>{
       if(D.mode==="duel"){ if(right) D.dscore[it.who.id]++; }
       else if(right){ if(!it.fix) D.score++; } else { if(S.cards[it.c.id]) S.cards[it.c.id].d=todayN(); miss(it); }
       const pm = right ? rnd(PRAISE) : rnd(CHEER); it.msg={ok:right, es:pm[0], pt:pm[1]}; tone(right?"ok":"bad"); if(right) buzz(15);
-      if(D.mode!=="duel"){ logToday().q++; save(); } drawDrill(); if(it.dir==="pt") speak(it.c.es); else if(it.dir==="reply") speak(it.c.ans); break; }
+      if(D.mode!=="duel"){ logToday().q++; save(); } drawDrill(); if(it.dir==="pt") speak(it.c.es); else if(it.dir==="reply") speak(it.c.ans); else if(it.dir==="gramq") speak(it.c.full); break; }
     case "next": { const it=D.items[D.i]; if(it && it.t==="read") readStop(); if(D && D.mode==="conv" && it && it.t==="mine" && !it.fix){ const lg=logToday(); lg.cl=(lg.cl||0)+1; save(); } D.revealed=false; D.i++; convMaybeDone(); drawDrill(); break; }
     case "check": checkWrite(); break;
     case "bpick": { const it=D.items[D.i]; const bi=+el.dataset.bi; if(it.seq.includes(bi)) break; it.seq.push(bi); drawDrill(); break; }
