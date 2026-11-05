@@ -49,6 +49,8 @@ Configurações › Sistema › Idioma › Conversão de texto em voz. No iPhone
 
 **Gramática explicada** (`GRAMATICA`, `niveis/gramatica.js`, exercícios em `niveis/gram-q.js`): passo fixo da rotina (3º) enquanto houver lição por ler, como treino em três partes: explicação com exemplos (áudio), 6 exercícios de completar com o porquê de cada resposta, e correção dos erros no fim (`startGram`, modo `gram`). Depois de lidas, entram no rodízio como revisão. 14 lições curtas em português (el/la, un/una, lo, ser/estar/hay, haber, pronomes, presente, verbos-chave, perguntas, gustar, pronomes de objeto, muy/mucho, preposições, negação), cada uma com exemplos com áudio. Abrem em folha (`openGramList`, `openGram`), entram no rodízio da rotina como passo "Gramática explicada" e ficam em Plan. "Entendi" marca a lição lida (`S.gram[id]`).
 
+**Lição do dia em partes** (novembro de 2026): a tela Hoy chama-se "Lição de hoje" e numera as partes: 1) Gramática do dia (explicação, exemplos, exercícios), 2) Palavras e frases do dia (começa com a prévia de todas as frases novas, item `vocab`, e só depois a prática), 3) Conversa falada (começa com "Palavras desta conversa": as palavras do diálogo que ainda não apareceram nas frases do curso, traduzidas pelo dicionário via `convVocab`), 4) um treino do rodízio. Ao tocar num passo, `markLesson` guarda a parte; o treino mostra a barra "Lição de hoje · parte k de n" e, no fim, "Continuar: parte k+1" (`nextpart`, `runStep`) ou "Lição de hoje concluída".
+
 ## Como instalar no celular
 
 O app é a pasta `espanhol/` (um `index.html` + ícones + `sw.js` para funcionar offline). Precisa estar num endereço `https`:

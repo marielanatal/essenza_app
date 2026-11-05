@@ -486,6 +486,10 @@ nav.tabs button.on svg{stroke-width:2.4}
 /* Treino (tela cheia) */
 .drill{position:fixed;inset:0;z-index:40;background:var(--paper);display:flex;flex-direction:column;padding:calc(10px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 .drill .top{display:flex;align-items:center;gap:12px;max-width:560px;width:100%;margin:0 auto}
+.drill .partbar{text-align:center;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:8px auto 0;max-width:560px;width:100%}
+.vocab{display:flex;flex-direction:column;gap:6px;width:100%}
+.vocab .phrase{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;text-align:left}
+.vocab .phrase .es{font-size:17px;font-weight:700}
 .x{width:42px;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;flex:none}
 .x svg{width:20px;height:20px}
 .drill .meter{flex:1}
@@ -5489,7 +5493,7 @@ function todaySteps(){
   const l=S.log[todayKey()]||{}; const nw=Math.min(newLeftToday(), newCards().length), due=dueCards().length;
   const m=S.minutes||15;
   const all=[
-    {id:"session", t:"Sessão", d: (nw===0&&due===0) ? "Frases de hoje em dia" : (due===0 && (l.n||0)>=S.daily) ? `Meta feita · extra: ${nw} novas à espera` : `${nw} novas · ${due} revisões · ≈ ${sessionMinutes(nw,due)} min`, done: due===0 && (nw===0 || (l.n||0)>=S.daily), started:(l.n||0)+(l.r||0)>0, act:"session", go:"Começar"},
+    {id:"session", t:"Palavras e frases do dia", d: (nw===0&&due===0) ? "Frases de hoje em dia" : (due===0 && (l.n||0)>=S.daily) ? `Meta feita · extra: ${nw} novas à espera` : `${nw} novas · ${due} revisões · ≈ ${sessionMinutes(nw,due)} min`, done: due===0 && (nw===0 || (l.n||0)>=S.daily), started:(l.n||0)+(l.r||0)>0, act:"session", go:"Começar"},
     (()=>{ const pl=convPlan(); const w=WEEKS[pl.week-1]; const name = `${w.title} · ${pl.label}`;
       return {id:"conv", t:"Conversa falada", d:(l.c||0)>0 ? `${name} · feita` : `${name}${(l.cl||0)>0?` · ${l.cl} ${l.cl===1?"fala feita":"falas feitas"}`:""} · ≈ 3 min`, done:(l.c||0)>0, started:(l.cl||0)>0, act:"conv", plan:true, go:(l.cl||0)>0?"Continuar":"Conversar"}; })(),
     (todayN()%2===0 ? {id:"build", t:"Montar frases", d:"Coloque as palavras na ordem · 8 frases · ≈ 3 min", done:(l.b||0)>0, act:"build", go:"Montar"}
@@ -5500,15 +5504,15 @@ function todaySteps(){
     {id:"quiz", t:"Quiz", d:"10 perguntas, com 'o que responder?' · ≈ 3 min", done:(l.q||0)>=10, act:"quiz", go:"Jogar"},
     {id:"listen", t:"Só de ouvido", d:"10 frases: ouça e escolha o sentido · ≈ 3 min", done:(l.li||0)>0, act:"listen", go:"Ouvir"},
     {id:"write", t:"Escrita", d:"Escreva a frase em espanhol · 8 frases · ≈ 3 min", done:(l.w||0)>0, act:"write", go:"Escrever"},
-    {id:"gram", t:"Gramática explicada", d:`${gramNext().t} · explicação, exemplos e ${gramNext().q.length} exercícios · ≈ 4 min`, done:(l.g||0)>0, act:"gram", go:"Ler"},
+    {id:"gram", t:"Gramática do dia", d:`${gramNext().t} · explicação, exemplos e ${gramNext().q.length} exercícios · ≈ 4 min`, done:(l.g||0)>0, act:"gram", go:"Ler"},
     {id:"extra", t:"Frases extra", d:`+${S.daily} além da meta · ≈ ${sessionMinutes(S.daily,0)} min`, done:(l.x||0)>0 && (l.n||0)>=S.daily*2, act:"extra", go:"Mais"}
   ];
   const n = m<=5 ? 1 : m<=10 ? 2 : m<=15 ? 4 : m<=20 ? 5 : 7;
   /* As etapas do meio giram a cada dia (montar, pronúncia, leitura, quiz), para a rotina não ser sempre igual */
-  /* Gramática é passo fixo (3º) enquanto houver lição por ler; depois entra no rodízio como revisão */
+  /* A lição do dia tem partes fixas: 1) gramática (enquanto houver lição por ler), 2) palavras e frases novas, 3) conversa; depois um treino do rodízio e o extra */
   const gram=all[8]; const unread=GRAMATICA.some(g=>!(S.gram||{})[g.id]);
   const pool=unread ? all.slice(2,8) : all.slice(2,9); const k=todayN()%pool.length; const rot=pool.slice(k).concat(pool.slice(0,k));
-  return (unread ? [all[0], all[1], gram, ...rot, all[9]] : [all[0], all[1], ...rot, all[9]]).slice(0,n);
+  return (unread ? [gram, all[0], all[1], ...rot, all[9]] : [all[0], all[1], ...rot, all[9]]).slice(0,n);
 }
 /* Plano da conversa do dia: evolui ao longo da semana. Dias 1 e 2: guiada (conversa 1, conversa 2). Dias 3 e 4: de memória (o português só aparece se pedir).
    Dias 5 e 6: papéis trocados (você faz o garçom, a recepcionista…). Dia 7: revisão de uma conversa de tema anterior. Sem conversa 2, a sequência se adapta. */
@@ -5863,11 +5867,11 @@ function renderHoje(){
   const stepsHtml = steps.map((st,i)=>{
     const cls = st.done ? "done" : (cur && cur.id===st.id ? "cur" : "todo");
     const go = cls==="cur" ? `<button class="go" data-act="${st.act}"${st.which?` data-which="${st.which}"`:""}${st.plan?' data-plan="1"':""}>${PLAY} ${st.started && st.id==="session" ? "Continuar agora" : "Começar agora"}</button>` : "";
-    return `<div class="step ${cls}"><span class="n">${st.done?CHECK:i+1}</span><div><b>${h(st.t)}</b><span class="d">${h(st.d)}</span></div>${go}</div>`;
+    return `<div class="step ${cls}"><span class="n">${st.done?CHECK:i+1}</span><div><b>Parte ${i+1}: ${h(st.t)}</b><span class="d">${h(st.d)}</span></div>${go}</div>`;
   }).join("");
   $("#v-hoje").innerHTML = `
     <div class="lola"><div class="av">${LOLA}</div><button class="bubble" data-act="say" data-say="${h(lola.es)}"><div class="name">Lola · toque numa palavra</div><div class="es">${W(lola.es)}</div><div class="pt">${h(lola.pt)}</div></button></div>
-    <div class="todayhead"><h2>Hoje</h2><div class="wk">${isBasic()?"":h(curLevel().name)+" · "}Tema ${w.n} de ${TOTAL_WEEKS} · <a href="#" data-act="goweek" data-week="${w.n}">${h(w.title)}</a></div></div>
+    <div class="todayhead"><h2>Lição de hoje</h2><div class="wk">${isBasic()?"":h(curLevel().name)+" · "}Tema ${w.n} de ${TOTAL_WEEKS} · <a href="#" data-act="goweek" data-week="${w.n}">${h(w.title)}</a></div></div>
     ${PHOTOS_ON ? photoEl(WP_WEEK[w.n], "banner", w.title) : ""}
     ${allDone && (backupAge()===null ? learnedCount()>=10 : backupAge()>=7) ? `<button class="card tint-s" style="text-align:left;width:100%" data-act="backup"><p class="small"><b>Faça um backup (leva 10 segundos).</b> ${IS_IOS?"No iPhone, apagar o app apaga o progresso. ":""}Toque aqui para gerar o link e guarde nas Notas ou no WhatsApp.</p></button>`:""}
     ${allDone ? `<div class="alldone"><div class="av" style="width:64px;height:64px;background:rgba(255,255,255,.2)">${LOLA}</div><div><div class="big">Feito por hoje. ¡Hasta mañana!</div><p>Rotina completa em ${streak()} ${streak()===1?"dia seguido":"dias seguidos"}.</p></div></div>` : ""}
@@ -6342,7 +6346,11 @@ function showTab(t){
    TREINOS (tela cheia)
    ============================================================ */
 let D = null; // treino atual
-function openDrill(d){ D = d; D.i = 0; D.score = 0; D.revealed = false; D.total = d.items.length; D.misses = []; D.fixing = false; D.fixed = 0; $("#drill").hidden = false; document.body.style.overflow="hidden"; drawDrill(); }
+/* Contexto da lição: qual parte está aberta (para a barra e o botão "próxima parte"). Marcado ao tocar num passo de Hoy ou em "Continuar". */
+let LESSON=null;
+function markLesson(k, n, t){ LESSON={k, n, t, at:Date.now()}; }
+function runStep(st){ const b=document.createElement("button"); b.hidden=true; b.dataset.act=st.act; if(st.which) b.dataset.which=st.which; if(st.plan) b.dataset.plan="1"; document.body.appendChild(b); b.click(); b.remove(); }
+function openDrill(d){ D = d; if(LESSON && Date.now()-LESSON.at<4000){ D.part=LESSON; } LESSON=null; D.i = 0; D.score = 0; D.revealed = false; D.total = d.items.length; D.misses = []; D.fixing = false; D.fixed = 0; $("#drill").hidden = false; document.body.style.overflow="hidden"; drawDrill(); }
 function closeDrill(){ hideDict(); try{ readStop(); }catch(e){} D = null; setTimeout(maybeReload, 300); $("#drill").hidden = true; document.body.style.overflow=""; try{ speechSynthesis.cancel(); }catch(e){} renderAll(); }
 /* Transcrição curta das falas anteriores da conversa (até 3), como um chat */
 function convPos(it){ const L=D.items.filter(x=>!x.fix && (x.t==="mine"||x.t==="theirs")); return `${L.indexOf(it)+1} de ${L.length}`; }
@@ -6358,7 +6366,7 @@ function blanksHtml(it, es, pre){
   <p class="small muted">Toque numa lacuna para ver e ouvir a palavra. Sem pressa: toque em ${MIC?"Falar":"Já falei"} só quando estiver pronta.</p>`;
 }
 function drillTop(){ const pct = D.items.length ? Math.round(100*D.i/D.items.length) : 100;
-  return `<div class="top"><button class="x" data-act="closedrill" aria-label="Fechar">${ICON.x}</button><div class="meter"><span style="width:${pct}%"></span></div><span class="count">${Math.min(D.i+1,D.items.length)}/${D.items.length}</span></div>`; }
+  return `<div class="top"><button class="x" data-act="closedrill" aria-label="Fechar">${ICON.x}</button><div class="meter"><span style="width:${pct}%"></span></div><span class="count">${Math.min(D.i+1,D.items.length)}/${D.items.length}</span></div>${D.part?`<div class="partbar">Lição de hoje · parte ${D.part.k} de ${D.part.n} · ${h(D.part.t)}</div>`:""}`; }
 
 function startSession(){
   const fresh = newCards().slice(0, newLeftToday());
@@ -6367,6 +6375,7 @@ function startSession(){
   for(let i=0;i<fresh.length;i+=4){ const chunk=fresh.slice(i,i+4); chunk.forEach(c=>items.push({t:"learn",c})); shuffle(chunk).forEach(c=>items.push({t:"test",c,dir:Math.random()<.8?"pt":"es"})); }
   due.forEach(c=>items.push({t:"test",c,dir:Math.random()<.8?"pt":"es"}));
   if(!items.length){ toast("Nada pendente hoje. Faça um quiz!"); return; }
+  if(fresh.length) items.unshift({t:"vocab", title:`Palavras e frases de hoje: ${fresh.length}`, sub:"Ouça e leia antes de praticar. Toque numa palavra para traduzir.", list:fresh.map(c=>[c.es,c.pt])});
   openDrill({mode:"session", items, revealed:false, retries:{}});
 }
 function quizPool(week){
@@ -6733,7 +6742,16 @@ function startWrite(){
 function startConv(week, role, which, hard, label){
   const w = WEEKS[(week||curWeek())-1]; const dg=dialogOf(w, which); which=dg.which;
   const lines = dg.lines; const def = dg.me; const me = role || def;
-  openDrill({mode:"conv", week:w.n, which, me, hard:!!hard, swap: me!==def, label:label||"", items:lines.map((l,k)=>({t:l[0]===me?"mine":"theirs", line:l, prev:k?lines[k-1]:null}))});
+  const items=lines.map((l,k)=>({t:l[0]===me?"mine":"theirs", line:l, prev:k?lines[k-1]:null}));
+  const pre=convVocab(lines); if(pre.length) items.unshift({t:"vocab", title:`Palavras desta conversa: ${pre.length}`, sub:"Estas ainda não passaram pelas suas frases. Ouça e toque para traduzir; depois a conversa fica fácil.", list:pre});
+  openDrill({mode:"conv", week:w.n, which, me, hard:!!hard, swap: me!==def, label:label||"", items});
+}
+/* Palavras da conversa que a pessoa ainda não viu nas frases do curso, com tradução do dicionário (sem as palavrinhas de ligação) */
+const CONV_STOP=new Set("el la los las un una unos unas de del a al en y e o u que es esta esto este está están soy eres somos son hay por para con sin no si sí me te se le lo nos os les mi tu su mis tus sus yo usted él ella nosotros nosotras vosotros vosotras ellos ellas ese esa eso aquí ahí allí muy mucho mucha más menos también pero porque como cuando donde qué quién cuánto cuánta cómo dónde cuándo ya hoy ahora bien mal gracias hola adiós buenos buenas días tardes noches señor señora perdón perdone perdona vale claro ok ana carmen lola pablo diego marta luca rosa amparo jordi pedro lucía sofía rocío elvira álvaro".split(" "));
+function convVocab(lines){
+  const known=new Set(seenCards().flatMap(c=>wordsOf(c.es))); const seen=new Set(); const out=[];
+  lines.forEach(l=>{ (l[1].match(/[A-Za-zÁÉÍÓÚÑÜáéíóúñü]+/g)||[]).forEach(tok=>{ const w=norm(tok); if(w.length<3 || CONV_STOP.has(w) || known.has(w) || seen.has(w)) return; seen.add(w); const d=dictLookup(tok); if(!d) return; let pt=d.pt.split("|")[0].split(";")[0].trim(); if(d.note) pt+=` (${d.note})`; out.push([tok.toLowerCase(), pt]); }); });
+  return out.slice(0,12);
 }
 /* Ao terminar a última fala da conversa (antes da correção), registra a conversa como feita no dia. */
 function convMaybeDone(){ if(!D || D.mode!=="conv" || D.convDone) return; const left=D.items.slice(D.i).some(x=>!x.fix && (x.t==="mine"||x.t==="theirs")); if(left) return;
@@ -6986,6 +7004,10 @@ function drawDrill(){
   } else if(it.t==="turn"){
     stage = `<div class="flash"><span class="kind">Duelo · ${D.dscore[D.players[0].id]} × ${D.dscore[D.players[1].id]}</span><div class="av" style="width:84px;height:84px">${faceOf(it.who.id)}</div><div class="big">Vez de ${h(it.who.name)}</div><p class="muted">Passe o celular. Vale 1 ponto por acerto.</p></div>`;
     actions = `<div class="actions"><button class="btn wide" data-act="next">¡Vamos!</button></div>`;
+  } else if(it.t==="vocab"){
+    stage = `<div class="flash" style="align-items:stretch;text-align:left"><span class="kind" style="text-align:center">${h(it.title)}</span><p class="small muted" style="text-align:center;margin:0 0 6px">${h(it.sub)}</p>
+      <div class="vocab">${it.list.map(([es,pt])=>`<div class="phrase"><div><div class="es">${W(es)}</div><div class="pt small">${h(pt)}</div></div>${sayBtn(es)}</div>`).join("")}</div></div>`;
+    actions = `<div class="actions"><button class="btn wide" data-act="next">${D.mode==="conv"?"Ir para a conversa":"Vamos praticar"}</button></div>`;
   } else if(it.t==="gramread"){
     const g=it.g, gi=GRAMATICA.indexOf(g);
     stage = `<div class="flash" style="align-items:stretch;text-align:left"><span class="kind" style="text-align:center">Gramática ${gi+1} de ${GRAMATICA.length} · leia com calma</span><div class="big" style="text-align:center;font-size:24px">${h(g.t)}</div>
@@ -7055,7 +7077,11 @@ function drawDone(){
     : D.mode==="read" ? `<button class="btn saff wide" data-act="read" data-pick="1">Outra leitura</button><button class="btn ghost wide" data-act="again">Ler de novo</button>`
     : D.mode==="gram" ? `${GRAMATICA.find(g=>!(S.gram||{})[g.id]) ? `<button class="btn saff wide" data-act="gram">Próxima lição de gramática</button>` : ""}<button class="btn ghost wide" data-act="gramlist">Todas as lições</button>`
     : `<button class="btn soft wide" data-act="again">Mais uma rodada</button>`;
-  $("#drill").innerHTML = drillTop() + `<div class="stage"><div class="done-box"><div class="av cheer" style="width:84px;height:84px">${LOLA}</div><div class="big">${h(big)}</div>${msg?`<p style="font-size:18px;font-weight:700">${h(msg)}</p>`:""}<p class="muted">${h(sub)}</p></div></div><div class="actions">${btns}<button class="btn ghost wide" data-act="closedrill">Voltar</button></div>`;
+  let partHtml="", partBtns=btns;
+  if(D.part){ const steps=todaySteps(); const nx=steps.find(x=>!x.done); const k=nx ? steps.indexOf(nx)+1 : null;
+    partHtml = nx ? `<p class="small" style="font-weight:700;color:var(--cobalt)">Parte ${D.part.k} de ${D.part.n} concluída. Próxima: parte ${k}, ${h(nx.t)}.</p>` : `<p class="small" style="font-weight:700;color:var(--ok)">Lição de hoje concluída: todas as ${D.part.n} partes feitas.</p>`;
+    partBtns = nx ? `<button class="btn saff wide" data-act="nextpart" data-k="${k}">Continuar: parte ${k}, ${h(nx.t)}</button>` : `<button class="btn soft wide" data-act="closedrill">Ver a tela de hoje</button>`; }
+  $("#drill").innerHTML = drillTop() + `<div class="stage"><div class="done-box"><div class="av cheer" style="width:84px;height:84px">${LOLA}</div><div class="big">${h(big)}</div>${msg?`<p style="font-size:18px;font-weight:700">${h(msg)}</p>`:""}<p class="muted">${h(sub)}</p>${partHtml}</div></div><div class="actions">${partBtns}<button class="btn ghost wide" data-act="closedrill">${D.part?"Parar por hoje":"Voltar"}</button></div>`;
 }
 function confetti_if(ok){ if(ok) confetti(); }
 function drawDuelDone(){
@@ -7171,6 +7197,7 @@ document.addEventListener("click", e=>{
   if(act==="dictword"){ showDict(el.dataset.w, ""); return; }
   if(act==="asklola"){ askLola(el.dataset.w, el.dataset.ctx); return; }
   if(act==="mission") return; // tratado no change
+  { const stepEl=el.closest(".step"); if(stepEl && el.classList.contains("go")){ const all=[...stepEl.parentElement.querySelectorAll(".step")]; const t=stepEl.querySelector("b")?.textContent.replace(/^Parte \d+: /,"")||""; markLesson(all.indexOf(stepEl)+1, all.length, t); } }
   switch(act){
     case "tab": showTab(el.dataset.tab); break;
     case "say": speak(el.dataset.say, false, el.dataset.who||""); break;
@@ -7287,6 +7314,7 @@ document.addEventListener("click", e=>{
     case "unlock": { const n=+el.dataset.week; setUnlocked(n); save(); renderAll(); toast(`Tema ${n} liberado no treino`); break; }
     case "chip": phraseFilter=el.dataset.k; renderFrases(); break;
     case "closedrill": closeDrill(); break;
+    case "nextpart": { const steps=todaySteps(); const nx=steps.find(x=>!x.done); if(!nx){ closeDrill(); break; } if(D) closeDrill(); markLesson(steps.indexOf(nx)+1, steps.length, nx.t); runStep(nx); break; }
     case "learned": { const c=D.items[D.i].c; if(!S.cards[c.id]){ S.cards[c.id]={b:0,d:todayN()}; logToday().n++; save(); } D.i++; drawDrill(); break; }
     case "hint": { const it=D.items[D.i]; const es = it.es || (it.line ? it.line[1] : (it.c ? it.c.es : "")); if(!it.hinted){ it.hinted=true; miss(it); } if(it.t==="frame"){ D.revealed=true; } drawDrill(); speak(es); break; }
     case "bw": { const it=D.items[D.i]; const i=+el.dataset.i; const es = it.es || (it.line ? it.line[1] : (it.c ? it.c.es : "")); const toks=es.split(/\s+/).filter(Boolean); it.hints=it.hints||[]; if(!it.hints.includes(i)) it.hints.push(i);
