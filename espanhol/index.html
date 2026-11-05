@@ -592,6 +592,20 @@ nav.tabs button.on svg{stroke-width:2.4}
 .jthumbs .t button{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;border:0;background:var(--bad);color:#fff;font-weight:800;font-size:12px;line-height:1}
 .filebtn{display:inline-flex;align-items:center;gap:8px;border:1.5px dashed var(--line);border-radius:12px;padding:10px 14px;font-weight:700;color:var(--cobalt);background:var(--paper);cursor:pointer}
 .filebtn input{display:none}
+/* My Maps */
+.mapbox{border-radius:var(--r);overflow:hidden;background:var(--paper);box-shadow:var(--shadow);aspect-ratio:4/3;position:relative;margin:0 0 10px}
+.mapbox iframe{width:100%;height:100%;border:0;display:block}
+.mapoff{position:absolute;inset:0;display:grid;place-items:center;padding:20px;text-align:center;color:var(--muted);font-weight:600}
+.mpt{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
+.mpt:first-of-type{border-top:0}
+.mpt .dot{width:12px;height:12px;border-radius:50%;margin-top:5px;flex:none;background:var(--cobalt)}
+.mpt .dot.ln{border-radius:3px;background:var(--saffron)}
+.mpt b{display:block;font-size:15px}
+.mpt .meta{font-size:12px;color:var(--muted);white-space:pre-line}
+.mpt a{color:var(--cobalt);font-weight:800;text-decoration:none;font-size:18px;padding:0 4px}
+.lay{display:inline-block;font-size:11px;font-weight:700;background:var(--paper);border-radius:99px;padding:2px 8px;color:var(--muted);vertical-align:middle}
+.blk .sl.map{color:var(--ok)}
+
 .jfull{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.92);display:grid;place-items:center}
 .jfull img{max-width:100%;max-height:100%;object-fit:contain}
 
@@ -5430,7 +5444,7 @@ function unpackState(x){
   (x.log||"").split(";").filter(Boolean).forEach(e=>{ const [k,v]=e.split(":"); const [n,r,q,s2,c,ee]=v.split(",").map(Number); st.log[keyFromNum(+k+20000)]={n,r,q,s:s2,c,e:ee}; });
   return normalize(st);
 }
-function fullBackup(){ persistLocal(); const states={}; locals().forEach(pf=>{ states[pf.id]=packState(stateOf(pf.id)); }); const viaje=Object.assign({}, PR.viaje); delete viaje.journal; return {v:2,t:Date.now(),uid:PR.uid,active:PR.active,list:PR.list,duels:PR.duels,viaje,states}; }
+function fullBackup(){ persistLocal(); const states={}; locals().forEach(pf=>{ states[pf.id]=packState(stateOf(pf.id)); }); const viaje=Object.assign({}, PR.viaje); delete viaje.journal; if(viaje.maps){ const mm={}; Object.keys(viaje.maps).forEach(k=>{ const m=viaje.maps[k]; if(m && m.mid) mm[k]={mid:m.mid, title:m.title||""}; }); viaje.maps=mm; } return {v:2,t:Date.now(),uid:PR.uid,active:PR.active,list:PR.list,duels:PR.duels,viaje,states}; }
 function backupLink(){ return APP_URL+"#bk="+b64e(fullBackup()); }
 function restoreBackup(bk){
   if(!bk || bk.v!==2 || !bk.states) return false;
@@ -5440,7 +5454,7 @@ function restoreBackup(bk){
   Object.entries(bk.states).forEach(([id,x])=>{ try{ localStorage.setItem(stateKey(id), JSON.stringify(unpackState(x))); }catch(e){} });
   if(!PR.list.some(x=>x.id===PR.active && !x.remote)) PR.active=(locals()[0]||PR.list[0]).id;
   /* A viagem (V) é um apelido fixo para PR.viaje: troca o conteúdo no lugar, senão a tela Viaje continua mostrando a rota antiga até reabrir o app. */
-  if(bk.viaje && bk.viaje!==V){ const keepJ=V.journal; Object.keys(V).forEach(k=>delete V[k]); Object.assign(V, bk.viaje); if(keepJ && !V.journal) V.journal=keepJ; } PR.viaje=V; if(!V.custom) V.custom={}; if(!Array.isArray(V.dests)||!V.dests.length) V.dests=["madrid","sevilla","barcelona"]; if(!V.days) V.days={};
+  if(bk.viaje && bk.viaje!==V){ const keepJ=V.journal, keepM=V.maps; Object.keys(V).forEach(k=>delete V[k]); Object.assign(V, bk.viaje); if(keepJ && !V.journal) V.journal=keepJ; if(keepM){ V.maps=V.maps||{}; Object.keys(keepM).forEach(k=>{ const o=keepM[k], n=V.maps[k]; if(o && (!n || (n.mid===o.mid && !(n.pts||[]).length))) V.maps[k]=o; }); } } PR.viaje=V; if(!V.custom) V.custom={}; if(!Array.isArray(V.dests)||!V.dests.length) V.dests=["madrid","sevilla","barcelona"]; if(!V.days) V.days={};
   Object.entries(V.custom).forEach(([id,c])=>{ if(!DEST[id]) registerCustom(id, c.name); });
   saveProfiles(); S=loadState(stateKey(PR.active))||defaults(); applyLevel(); remote=null; openWeek=null; renderAll(); connectRemote(); return true;
 }
@@ -6308,6 +6322,70 @@ async function jExport(){ const J=journal().slice().sort((a,b)=>a.d<b.d?-1:1); i
   const u=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=u; a.download="guia-da-viagem.html"; a.target="_blank"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u), 60000); toast("Guia gerado. No iPhone, use Compartilhar › Salvar em Arquivos.");
 }
 async function jViewPhoto(id){ const u=await jPhotoUrl(id); if(!u) return; const d=document.createElement("div"); d.className="jfull"; d.innerHTML=`<img src="${u}" alt="">`; d.addEventListener("click", ()=>d.remove()); document.body.appendChild(d); }
+/* ---------- Google My Maps: link por cidade (mapa embutido + abrir no app) e pontos importados de KML/KMZ ---------- */
+let MFORM=null;
+function maps(){ if(!V.maps || typeof V.maps!=="object" || Array.isArray(V.maps)) V.maps={}; return V.maps; }
+function mapOf(key){ const m=maps()[key]; return m && (m.mid || (m.pts||[]).length) ? m : null; }
+function mapMid(url){ const u=String(url||"").trim(); const m=u.match(/[?&#]mid=([\w-]+)/); if(m) return m[1]; return /^[\w-]{20,}$/.test(u) ? u : null; }
+function mapEmbed(mid){ return `https://www.google.com/maps/d/embed?mid=${encodeURIComponent(mid)}&ehbc=2E312F&noprof=1`; }
+function mapOpen(mid){ return `https://www.google.com/maps/d/viewer?mid=${encodeURIComponent(mid)}`; }
+function ptLink(p){ return p.lat!=null ? `https://www.google.com/maps/search/?api=1&query=${p.lat}%2C${p.lng}` : `https://www.google.com/maps/search/${encodeURIComponent(p.n)}`; }
+function mapName(key){ return key==="_geral" ? "a viagem toda" : (DEST[key] ? DEST[key].name : key); }
+async function kmlText(file){ const u8=new Uint8Array(await file.arrayBuffer()); if(/\.kmz$/i.test(file.name||"") || (u8[0]===0x50 && u8[1]===0x4b)) return await unzipKml(u8); return new TextDecoder("utf-8").decode(u8); }
+async function unzipKml(u8){
+  if(typeof DecompressionStream==="undefined") throw new Error("Este navegador não abre KMZ. No My Maps, marque “Exportar como KML em vez de KMZ”.");
+  const dv=new DataView(u8.buffer, u8.byteOffset, u8.byteLength); let eocd=-1;
+  for(let i=u8.length-22;i>=0 && i>u8.length-70000;i--){ if(dv.getUint32(i,true)===0x06054b50){ eocd=i; break; } }
+  if(eocd<0) throw new Error("Arquivo KMZ inválido.");
+  const n=dv.getUint16(eocd+10,true); let p=dv.getUint32(eocd+16,true);
+  for(let k=0;k<n;k++){ if(dv.getUint32(p,true)!==0x02014b50) break; const method=dv.getUint16(p+10,true), csize=dv.getUint32(p+20,true), nlen=dv.getUint16(p+28,true), elen=dv.getUint16(p+30,true), clen=dv.getUint16(p+32,true), off=dv.getUint32(p+42,true); const name=new TextDecoder().decode(u8.subarray(p+46,p+46+nlen)); p+=46+nlen+elen+clen;
+    if(!/\.kml$/i.test(name)) continue; const ln=dv.getUint16(off+26,true), le=dv.getUint16(off+28,true); const data=u8.subarray(off+30+ln+le, off+30+ln+le+csize);
+    if(method===0) return new TextDecoder().decode(data); if(method!==8) throw new Error("KMZ com compressão desconhecida.");
+    return await new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).text(); }
+  throw new Error("Não achei o KML dentro do KMZ.");
+}
+function parseKml(text){
+  const doc=new DOMParser().parseFromString(text,"text/xml"); if(doc.querySelector("parsererror")) throw new Error("Não consegui ler este arquivo como KML.");
+  const q=(el,sel)=>{ const x=el.querySelector(sel); return x ? x.textContent.trim() : ""; };
+  const title=q(doc,"Document > name"); const pts=[];
+  doc.querySelectorAll("Placemark").forEach(pm=>{ if(pts.length>=400) return; let layer=""; for(let a=pm.parentNode; a && a.nodeType===1; a=a.parentNode){ if(a.localName==="Folder"){ layer=q(a,":scope > name"); break; } }
+    const n=q(pm,":scope > name")||"(sem nome)"; const raw=q(pm,":scope > description"); const im=raw.match(/<img[^>]+src="([^"]+)"/i);
+    const d=raw.replace(/<img[^>]*>/gi,"").replace(/<br\s*\/?>/gi,"\n").replace(/<[^>]+>/g,"").replace(/&nbsp;/g," ").replace(/&amp;/g,"&").replace(/\n{2,}/g,"\n").trim().slice(0,300);
+    const c=q(pm,"Point > coordinates"); let lat=null, lng=null; if(c){ const [x,y]=c.split(/[\s,]+/).map(Number); if(isFinite(x)&&isFinite(y)){ lng=+x.toFixed(6); lat=+y.toFixed(6); } }
+    pts.push({n, d, lat, lng, layer, line: !c && !!pm.querySelector("LineString"), img: im ? im[1] : ""}); });
+  const layers=[...new Set(pts.map(p=>p.layer).filter(Boolean))];
+  return {title, pts, layers};
+}
+function openMapForm(key){
+  const m=maps()[key]||{}; MFORM={key, pts:m.pts||null, title:m.title||"", layers:m.layers||[]};
+  const el=$("#sheet"); el.hidden=false;
+  el.innerHTML=`<div class="sheet" role="dialog" aria-label="Mapa"><div class="spread"><h2 style="font-size:22px">Mapa de ${h(mapName(key))}</h2><button class="x" data-act="closesheet" aria-label="Fechar">${ICON.x}</button></div>
+    <div class="stack" style="gap:14px">
+      <div class="field"><label for="m-url">Link do mapa no Google My Maps</label><input id="m-url" inputmode="url" autocapitalize="off" placeholder="https://www.google.com/maps/d/edit?mid=…" value="${h(m.mid ? mapOpen(m.mid) : "")}"></div>
+      <p class="small muted">No My Maps: <b>Compartilhar</b> › ative <b>Qualquer pessoa com o link</b> › <b>Copiar link</b>. O mapa passa a aparecer nesta tela e abre no app do Google Maps.</p>
+      <div class="field"><label>Pontos do mapa (opcional: ficam no app mesmo sem internet e entram no roteiro)</label>
+        <label class="filebtn" for="m-file">${m.pts && m.pts.length ? `Importar de novo (hoje: ${m.pts.length} pontos)` : "Importar arquivo KML ou KMZ"}<input id="m-file" type="file" accept=".kml,.kmz,application/vnd.google-earth.kml+xml,application/vnd.google-earth.kmz"></label>
+        <p class="small muted" style="margin-top:6px">No My Maps, menu <b>⋮</b> ao lado do nome do mapa › <b>Exportar para KML/KMZ</b> › Mapa inteiro › Baixar. Depois escolha o arquivo aqui. Quando mudarem o mapa, é só importar de novo.</p>
+        <div id="m-status" class="small" style="font-weight:600"></div></div>
+      <div class="actions duo">${mapOf(key)?`<button class="btn bad" data-act="mdel" data-key="${key}">Tirar mapa</button>`:`<button class="btn ghost" data-act="closesheet">Cancelar</button>`}<button class="btn wide" data-act="msave" data-key="${key}">Salvar</button></div></div></div>`;
+  const fi=$("#m-file"); if(fi) fi.addEventListener("change", async ()=>{ const f=fi.files[0]; fi.value=""; if(!f) return; const st=$("#m-status"); st.textContent="Lendo o arquivo…"; try{ const r=parseKml(await kmlText(f)); MFORM.pts=r.pts; MFORM.title=r.title; MFORM.layers=r.layers; st.textContent=`${r.pts.length} ${r.pts.length===1?"ponto":"pontos"}${r.layers.length?` em ${r.layers.length} ${r.layers.length===1?"camada":"camadas"} (${r.layers.join(", ")})`:""}${r.title?` · “${r.title}”`:""}. Toque em Salvar.`; }catch(e){ st.textContent="Não deu: "+(e.message||e); } });
+}
+function mapPtHtml(p){ return `<div class="mpt"><span class="dot${p.line?" ln":""}"></span><div style="min-width:0;flex:1"><b>${h(p.n)}</b>${p.d?`<div class="meta">${h(p.d.length>160?p.d.slice(0,160)+"…":p.d)}</div>`:""}</div>${p.line?"":`<a href="${ptLink(p)}" target="_blank" rel="noopener" aria-label="abrir no Google Maps">↗</a>`}</div>`; }
+function mapSectionHtml(key){
+  const name=mapName(key), m=mapOf(key);
+  if(!m) return `<div class="sec-h"><h3>Mapa no Google My Maps</h3></div><div class="card stack" style="gap:8px"><p class="small muted">Vocês montam mapas no My Maps com os pontos e os hotéis? Cole o link aqui: o mapa de ${h(name)} aparece nesta tela, abre no Google Maps e os pontos entram no roteiro dia a dia.</p><button class="btn soft wide" data-act="mform" data-key="${key}">+ Ligar o mapa de ${h(name)}</button></div>`;
+  const pts=m.pts||[]; const by={}; pts.forEach(p=>{ (by[p.layer||""]=by[p.layer||""]||[]).push(p); });
+  return `<div class="sec-h"><h3>Mapa de ${h(name)}</h3>${m.title?`<span class="small muted">${h(m.title)}</span>`:""}</div>
+    ${m.mid?`<div class="mapbox">${navigator.onLine===false?`<div class="mapoff">Sem internet agora. O mapa aparece quando a conexão voltar${pts.length?"; os pontos importados estão logo abaixo":""}.</div>`:`<iframe src="${mapEmbed(m.mid)}" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" title="Mapa de ${h(name)}"></iframe>`}</div>`:""}
+    <div class="row" style="gap:8px">${m.mid?`<a class="btn soft" style="flex:1" href="${mapOpen(m.mid)}" target="_blank" rel="noopener">Abrir no Google Maps ↗</a>`:""}<button class="btn ghost" data-act="mform" data-key="${key}">${pts.length?"Atualizar":"Importar pontos"}</button></div>
+    ${pts.length?`<div class="card" style="padding:6px 16px">${Object.keys(by).map(l=>`${l?`<div class="eyebrow" style="margin:10px 0 2px">${h(l)} · ${by[l].length}</div>`:""}${by[l].map(mapPtHtml).join("")}`).join("")}</div><p class="small muted" style="padding:0 4px">${pts.length} ${pts.length===1?"ponto":"pontos"} do seu mapa. Toque em ↗ para abrir o lugar no Google Maps.</p>`:`<p class="small muted" style="padding:0 4px">Importe o arquivo KML/KMZ do mapa para ver os pontos aqui mesmo sem internet e tê-los no roteiro dia a dia.</p>`}`;
+}
+function mapDayHtml(id,k){ const m=mapOf(id); const pts=m ? (m.pts||[]).filter(p=>!p.line) : []; if(!pts.length) return ""; const nd=V.days[id]||1; const per=Math.ceil(pts.length/nd); const mine=pts.slice(k*per,(k+1)*per); if(!mine.length) return ""; return `<div class="blk"><span class="sl map">Mapa</span><div><div class="meta" style="margin-bottom:2px">Do seu My Maps${k===0&&nd>1&&pts.length>per?` (${pts.length} pontos em ${nd} dias)`:""}</div>${mine.map(p=>`<a href="${ptLink(p)}" target="_blank" rel="noopener">${h(p.n)}</a>${p.layer?` <span class="lay">${h(p.layer)}</span>`:""}`).join("<br>")}</div></div>`; }
+function mapsCardHtml(){ const keys=Object.keys(maps()).filter(k=>mapOf(k)); const cities=keys.filter(k=>k!=="_geral" && DEST[k]); const g=mapOf("_geral"); const npts=keys.reduce((a,k)=>a+((maps()[k].pts||[]).length),0);
+  return `<div class="sec-h"><h3>Mapas da família (My Maps)</h3></div>
+    <button class="menu" data-act="vgo" data-s="mapa"><span class="ic" style="background:var(--ok-soft);color:var(--ok)">${ICON.plane}</span><span><b>Mapa geral da viagem</b><span>${g ? (g.mid?"Ligado":"Só pontos")+((g.pts||[]).length?` · ${g.pts.length} pontos`:"") : "Cole o link do mapa com todas as cidades"}</span></span><span class="chev">›</span></button>
+    ${cities.length?`<div class="row" style="gap:6px;margin-top:8px">${cities.map(c=>`<button class="ichip on" data-act="vgo" data-s="cidade" data-city="${c}">${h(DEST[c].name)}${(maps()[c].pts||[]).length?` · ${maps()[c].pts.length}`:""}</button>`).join("")}</div>`:""}
+    <p class="small muted" style="padding:0 4px">${cities.length?`${cities.length} ${cities.length===1?"cidade com mapa":"cidades com mapa"}${npts?` e ${npts} pontos importados`:""}. `:""}Os mapas de cada cidade ficam na tela da cidade; os pontos importados entram no roteiro dia a dia.</p>`; }
 function vgo(screen, city){ if(screen==="rota" && V.screen!=="rota") V.back=V.screen||"home"; if(screen!=="rota") $("#sheet").hidden=true; V.screen=screen; if(city) V.city=city; saveProfiles(); renderViaje(); if(screen!=="rota") window.scrollTo(0,0); }
 function routeSummary(){ const sel=V.dests.filter(id=>DEST[id]); const total=sel.reduce((a,id)=>a+(V.days[id]||0),0); return {sel,total,text: sel.map(id=>`${DEST[id].name} ${V.days[id]||1}d`).join(" → ") + (V.dep===arrivalId() && sel.length>1 ? ` → ${DEST[arrivalId()].name}` : "")}; }
 function renderViaje(){
@@ -6346,6 +6424,7 @@ function renderViaje(){
       <p class="small muted" style="padding:0 4px;margin-top:-6px">Suas impressões de cada etapa: como chegou, trem, hotel, lugares, comida, com fotos e links. No fim vira um guia para guardar ou mandar.</p>
       <button class="menu" data-act="vgo" data-s="diario"><span class="ic" style="background:var(--saffron-soft);color:#8a5a00">${ICON.cards}</span><span><b>Abrir o diário</b><span>${journal().length ? `${journal().length} ${journal().length===1?"anotação":"anotações"} · ${journal().reduce((a,e)=>a+e.photos.length,0)} fotos` : "Nenhuma anotação ainda. Comece pela chegada."}</span></span><span class="chev">›</span></button>
       <button class="btn soft wide" data-act="jnew" style="margin-top:8px">+ Nova anotação</button>
+      ${mapsCardHtml()}
       <button class="menu" data-act="gokit" style="margin-top:8px"><span class="ic" style="background:var(--bad-soft);color:var(--bad)">${ICON.sos}</span><span><b>Kit de sobrevivência</b><span>${SURV_CARDS.length} frases por situação, telefones, embaixada, dinheiro. Offline.</span></span><span class="chev">›</span></button>
       <div class="card tint-g small"><b>Outras cidades?</b> Adicione em Sua rota. Toda cidade nova ganha um guia automático (Wikipédia + Wikivoyage) na hora; ${packNames().length} cidades têm pacote completo (${packNames().join(", ")}). Me peça o pacote das que faltarem.</div>`;
   }
@@ -6396,6 +6475,7 @@ function renderViaje(){
         ${buy.length?`<div class="sec-h"><h3>Comprar</h3></div><div class="card" style="padding:4px 16px">${buy.slice(0,5).map(it=>autoItemHtml(d,it)).join("")}</div>`:""}
         ${(a.trips||[]).length?`<div class="sec-h"><h3>Bate e volta a partir de ${h(d.name)}</h3></div><p class="small muted" style="padding:0 4px;margin-top:-6px">Cidades vizinhas sugeridas pelo Wikivoyage. Se você der mais dias a ${h(d.name)} do que os lugares preenchem, o roteiro usa os dias extras para elas.</p><div class="card" style="padding:4px 16px">${a.trips.map(tr=>autoTripHtml(d,tr)).join("")}</div>`:""}
         <div class="row" style="gap:8px">${a.srcUrl?`<a class="btn soft" href="${h(a.srcUrl)}" target="_blank" rel="noopener">Artigo completo no Wikivoyage ↗</a>`:""}<button class="btn ghost" data-act="autorefresh" data-id="${id}">Atualizar guia</button></div>`; })()}
+      ${mapSectionHtml(id)}
       <div class="sec-h"><h3>Suas anotações em ${h(d.name)}</h3></div>
       ${jListHtml(journal().filter(e=>e.city===id), "Nada anotado ainda sobre esta cidade.")}
       <button class="btn soft wide" data-act="jnew" data-city="${id}">+ Anotar sobre ${h(d.name)}</button>
@@ -6421,12 +6501,14 @@ function renderViaje(){
       ${sabiasCard(id, 2)}
       <div class="sec-h"><h3>Transporte</h3></div>
       ${d.transit.map(g=>`<div class="card" style="padding:12px 16px"><div class="eyebrow" style="margin-bottom:4px">${h(g.t)}</div>${g.o.map(o=>`<div class="item"><div class="hd">${o[2]?`<a href="${h(o[2])}" target="_blank" rel="noopener">${h(o[0])}</a>`:`<span style="font-family:var(--f-display);font-weight:600;font-size:16px">${h(o[0])}</span>`}<span class="meta">${h(o[1])}</span></div><div class="tip">${h(o[3])}</div></div>`).join("")}</div>`).join("")}
+      ${mapSectionHtml(id)}
       <div class="sec-h"><h3>Suas anotações em ${h(d.name)}</h3></div>
       ${jListHtml(journal().filter(e=>e.city===id), "Nada anotado ainda sobre esta cidade.")}
       <button class="btn soft wide" data-act="jnew" data-city="${id}">+ Anotar sobre ${h(d.name)}</button>
       <div class="citynav"><button data-act="vgo" data-s="cidade" data-city="${prev||""}" ${prev?"":"disabled"}>${prev?"← "+h(DEST[prev].name):"← início"}</button><button data-act="vgo" data-s="cidade" data-city="${next||""}" ${next?"":"disabled"}>${next?h(DEST[next].name)+" →":"fim →"}</button></div>
       <button class="btn ghost wide" data-act="vgo" data-s="home">← Voltar para Viaje</button>`;
   }
+  if(under==="mapa"){ html = back("Mapa geral") + `<p class="small muted" style="padding:0 4px">Um mapa do My Maps com a viagem toda (ou o que vocês quiserem ver junto). Os mapas de cada cidade ficam na tela da cidade.</p>${mapSectionHtml("_geral")}`; }
   if(under==="diario"){
     const J=journal(); const cities=[...new Set(J.map(e=>e.city))]; const f=V.jfilter||"";
     const list=f ? J.filter(e=>e.city===f) : J;
@@ -6448,14 +6530,14 @@ function renderViaje(){
         for(let k=0;k<nd;k++){ const tr = k>=cdays ? atrips[k-cdays] : null;
           if(tr){ parts.push(`<div class="dayc"><h3>${h(fmtDay(CD[id][0]+k))} · ${h(dd.name)}, dia ${k+1}: bate-volta a ${h(tr.t)}</h3><div class="blk"><span class="sl m">Dia</span><div><a href="${h(autoTripLink(dd,tr))}" target="_blank" rel="noopener">${h(tr.t)}</a> <span class="bk h"><i></i>bate-volta</span><div class="meta">rota de transporte público no Google Maps</div>${tr.desc?`<p class="small" style="margin-top:6px">${h(tr.desc)}</p>`:""}</div></div><p class="small muted">Sugestão automática do Wikivoyage. Prefere outra? Troque a ordem dos dias ou peça o pacote desta cidade.</p></div>`); continue; }
           const bl=autoDayBlocks(id,k);
-          parts.push(`<div class="dayc"><h3>${h(fmtDay(CD[id][0]+k))} · ${h(dd.name)}, dia ${k+1}</h3>${bl.length ? bl.map(b=>`<div class="blk"><span class="sl ${b.slot}">${b.slot==="m"?"Manhã":b.slot==="t"?"Tarde":"Noite"}</span><div><a href="${h(autoItemLink(dd,b.it))}" target="_blank" rel="noopener">${h(b.it.t)}</a><div class="meta">${h([b.it.addr,b.it.price].filter(Boolean).join(" · ")||"guia automático (Wikivoyage)")}</div></div></div>`).join("")+`<p class="small muted">Sugestão automática, sem curadoria. Toque em "Ver tudo" para a lista completa.</p>` : `<p class="small muted">${AUTO[id] ? `Sem lugares no Wikivoyage para ${h(dd.name)}: dia livre. Use a busca ou o Google Maps.` : "Montando sugestões automáticas…"}</p>`}<button class="btn ghost" style="min-height:38px;padding:6px 12px;align-self:flex-start" data-act="vgo" data-s="cidade" data-city="${id}">Ver tudo sobre ${h(dd.name)} ›</button></div>`); } }
+          parts.push(`<div class="dayc"><h3>${h(fmtDay(CD[id][0]+k))} · ${h(dd.name)}, dia ${k+1}</h3>${mapDayHtml(id,k)}${bl.length ? bl.map(b=>`<div class="blk"><span class="sl ${b.slot}">${b.slot==="m"?"Manhã":b.slot==="t"?"Tarde":"Noite"}</span><div><a href="${h(autoItemLink(dd,b.it))}" target="_blank" rel="noopener">${h(b.it.t)}</a><div class="meta">${h([b.it.addr,b.it.price].filter(Boolean).join(" · ")||"guia automático (Wikivoyage)")}</div></div></div>`).join("")+`<p class="small muted">Sugestão automática, sem curadoria. Toque em "Ver tudo" para a lista completa.</p>` : `<p class="small muted">${AUTO[id] ? `Sem lugares no Wikivoyage para ${h(dd.name)}: dia livre. Use a busca ou o Google Maps.` : "Montando sugestões automáticas…"}</p>`}<button class="btn ghost" style="min-height:38px;padding:6px 12px;align-self:flex-start" data-act="vgo" data-s="cidade" data-city="${id}">Ver tudo sobre ${h(dd.name)} ›</button></div>`); } }
       buildPlan(id, V.days[id]||1, V.interests, V.ritmo).forEach((day,k)=>{
         day.title = `${fmtDay(CD[id][0]+k)} · ${day.title}`; day.who = whoTag(CD[id][0]+k);
         const dayCur = (()=>{ for(const b of (day.blocks||[])){ const cs=curiosFor(id,b.m.t); if(cs.length) return cs[(k+ (day.blocks.indexOf(b)))%cs.length]; } if(day.trip){ const cs=curiosFor(id,day.trip.t); if(cs.length) return cs[0]; } return curioPick(id,1,10+k+i*3)[0]; })();
         const fod = foodOfDay(id, k + i*2);
         const dayCurHtml = (fod.length ? `<p class="curio-in food"><b>Para comer hoje</b> ${fod.map(f=>`<span class="bk ${FOOD_K[f.k][1]}"><i></i>${f.k}</span> <b style="display:inline;font-size:inherit;letter-spacing:0;text-transform:none;color:inherit">${h(f.t)}</b>: ${h(f.w)}`).join("<br>")}</p>` : "") + (dayCur ? `<p class="curio-in"><b>Curiosidade do dia</b> ${dayCur.t}</p>` : "");
-        if(day.kind==="city") parts.push(`<div class="dayc"><h3>${h(day.title)} ${day.who||""}</h3>${day.blocks.map(b=>`<div class="blk"><span class="sl ${b.slot}">${b.slot==="m"?"Manhã":b.slot==="t"?"Tarde":"Noite"}</span><div><a href="${h(b.m.link)}" target="_blank" rel="noopener">${h(b.m.t)}</a> ${bkTag(b.m.pay?b.m.book:"g")}<div class="meta">${h(b.m.area)}${b.m.price?` · ${h(b.m.price)}`:""}</div></div></div>`).join("")}${dayCurHtml}<button class="btn ghost" style="min-height:38px;padding:6px 12px;align-self:flex-start" data-act="vgo" data-s="cidade" data-city="${id}">Ver tudo sobre ${h(DEST[id].name)} ›</button></div>`);
-        else parts.push(`<div class="dayc"><h3>${h(day.title)} ${day.who||""}</h3><div class="blk"><span class="sl m">Dia</span><div><a href="${h(day.trip.link)}" target="_blank" rel="noopener">${h(day.trip.t)}</a> ${bkTag(day.trip.book)}<div class="meta">${h(day.trip.how)} · ${h(day.trip.price)}</div><p class="small" style="margin-top:6px">${day.trip.tip}</p></div></div>${dayCurHtml}</div>`);
+        if(day.kind==="city") parts.push(`<div class="dayc"><h3>${h(day.title)} ${day.who||""}</h3>${day.blocks.map(b=>`<div class="blk"><span class="sl ${b.slot}">${b.slot==="m"?"Manhã":b.slot==="t"?"Tarde":"Noite"}</span><div><a href="${h(b.m.link)}" target="_blank" rel="noopener">${h(b.m.t)}</a> ${bkTag(b.m.pay?b.m.book:"g")}<div class="meta">${h(b.m.area)}${b.m.price?` · ${h(b.m.price)}`:""}</div></div></div>`).join("")}${mapDayHtml(id,k)}${dayCurHtml}<button class="btn ghost" style="min-height:38px;padding:6px 12px;align-self:flex-start" data-act="vgo" data-s="cidade" data-city="${id}">Ver tudo sobre ${h(DEST[id].name)} ›</button></div>`);
+        else parts.push(`<div class="dayc"><h3>${h(day.title)} ${day.who||""}</h3><div class="blk"><span class="sl m">Dia</span><div><a href="${h(day.trip.link)}" target="_blank" rel="noopener">${h(day.trip.t)}</a> ${bkTag(day.trip.book)}<div class="meta">${h(day.trip.how)} · ${h(day.trip.price)}</div><p class="small" style="margin-top:6px">${day.trip.tip}</p></div></div>${mapDayHtml(id,k)}${dayCurHtml}</div>`);
       });
     });
     const last=sel[sel.length-1]; const backDay = V.ret ? numOf(V.ret) : CD[last][1]+1; const gap = V.ret ? numOf(V.ret)-(CD[last][1]+1) : 0;
@@ -7375,6 +7457,9 @@ document.addEventListener("click", e=>{
     case "vsuggest": { const sg=suggestOrder(); if(!sg) break; const rest=V.dests.filter(id=>!sg.order.includes(id)); V.dests=[...sg.order, ...rest]; saveProfiles(); renderViaje(); toast(`Ordem mais curta: ${Math.round(sg.km)} km no total.`); break; }
     case "jtravadd": { travelers().push({id:"t"+Date.now().toString(36), name:"Família", from:"", to:V.ret||""}); saveProfiles(); renderViaje(); break; }
     case "jtravdel": { V.travelers=travelers().filter(t=>t.id!==el.dataset.id); saveProfiles(); renderViaje(); break; }
+    case "mform": { openMapForm(el.dataset.key); break; }
+    case "msave": { const key=el.dataset.key; const mid=mapMid($("#m-url").value); if(!mid && $("#m-url").value.trim()){ toast("Não achei o código do mapa no link. Use o link completo do My Maps (com mid=…)."); break; } if(!mid && !(MFORM && MFORM.pts && MFORM.pts.length)){ toast("Cole o link do mapa ou importe o arquivo KML."); break; } maps()[key]={mid: mid||"", title: MFORM.title||"", pts: MFORM.pts||[], layers: MFORM.layers||[], at: Date.now()}; saveProfiles(); $("#sheet").hidden=true; MFORM=null; toast(mid ? "Mapa ligado." : "Pontos guardados."); renderViaje(); break; }
+    case "mdel": { if(!confirm("Tirar este mapa e os pontos importados do app? O mapa no My Maps continua igual.")) break; delete maps()[el.dataset.key]; saveProfiles(); $("#sheet").hidden=true; MFORM=null; renderViaje(); break; }
     case "jnew": { const c=el.dataset.city||null; let day=null; if(c){ const cd=cityDates()[c]; if(cd && !(todayN()>=cd[0] && todayN()<=cd[1])) day=cd[0]; } openJournalForm(jNew(c, day)); break; }
     case "jedit": { const e=journal().find(x=>x.id===el.dataset.id); if(e) openJournalForm(e); break; }
     case "jsave": jSave(); break;
