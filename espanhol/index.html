@@ -37,6 +37,7 @@
 html[data-course="es"]{--hero-a:#8f0d19;--hero-b:#d1202b;--hero-band:#f6c453;--board:#8f0d19;--paper:#faf5ee}
 html[data-course="fr"]{--hero-a:#1f3a93;--hero-b:#3b5bd1;--hero-band:#e8333b;--board:#1f3a93;--paper:#f3f5fb}
 html[data-course="it"]{--hero-a:#0f6b3a;--hero-b:#1f9a55;--hero-band:#d8232a;--board:#0f6b3a;--paper:#f4f8f3}
+html[data-paper="neutral"]:not([data-theme="dark"]){--paper:#f4f5f9}
 html[data-course="es"][data-theme="dark"]{--paper:#15100f;--surface:#201818;--line:#332727}
 html[data-course="fr"][data-theme="dark"]{--paper:#0d1120;--surface:#161c30;--line:#272f4a}
 html[data-course="it"][data-theme="dark"]{--paper:#0d1510;--surface:#152018;--line:#263329}
@@ -550,9 +551,9 @@ nav.tabs button.on svg{stroke-width:2.4}
 .sheet .row,.sheet label,.sheet .stack{min-width:0}
 .sheet select,.sheet input,.sheet textarea{min-width:0;max-width:100%;text-overflow:ellipsis}
 .field label{font-weight:700;font-size:15px}
-.field input,.field select,.field textarea{border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:11px 12px;font-size:16px;width:100%}
+.field input,.field select,.field textarea{border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:11px 12px;font-size:16px;width:100%;color:var(--ink)}
 .field input:focus,.field select:focus,.field textarea:focus,.search:focus,.kitsearch:focus,.tr textarea:focus,.answer:focus{outline:none;border-color:var(--cobalt);box-shadow:0 0 0 3px var(--cobalt-soft)}
-.field textarea{min-height:90px;font-family:var(--f-mono);font-size:16px}
+.field textarea{min-height:90px;font-family:var(--f-body);font-size:16px;line-height:1.45}
 .field input[type=range]{padding:0;accent-color:var(--cobalt)}
 /* Viaje: ordem das cidades, viajantes e diário */
 .ord{display:inline-flex;flex-direction:column;gap:3px;margin-left:auto}
@@ -587,11 +588,20 @@ nav.tabs button.on svg{stroke-width:2.4}
 .starpick button{font-size:26px;background:none;border:0;color:var(--line);padding:0 2px;line-height:1}
 .starpick button.on{color:var(--saffron)}
 .jthumbs{display:flex;gap:6px;flex-wrap:wrap}
+.jtext{min-height:150px!important;font-size:17px!important;padding:14px!important;border-radius:14px!important}
+.jmeta{display:flex;gap:6px;flex-wrap:wrap}
+.jmeta .ichip{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;font-size:13px}
+.jmeta .ichip svg{width:14px;height:14px}
+.jmore{display:flex;flex-direction:column;gap:12px;background:var(--paper);border-radius:14px;padding:12px}
+.jmore .route label input,.jmore .route label select{background:var(--surface)}
+.pickrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pickrow .filebtn{justify-content:center;background:var(--surface);min-height:48px}
 .jthumbs .t{position:relative;width:72px;height:72px}
 .jthumbs img{width:72px;height:72px;object-fit:cover;border-radius:10px}
 .jthumbs .t button{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;border:0;background:var(--bad);color:#fff;font-weight:800;font-size:12px;line-height:1}
 .filebtn{display:inline-flex;align-items:center;gap:8px;border:1.5px dashed var(--line);border-radius:12px;padding:10px 14px;font-weight:700;color:var(--cobalt);background:var(--paper);cursor:pointer}
 .filebtn input{display:none}
+.filebtn svg{width:18px;height:18px;flex:none}
 /* atalhos de mapa para usar na viagem */
 .mapbar{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:var(--ok-soft);border:0;border-radius:var(--r);padding:12px 14px;margin:0 0 10px}
 .mapbar b{display:block;font-size:15px} .mapbar span.sub{font-size:12px;color:var(--muted)}
@@ -4118,6 +4128,9 @@ const BRAND = { es:{hi:"¡Hola!", flag:'<rect x="2" y="10" width="60" height="44
                 fr:{hi:"Salut!", flag:'<rect x="2" y="10" width="60" height="44" rx="10" fill="#fff"/><path d="M2 20a10 10 0 0 1 10-10h10v44H12A10 10 0 0 1 2 44z" fill="#0055a4"/><path d="M42 10h10a10 10 0 0 1 10 10v24a10 10 0 0 1-10 10H42z" fill="#ef4135"/>'},
                 it:{hi:"Ciao!", flag:'<rect x="2" y="10" width="60" height="44" rx="10" fill="#fff"/><path d="M2 20a10 10 0 0 1 10-10h10v44H12A10 10 0 0 1 2 44z" fill="#009246"/><path d="M42 10h10a10 10 0 0 1 10 10v24a10 10 0 0 1-10 10H42z" fill="#ce2b37"/>'} };
 function renderBrandIcon(code){ const b=BRAND[code]||BRAND.es; return `<svg viewBox="0 0 64 64" aria-hidden="true">${b.flag}<path d="M14 18h36a6 6 0 0 1 6 6v14a6 6 0 0 1-6 6H30l-9 7v-7h-7a6 6 0 0 1-6-6V24a6 6 0 0 1 6-6z" fill="#fff"/><text x="32" y="38" text-anchor="middle" font-family="DejaVu Sans, Arial, sans-serif" font-weight="700" font-size="15" fill="#151b2e">${b.hi}</text></svg><span>Rumbo</span>`; }
+function paperKey(){ try{ return localStorage.getItem("rumbo-paper")||"neutral"; }catch(e){ return "neutral"; } }
+function applyPaper(){ document.documentElement.dataset.paper = paperKey(); }
+applyPaper();
 function applyTheme(key){
   const t=THEMES[key]||THEMES.es; document.documentElement.dataset.course = THEMES[key] ? key : "es";
   const m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute("content", getComputedStyle(document.documentElement).getPropertyValue("--paper").trim() || t.heroA);
@@ -6308,26 +6321,40 @@ function jNew(city, day){ const dayKey = day ? keyFromNum(day) : (todayN()>=numO
 function openJournalForm(entry){
   JFORM = entry ? JSON.parse(JSON.stringify(entry)) : jNew(); const isNew = !entry || !journal().some(x=>x.id===entry.id);
   const cities=[...V.dests.filter(id=>DEST[id]).map(id=>[id, DEST[id].name]), ["_caminho","No caminho / outro lugar"]];
-  const el=$("#sheet"); const e=JFORM;
+  const el=$("#sheet"); const e=JFORM; const more = !isNew && (e.title || e.links.length || e.stars);
+  const cityName = DEST[e.city] ? DEST[e.city].name : "No caminho";
   el.innerHTML=`<div class="sheet" role="dialog" aria-label="Anotação"><div class="spread"><h2 style="font-size:22px">${isNew?"Nova anotação":"Editar anotação"}</h2><button class="x" data-act="closesheet" aria-label="Fechar">${ICON.x}</button></div>
-    <div class="route">
-      <label><span class="eyebrow">Dia</span><input type="date" id="j-d" value="${h(e.d)}"></label>
-      <label><span class="eyebrow">Cidade</span><select id="j-city">${cities.map(([id,n])=>`<option value="${id}" ${e.city===id?"selected":""}>${h(n)}</option>`).join("")}</select></label>
-    </div>
-    <div><div class="eyebrow" style="margin-bottom:6px">Tipo</div><div class="kinds" id="j-kinds">${JKINDS.map(([k,l])=>`<button type="button" data-act="jkind" data-k="${k}" class="${e.kind===k?"on":""}">${l}</button>`).join("")}</div></div>
-    <div class="field"><label for="j-title">Título</label><input id="j-title" maxlength="80" placeholder="Ex.: Trem Madrid → Sevilha, Hotel em Triana, Jantar na Cava Baja" value="${h(e.title)}"></div>
-    <div class="field"><label for="j-text">Como foi</label><textarea id="j-text" placeholder="Como cheguei, o que vi, o que comi, o que valeu e o que não valeu…" style="font-family:var(--f-body);min-height:120px">${h(e.text)}</textarea></div>
-    <div class="field"><label for="j-links">Links (um por linha; pode ser "nome | endereço")</label><textarea id="j-links" placeholder="Hotel Alfonso XIII | https://…" style="font-family:var(--f-body);min-height:60px">${h(e.links.map(l=>l.t&&l.t!==l.u?`${l.t} | ${l.u}`:l.u).join("\n"))}</textarea></div>
-    <div><div class="eyebrow" style="margin-bottom:6px">Nota</div><div class="starpick" id="j-stars">${[1,2,3,4,5].map(n=>`<button type="button" data-act="jstar" data-n="${n}" class="${e.stars>=n?"on":""}">★</button>`).join("")}</div></div>
-    <div><div class="eyebrow" style="margin-bottom:6px">Fotos</div><div class="jthumbs" id="j-thumbs"></div><label class="filebtn" style="margin-top:8px">${ICON.cards} Adicionar fotos<input type="file" id="j-files" accept="image/*" multiple></label><span class="hint">As fotos ficam guardadas neste aparelho (reduzidas) e entram no guia exportado. Não vão no link de backup.</span></div>
-    <div class="actions duo">${!isNew?`<button class="btn bad" data-act="jdel" data-id="${e.id}">Excluir</button>`:`<button class="btn ghost" data-act="closesheet">Cancelar</button>`}<button class="btn wide" data-act="jsave">Salvar</button></div></div>`;
+    <div class="stack" style="gap:12px">
+      <div class="kinds" id="j-kinds">${JKINDS.map(([k,l])=>`<button type="button" data-act="jkind" data-k="${k}" class="${e.kind===k?"on":""}">${l}</button>`).join("")}</div>
+      <div class="field"><textarea id="j-text" class="jtext" placeholder="Conte como foi: o trem, o hotel, o que viu, o que comeu, o que valeu… Pode colar links no meio do texto." ${isNew?"autofocus":""}>${h(e.text)}</textarea></div>
+      <div class="pickrow"><label class="filebtn" for="j-cam">${ICON.camera} Tirar foto<input type="file" id="j-cam" accept="image/*" capture="environment"></label><label class="filebtn" for="j-files">${ICON.cards} Da galeria<input type="file" id="j-files" accept="image/*" multiple></label></div>
+      <div class="jthumbs" id="j-thumbs"></div>
+      <div class="jmeta"><button type="button" class="ichip" data-act="jmore">${ICON.cal} <span id="j-dlabel">${h(fmtDay(numOf(e.d)))}</span></button><button type="button" class="ichip" data-act="jmore">${ICON.plane} <span id="j-clabel">${h(cityName)}</span></button><button type="button" class="ichip${more?" on":""}" data-act="jmore" id="j-morebtn">${more?"Menos opções":"Título, nota e links"}</button></div>
+      <div class="jmore" id="j-more" ${more?"":"hidden"}>
+        <div class="route">
+          <label><span class="eyebrow">Dia</span><input type="date" id="j-d" value="${h(e.d)}"></label>
+          <label><span class="eyebrow">Cidade</span><select id="j-city">${cities.map(([id,n])=>`<option value="${id}" ${e.city===id?"selected":""}>${h(n)}</option>`).join("")}</select></label>
+        </div>
+        <div class="field"><label for="j-title">Título (se vazio, uso a primeira frase)</label><input id="j-title" maxlength="80" placeholder="Ex.: Trem Madrid → Sevilha" value="${h(e.title)}"></div>
+        <div><div class="eyebrow" style="margin-bottom:6px">Nota</div><div class="starpick" id="j-stars">${[1,2,3,4,5].map(n=>`<button type="button" data-act="jstar" data-n="${n}" class="${e.stars>=n?"on":""}">★</button>`).join("")}</div></div>
+        <div class="field"><label for="j-links">Links (um por linha; pode ser "nome | endereço")</label><textarea id="j-links" placeholder="Hotel Alfonso XIII | https://…" style="min-height:56px">${h(e.links.map(l=>l.t&&l.t!==l.u?`${l.t} | ${l.u}`:l.u).join("\n"))}</textarea></div>
+      </div>
+      <span class="hint">As fotos ficam guardadas neste aparelho (reduzidas) e entram no guia exportado. Não vão no link de backup.</span>
+      <div class="actions duo">${!isNew?`<button class="btn bad" data-act="jdel" data-id="${e.id}">Excluir</button>`:`<button class="btn ghost" data-act="closesheet">Cancelar</button>`}<button class="btn wide" data-act="jsave">Salvar</button></div></div></div>`;
   el.hidden=false; jThumbs();
-  const fi=$("#j-files"); if(fi) fi.addEventListener("change", async ()=>{ const files=[...fi.files]; fi.value=""; for(const f of files){ try{ const b=await jShrink(f); const id="p"+Date.now().toString(36)+Math.random().toString(36).slice(2,6); await jPhotoPut(id,b); JFORM.photos.push(id); }catch(err){ toast("Não consegui ler uma das fotos."); } } jThumbs(); });
+  const addFiles = async (fi) => { const files=[...fi.files]; fi.value=""; for(const f of files){ try{ const b=await jShrink(f); const id="p"+Date.now().toString(36)+Math.random().toString(36).slice(2,6); await jPhotoPut(id,b); JFORM.photos.push(id); }catch(err){ toast("Não consegui ler uma das fotos."); } } jThumbs(); };
+  ["j-files","j-cam"].forEach(id=>{ const fi=$("#"+id); if(fi) fi.addEventListener("change", ()=>addFiles(fi)); });
+  const jd=$("#j-d"); if(jd) jd.addEventListener("change", ()=>{ if(/^\d{4}-\d{2}-\d{2}$/.test(jd.value)) $("#j-dlabel").textContent=fmtDay(numOf(jd.value)); });
+  const jc=$("#j-city"); if(jc) jc.addEventListener("change", ()=>{ $("#j-clabel").textContent = DEST[jc.value] ? DEST[jc.value].name : "No caminho"; });
+  if(isNew) setTimeout(()=>{ const t=$("#j-text"); if(t && !IS_IOS) t.focus(); }, 50);
 }
 async function jThumbs(){ const el=$("#j-thumbs"); if(!el||!JFORM) return; const parts=[]; for(const id of JFORM.photos){ const u=await jPhotoUrl(id); parts.push(`<div class="t"><img src="${u}" alt=""><button type="button" data-act="jrmphoto" data-id="${id}" aria-label="tirar foto">×</button></div>`); } el.innerHTML=parts.join(""); }
 function jReadForm(){ const e=JFORM; e.d=$("#j-d").value||e.d; e.city=$("#j-city").value; e.title=($("#j-title").value||"").trim(); e.text=($("#j-text").value||"").trim();
   e.links=($("#j-links").value||"").split("\n").map(x=>x.trim()).filter(Boolean).map(x=>{ const m=x.split("|").map(y=>y.trim()); const u=(m.length>1?m[1]:m[0]); const t=(m.length>1?m[0]:""); const url=/^https?:\/\//i.test(u)?u:"https://"+u; return {t:t||url.replace(/^https?:\/\//,"").split("/")[0], u:url}; });
-  if(!e.title && !e.text && !e.photos.length){ toast("Escreva um título ou algumas linhas."); return null; } if(!e.title) e.title = JKINDS.find(k=>k[0]===e.kind)[1]+" em "+(DEST[e.city]?DEST[e.city].name:"viagem"); return e; }
+  const inText=(e.text.match(/https?:\/\/[^\s<>"')\]]+/gi)||[]); inText.forEach(u=>{ if(!e.links.some(l=>l.u===u)) e.links.push({t:u.replace(/^https?:\/\//,"").split("/")[0], u}); });
+  if(!e.title && !e.text && !e.photos.length){ toast("Escreva algumas linhas ou ponha uma foto."); return null; }
+  if(!e.title){ const first=e.text.replace(/https?:\/\/\S+/g,"").split(/(?<=[.!?…])\s+|\n/)[0].trim(); e.title = first ? (first.length>60 ? first.slice(0,57).trim()+"…" : first.replace(/[.!…]+$/,"")) : JKINDS.find(k=>k[0]===e.kind)[1]+" em "+(DEST[e.city]?DEST[e.city].name:"viagem"); }
+  return e; }
 function jSave(){ const e=jReadForm(); if(!e) return; const J=journal(); const i=J.findIndex(x=>x.id===e.id); if(i>=0) J[i]=e; else J.push(e); e.t=Date.now(); saveProfiles(); $("#sheet").hidden=true; JFORM=null; toast("Anotação guardada."); if(V.screen!=="diario" && V.screen!=="cidade") V.screen="diario"; renderViaje(); }
 async function jDelete(id){ if(!confirm("Excluir esta anotação e as fotos dela?")) return; const J=journal(); const e=J.find(x=>x.id===id); if(e) for(const p of e.photos) await jPhotoDel(p); V.journal=J.filter(x=>x.id!==id); saveProfiles(); $("#sheet").hidden=true; JFORM=null; renderViaje(); }
 function jStars(n){ return n ? "★".repeat(n)+"☆".repeat(5-n) : ""; }
@@ -7412,6 +7439,7 @@ function openSettings(){
       <p class="hint" id="s-feas">${(()=>{ const f=feasibility(); return f.left===0 ? "Todas as frases do plano já vistas." : f.ok ? `No ritmo: faltam ${f.left} frases e ${f.days} dias; ${S.daily}/dia dá conta.` : `Atenção: faltam ${f.left} frases em ${f.days} dias; precisaria de ${f.need}/dia.`; })()}</p>
     </div>
     <div class="field"><label for="s-voice">Voz do espanhol</label>${canSpeak ? (()=>{ loadVoices(); const L=esVoices(); const auto=esVoice(); return `<select id="s-voice"><option value="system" ${useSystemVoice()?"selected":""}>Padrão do iPhone: a voz marcada em Ajustes › Vozes (use esta para a aprimorada)</option><option value="" ${!useSystemVoice()&&!S.voice?"selected":""}>Automática do app (${auto?voiceLabel(auto):"a do celular"})</option>${L.map(v=>`<option value="${h(v.voiceURI)}" ${S.voice===v.voiceURI||S.voice===v.name?"selected":""}>${h(voiceLabel(v))}</option>`).join("")}</select><div class="row" style="gap:8px;margin-top:6px"><button class="btn soft" data-act="voicetest">Testar voz</button>${L.length>1?`<button class="btn ghost" data-act="voicecompare">Comparar as ${L.length} vozes</button>`:""}${IS_IOS?`<button class="btn ghost" data-act="voiceab">Comum × padrão</button>`:""}</div><span class="hint" id="s-voice-now" style="color:var(--cobalt);font-weight:700">${LAST_VOICE?"Falou agora com: "+h(LAST_VOICE):""}</span>
+    <div class="field"><label for="s-paper">Fundo</label><select id="s-paper"><option value="neutral" ${paperKey()==="neutral"?"selected":""}>Claro neutro</option><option value="cream" ${paperKey()==="cream"?"selected":""}>Creme (cores da Espanha)</option></select></div>
     <div class="field"><label for="s-theme">Cores do app (prévia de outros países)</label><select id="s-theme">${Object.keys(THEMES).map(k=>`<option value="${k}" ${themeKey()===k?"selected":""}>${h(THEMES[k].name)}</option>`).join("")}</select><span class="hint">Só muda as cores e as fotos do cabeçalho. O conteúdo continua o curso de espanhol.</span></div>
     <label class="row" style="gap:8px;margin-top:8px;align-items:center"><input type="checkbox" id="s-audio" ${AUDIO.on?"checked":""} style="width:22px;height:22px;accent-color:var(--cobalt)"> <span><b>Vozes gravadas (Elvira e Álvaro)</b><br><span class="hint">${AUDIO.keys && AUDIO.keys.size ? `${AUDIO.keys.size} áudios disponíveis: frases, diálogos, fórmulas e leituras tocam com voz natural; o resto usa a voz do celular. Precisa de internet na primeira vez que cada frase toca.` : "Ainda sem áudios gravados neste endereço (a rotina do GitHub gera os arquivos). Até lá, usa a voz do celular."}</span></span></label><span class="hint">${L.length} ${L.length===1?"voz de espanhol instalada":"vozes de espanhol instaladas"} neste aparelho. ${IS_IOS ? "O Safari só mostra ao app as vozes comuns; a aprimorada não aparece nesta lista, mas funciona assim: em Ajustes do iPhone › Acessibilidade › Conteúdo Falado › Vozes › Espanhol, toque em Mónica (Aprimorada) para deixá-la marcada como a voz do espanhol; depois escolha aqui 'Padrão do iPhone' e toque em Testar voz: ela se apresenta como 'la voz mejorada'." : "No Android, em Configurações › Sistema › Idioma › Conversão de texto em voz › Google, instale a voz 'Espanhol (Espanha)' e volte aqui."}</span>`; })() : `<span class="hint">Este navegador não oferece voz.</span>`}</div>
     ${IS_IOS ? `<label class="row" style="gap:8px;margin-top:8px;align-items:center"><input type="checkbox" id="s-micsafe" ${(localStorage.getItem("rumbo-micsafe")!=="off")?"checked":""} style="width:22px;height:22px;accent-color:var(--cobalt)"> <span><b>Proteger o microfone nas lições</b><br><span class="hint">No iPhone, o tocador das vozes gravadas faz o microfone parar depois da primeira frase. Com isto ligado, as lições com microfone (sessão, conversa, pronúncia, fórmulas) usam a voz do celular; a Lola, as leituras e o quiz continuam com as vozes gravadas.</span></span></label>` : ""}
@@ -7443,6 +7471,7 @@ function openSettings(){
   const slv=$("#s-level"); if(slv) slv.addEventListener("change", ()=>{ const id=slv.value; if(!COURSE[id] || id===curLevel().id) return; const started=id!=="basico" && S.startL && S.startL[id]; const restart = id!=="basico" && (!started || confirm(`Recomeçar o nível ${COURSE[id].name} do tema 1 a partir de hoje?\n\nOK: começa do tema 1 hoje.\nCancelar: continua de onde você parou nesse nível.`)); setLevel(id, restart); openSettings(); toast(`Nível ${COURSE[id].name}: tema ${curWeek()} de ${TOTAL_WEEKS}`); });
   const sms=$("#s-micsafe"); if(sms) sms.addEventListener("change", ()=>{ try{ localStorage.setItem("rumbo-micsafe", sms.checked?"on":"off"); }catch(e){} toast(sms.checked?"Lições com microfone usam a voz do celular.":"Lições com microfone usam as vozes gravadas."); });
   const sa=$("#s-audio"); if(sa) sa.addEventListener("change", ()=>{ AUDIO.on=sa.checked; try{ localStorage.setItem("rumbo-audio", sa.checked?"on":"off"); }catch(e){} toast(sa.checked?"Vozes gravadas ligadas.":"Vozes gravadas desligadas: usando a voz do celular."); });
+  const spp=$("#s-paper"); if(spp) spp.addEventListener("change", ()=>{ try{ localStorage.setItem("rumbo-paper", spp.value); }catch(e){} applyPaper(); applyTheme(themeKey()); toast(spp.value==="neutral" ? "Fundo claro neutro." : "Fundo creme."); });
   const sth=$("#s-theme"); if(sth) sth.addEventListener("change", ()=>{ try{ localStorage.setItem("rumbo-theme", sth.value); }catch(e){} applyTheme(sth.value); loadPhotos(); renderBoard(); toast(`Cores: ${THEMES[sth.value].name}`); });
   const spn=$("#s-partner"); if(spn) spn.addEventListener("change", ()=>{ S.partner=spn.value==="m"?"m":spn.value==="f"?"f":"auto"; save(); speak(spn.value==="m" ? "Hola, soy Álvaro. Hablaré contigo en las conversaciones." : "Hola, soy Elvira. Hablaré contigo en las conversaciones.", false, spn.value==="m"?"m":""); });
   const sv=$("#s-voice"); if(sv) sv.addEventListener("change", ()=>{ S.voice=sv.value||""; save(); loadVoices(); speak(voiceIntro(esVoice())); });
@@ -7516,6 +7545,7 @@ document.addEventListener("click", e=>{
     case "jedit": { const e=journal().find(x=>x.id===el.dataset.id); if(e) openJournalForm(e); break; }
     case "jsave": jSave(); break;
     case "jdel": jDelete(el.dataset.id); break;
+    case "jmore": { const m=$("#j-more"); if(!m) break; m.hidden=!m.hidden; const b=$("#j-morebtn"); if(b){ b.textContent = m.hidden ? "Título, nota e links" : "Menos opções"; b.classList.toggle("on", !m.hidden); } if(!m.hidden) m.scrollIntoView({block:"nearest", behavior:"smooth"}); break; }
     case "jkind": { if(!JFORM) break; JFORM.kind=el.dataset.k; document.querySelectorAll("#j-kinds button").forEach(b=>b.classList.toggle("on", b.dataset.k===JFORM.kind)); break; }
     case "jstar": { if(!JFORM) break; JFORM.stars = JFORM.stars===+el.dataset.n ? 0 : +el.dataset.n; document.querySelectorAll("#j-stars button").forEach(b=>b.classList.toggle("on", +b.dataset.n<=JFORM.stars)); break; }
     case "jrmphoto": { if(!JFORM) break; JFORM.photos=JFORM.photos.filter(x=>x!==el.dataset.id); jPhotoDel(el.dataset.id); jThumbs(); break; }
