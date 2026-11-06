@@ -601,6 +601,27 @@ nav.tabs button.on svg{stroke-width:2.4}
 .jthumbs .t button{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;border:0;background:var(--bad);color:#fff;font-weight:800;font-size:12px;line-height:1}
 .filebtn{display:inline-flex;align-items:center;gap:8px;border:1.5px dashed var(--line);border-radius:12px;padding:10px 14px;font-weight:700;color:var(--cobalt);background:var(--paper);cursor:pointer}
 .filebtn input{display:none}
+/* Onde estou */
+.here{background:linear-gradient(135deg,var(--ok),#2f9e6a);color:#fff;border-radius:var(--r);padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px}
+.here .eyebrow{color:rgba(255,255,255,.85)}
+.here h3{font-family:var(--f-display);font-size:22px}
+.here .sub{font-size:13px;color:rgba(255,255,255,.9)}
+.here .row{gap:8px}
+.here .btn{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.35);min-height:42px;padding:8px 12px;font-size:14px;flex:1}
+.here .btn.main{background:#fff;color:var(--ok);border-color:#fff}
+.here.off{background:var(--surface);color:var(--ink);border:1px solid var(--line)} .here.off .eyebrow,.here.off .sub{color:var(--muted)} .here.off .btn{background:var(--cobalt);color:#fff;border:0} .here.off .btn.soft{background:var(--cobalt-soft);color:var(--cobalt)}
+.nr{display:grid;grid-template-columns:56px 1fr;gap:10px;align-items:start;padding:12px 0;border-top:1px solid var(--line)}
+.nr:first-child{border-top:0}
+.nr .ph{width:56px;height:56px;border-radius:12px;object-fit:cover;background:var(--paper)}
+.nr .ph.e{display:grid;place-items:center;color:var(--cobalt);font-weight:800;font-family:var(--f-display);font-size:20px}
+.nr b{display:block;font-size:15px}
+.nr .dist{display:inline-block;font-size:11px;font-weight:700;color:var(--ok);background:var(--ok-soft);border-radius:99px;padding:1px 8px;margin-left:6px;vertical-align:middle}
+.nr p{font-size:14px;color:var(--muted);margin-top:2px;line-height:1.4}
+.nr p .w{color:inherit}
+.nr .lk{display:flex;gap:10px;margin-top:4px;font-size:13px;font-weight:700}
+.nr .lk a{color:var(--cobalt);text-decoration:none}
+.big .acts{flex-wrap:wrap} .big .acts .btn{flex:1 1 calc(50% - 8px)}
+
 /* Capa (Início) com ação */
 .cover{display:flex;flex-direction:column;gap:12px}
 .greet{padding:4px 4px 0}
@@ -5410,7 +5431,7 @@ async function autoGuide(id){
     const name=d.name;
     try{ const sr=await wpJson("https://pt.wikipedia.org/w/api.php?action=query&list=search&srsearch="+encodeURIComponent(name+" Espanha")+"&srlimit=1&format=json&origin=*");
       const hit=sr&&sr.query&&sr.query.search&&sr.query.search[0];
-      if(hit){ const sm=await wpJson("https://pt.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(hit.title.replace(/ /g,"_"))); out.about=(sm.extract||"").slice(0,700); out.aboutUrl=(sm.content_urls&&sm.content_urls.mobile&&sm.content_urls.mobile.page)||("https://pt.wikipedia.org/wiki/"+encodeURIComponent(hit.title)); }
+      if(hit){ const sm=await wpJson("https://pt.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(hit.title.replace(/ /g,"_"))); out.about=(sm.extract||"").slice(0,700); if(sm.coordinates && isFinite(sm.coordinates.lat)) out.coord=[+sm.coordinates.lat, +sm.coordinates.lon]; out.aboutUrl=(sm.content_urls&&sm.content_urls.mobile&&sm.content_urls.mobile.page)||("https://pt.wikipedia.org/wiki/"+encodeURIComponent(hit.title)); }
     }catch(e){ out.err+="wikipedia: "+(e.message||e)+" "; }
     for(const lang of ["es","en"]){
       try{ const sr=await wpJson(`https://${lang}.wikivoyage.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(name)}&srlimit=1&format=json&origin=*`);
@@ -5992,7 +6013,7 @@ function renderInicio(){
   const sel = V.dests.filter(id=>DEST[id]); const CD=cityDates(); const t=todayN(); const curCity = sel.find(id=>t>=CD[id][0] && t<=CD[id][1]); const daysLeft=numOf(S.trip)-t; const nMaps=Object.keys(maps()).filter(k=>mapOf(k)).length; const nJ=journal().length; const {total:totalDays, text:routeText}=routeSummary();
   let trip;
   if(curCity){ const k=t-CD[curCity][0]+1, nd=V.days[curCity]||1; const m=mapOf(curCity);
-    trip = `<h3>Hoje em ${h(DEST[curCity].name)}</h3><div class="sub">dia ${k} de ${nd} · ${h(fmtDay(t))}${nJ?` · ${nJ} ${nJ===1?"anotação":"anotações"}`:""}</div><div class="acts">${m?`<button class="btn" data-act="govia" data-s="mapa" data-city="${curCity}">Mapa</button>`:""}<button class="btn${m?" soft":""}" data-act="govia" data-s="roteiro">Roteiro</button><button class="btn soft" data-act="govia" data-s="diario" data-new="1" data-city="${curCity}">Anotar</button></div>`; }
+    trip = `<h3>Hoje em ${h(DEST[curCity].name)}</h3><div class="sub">dia ${k} de ${nd} · ${h(fmtDay(t))}${nJ?` · ${nJ} ${nJ===1?"anotação":"anotações"}`:""}</div><div class="acts">${m?`<button class="btn" data-act="govia" data-s="mapa" data-city="${curCity}">Mapa</button>`:""}<button class="btn${m?" soft":""}" data-act="govia" data-s="roteiro">Roteiro</button><button class="btn soft" data-act="govia" data-s="diario" data-new="1" data-city="${curCity}">Anotar</button><button class="btn soft" data-act="govia" data-s="aqui">Onde estou</button></div>`; }
   else if(daysLeft>0){ trip = `<h3>${daysLeft} ${daysLeft===1?"dia":"dias"} para a viagem</h3><div class="sub">${h(routeText)} · ${totalDays} dias${nMaps?` · ${nMaps} ${nMaps===1?"mapa":"mapas"}`:""}${nJ?` · ${nJ} ${nJ===1?"anotação":"anotações"}`:""}</div><div class="acts"><button class="btn" data-act="govia" data-s="roteiro">Roteiro</button><button class="btn soft" data-act="govia" data-s="mapas">Mapas</button><button class="btn soft" data-act="govia" data-s="diario">Diário</button></div>`; }
   else { trip = `<h3>Lembranças da viagem</h3><div class="sub">${nJ?`${nJ} ${nJ===1?"anotação":"anotações"} no diário`:"O diário está esperando suas histórias"}</div><div class="acts"><button class="btn" data-act="govia" data-s="diario">Diário</button><button class="btn soft" data-act="govia" data-s="roteiro">Roteiro</button></div>`; }
   const via = `<div class="big trip"><div class="eyebrow"><span class="ic" style="background:var(--ok-soft);color:var(--ok)">${ICON.plane}</span>Viagem · ${sel.length} ${sel.length===1?"cidade":"cidades"} · chega ${h(fmtShort(numOf(S.trip)))}</div>${trip}<button class="more" data-act="tab" data-tab="viaje">Abrir a Viaje ›</button></div>`;
@@ -6499,6 +6520,59 @@ function mapsCardHtml(){ const keys=Object.keys(maps()).filter(k=>mapOf(k)); con
     <button class="menu" data-act="vgo" data-s="mapa"><span class="ic" style="background:var(--ok-soft);color:var(--ok)">${ICON.plane}</span><span><b>Mapa geral da viagem</b><span>${g ? (g.mid?"Ligado":"Só pontos")+((g.pts||[]).length?` · ${g.pts.length} pontos`:"") : "Cole o link do mapa com todas as cidades"}</span></span><span class="chev">›</span></button>
     ${cities.length?`<div class="row" style="gap:6px;margin-top:8px">${cities.map(c=>`<button class="ichip on" data-act="vgo" data-s="cidade" data-city="${c}">${h(DEST[c].name)}${(maps()[c].pts||[]).length?` · ${maps()[c].pts.length}`:""}</button>`).join("")}</div>`:""}
     <p class="small muted" style="padding:0 4px">${cities.length?`${cities.length} ${cities.length===1?"cidade com mapa":"cidades com mapa"}${npts?` e ${npts} pontos importados`:""}. `:""}Os mapas de cada cidade ficam na tela da cidade; os pontos importados entram no roteiro dia a dia.</p>`; }
+/* ---------- Onde estou: localização do aparelho, cidade detectada e o que há por perto ---------- */
+let HERE=null, HERE_BUSY=false, HERE_ERR="", HERE_WIKI=null;
+try{ const h0=JSON.parse(localStorage.getItem("rumbo-here")||"null"); if(h0 && h0.lat) HERE=h0; }catch(e){}
+function kmLL(A,B){ const r=Math.PI/180; const dl=(B[0]-A[0])*r, dg=(B[1]-A[1])*r; const x=Math.sin(dl/2)**2+Math.cos(A[0]*r)*Math.cos(B[0]*r)*Math.sin(dg/2)**2; return 6371*2*Math.asin(Math.sqrt(x)); }
+function fmtDist(km){ return km<1 ? `${Math.max(10,Math.round(km*1000/10)*10)} m` : `${km<10 ? km.toFixed(1).replace(".",",") : Math.round(km)} km`; }
+function cityCoord(id){ if(COORDS[id]) return COORDS[id]; const a=AUTO[id]; return a && a.coord ? a.coord : null; }
+function hereCity(lat,lng){ let best=null; const ids=[...new Set([...V.dests.filter(id=>DEST[id]), ...Object.keys(COORDS)])]; ids.forEach(id=>{ const c=cityCoord(id); if(!c) return; const km=kmLL([lat,lng], c); if(!best || km<best.km) best={id, km}; }); return best && best.km<=35 ? best : null; }
+function hereLocate(){
+  if(!navigator.geolocation){ HERE_ERR="Este navegador não fornece a localização."; renderViaje(); return; }
+  HERE_BUSY=true; HERE_ERR=""; renderViaje();
+  navigator.geolocation.getCurrentPosition(pos=>{ const {latitude:lat, longitude:lng, accuracy:acc}=pos.coords; HERE={lat:+lat.toFixed(5), lng:+lng.toFixed(5), acc:Math.round(acc||0), t:Date.now()}; const c=hereCity(lat,lng); HERE.city=c?c.id:null; HERE.km=c?c.km:null; HERE_BUSY=false; try{ localStorage.setItem("rumbo-here", JSON.stringify(HERE)); }catch(e){} HERE_WIKI=null; renderViaje(); hereWiki(1500); },
+    err=>{ HERE_BUSY=false; HERE_ERR = err && err.code===1 ? "Sem permissão para a localização. No iPhone: Ajustes › Privacidade e Segurança › Serviços de Localização › Safari (ou Sites do Safari) › Ao usar o app. Depois toque de novo em Usar minha localização." : err && err.code===2 ? "Não consegui achar a posição (sem sinal de GPS). Tente ao ar livre." : "Demorou demais para achar a posição. Tente de novo."; renderViaje(); },
+    {enableHighAccuracy:true, timeout:20000, maximumAge:30000});
+}
+async function hereWiki(radius){
+  if(!HERE) return; const key=`${HERE.lat},${HERE.lng},${radius}`; HERE_WIKI={key, r:radius, busy:true, list:[], err:""}; if(V.screen==="aqui") renderViaje();
+  try{
+    const g=await wpJson(`https://es.wikipedia.org/w/api.php?action=query&list=geosearch&gscoord=${HERE.lat}|${HERE.lng}&gsradius=${radius}&gslimit=20&format=json&origin=*`);
+    const list=((g.query&&g.query.geosearch)||[]).filter(x=>!/^(Anexo|Categoría|Plantilla):/.test(x.title));
+    let pages={}; if(list.length){ const d=await wpJson(`https://es.wikipedia.org/w/api.php?action=query&pageids=${list.map(x=>x.pageid).join("|")}&prop=extracts|pageimages|info&exintro=1&explaintext=1&exlimit=20&exchars=340&piprop=thumbnail&pithumbsize=240&inprop=url&format=json&origin=*`); pages=(d.query&&d.query.pages)||{}; }
+    const out=list.map(x=>{ const pg=pages[x.pageid]||{}; return {title:x.title, km:x.dist/1000, lat:x.lat, lng:x.lon, extract:(pg.extract||"").replace(/\s+/g," ").trim(), thumb:pg.thumbnail&&pg.thumbnail.source||"", url:pg.fullurl||("https://es.wikipedia.org/wiki/"+encodeURIComponent(x.title.replace(/ /g,"_")))}; }).filter(x=>x.extract.length>40).sort((a,b)=>a.km-b.km);
+    if(HERE_WIKI && HERE_WIKI.key===key){ HERE_WIKI={key, r:radius, busy:false, list:out, err:""}; try{ localStorage.setItem("rumbo-here-wiki", JSON.stringify(HERE_WIKI)); }catch(e){} }
+  }catch(e){ if(HERE_WIKI && HERE_WIKI.key===key) HERE_WIKI={key, r:radius, busy:false, list:[], err:(e&&e.message)||"erro"}; try{ const c=JSON.parse(localStorage.getItem("rumbo-here-wiki")||"null"); if(c && c.key===key) HERE_WIKI=c; }catch(e2){} }
+  if(V.screen==="aqui") renderViaje();
+}
+function hereMapPts(maxKm){ if(!HERE) return []; const out=[]; Object.keys(maps()).forEach(k=>{ const m=mapOf(k); if(!m) return; (m.pts||[]).forEach(p=>{ if(p.lat==null) return; const km=kmLL([HERE.lat,HERE.lng],[p.lat,p.lng]); if(km<=maxKm) out.push(Object.assign({km, mapKey:k}, p)); }); }); return out.sort((a,b)=>a.km-b.km).slice(0,12); }
+function dirLink(lat,lng){ return `https://www.google.com/maps/dir/?api=1&destination=${lat}%2C${lng}&travelmode=walking`; }
+function hereHtml(){
+  const when = HERE ? new Date(HERE.t) : null; const old = HERE && Date.now()-HERE.t > 20*60000;
+  const city = HERE && HERE.city && DEST[HERE.city] ? DEST[HERE.city] : null;
+  let head;
+  if(HERE_BUSY) head = `<div class="here"><div class="eyebrow">Localizando…</div><h3>Procurando sua posição</h3><div class="sub">Leva alguns segundos. Na primeira vez o iPhone pergunta se o app pode usar a localização.</div></div>`;
+  else if(!HERE) head = `<div class="here off"><div class="eyebrow">Onde estou</div><h3>Use a sua localização</h3><div class="sub">O app descobre em que cidade você está e mostra o que está perto: os pontos do seu mapa, os imperdíveis, lugares ao redor com curiosidades e o que comer ali. A localização fica só no aparelho.</div>${HERE_ERR?`<div class="sub" style="color:var(--bad);font-weight:600">${h(HERE_ERR)}</div>`:""}<div class="row"><button class="btn" data-act="here">Usar minha localização</button></div></div>`;
+  else head = `<div class="here"><div class="eyebrow">${city ? `Você está em` : "Você está"}${HERE.city && !city ? "" : ""}</div><h3>${city ? h(city.name) : "fora das cidades da rota"}</h3><div class="sub">${city ? `a ${fmtDist(HERE.km)} do centro · ` : ""}${HERE.acc?`precisão ${fmtDist(HERE.acc/1000)} · `:""}${when.getHours()}:${String(when.getMinutes()).padStart(2,"0")}${old?" · pode ter mudado":""}${HERE_ERR?` · <b>${h(HERE_ERR)}</b>`:""}</div><div class="row"><button class="btn main" data-act="here">Atualizar posição</button><a class="btn" href="https://www.google.com/maps/search/?api=1&query=${HERE.lat}%2C${HERE.lng}" target="_blank" rel="noopener">Ver no Google Maps ↗</a></div></div>`;
+  if(!HERE) return head;
+  const parts=[head];
+  const pts=hereMapPts(3);
+  if(pts.length) parts.push(`<div class="sec-h"><h3>Do seu mapa, perto daqui</h3></div><div class="card" style="padding:4px 16px">${pts.map(p=>`<div class="nr"><span class="ph e">${h((p.layer||p.n).charAt(0).toUpperCase())}</span><div><b>${h(p.n)}<span class="dist">${fmtDist(p.km)}</span></b>${p.d?`<p>${h(p.d.length>120?p.d.slice(0,120)+"…":p.d)}</p>`:""}<div class="lk"><a href="${dirLink(p.lat,p.lng)}" target="_blank" rel="noopener">Como chegar a pé ↗</a>${p.layer?`<span class="muted">${h(p.layer)}</span>`:""}</div></div></div>`).join("")}</div>`);
+  else if(Object.keys(maps()).some(k=>mapOf(k) && (mapOf(k).pts||[]).length)) parts.push(`<p class="small muted" style="padding:0 4px">Nenhum ponto do seu mapa a menos de 3 km.</p>`);
+  const wk=HERE_WIKI;
+  parts.push(`<div class="sec-h"><h3>Ao seu redor</h3><span class="small muted">Wikipédia em espanhol · toque numa palavra</span></div>`);
+  if(!wk || wk.busy) parts.push(`<div class="card"><p class="small muted">Buscando lugares num raio de ${fmtDist((wk?wk.r:1500)/1000)}…</p></div>`);
+  else if(wk.err && !wk.list.length) parts.push(`<div class="card"><p class="small muted">Sem internet para buscar os lugares ao redor (${h(wk.err)}). Os pontos do seu mapa e o pacote da cidade funcionam sem conexão.</p><button class="btn soft" data-act="herewiki" data-r="${wk.r}" style="margin-top:8px">Tentar de novo</button></div>`);
+  else if(!wk.list.length) parts.push(`<div class="card"><p class="small muted">Nada na Wikipédia num raio de ${fmtDist(wk.r/1000)}.</p><button class="btn soft" data-act="herewiki" data-r="${wk.r*3}" style="margin-top:8px">Procurar mais longe</button></div>`);
+  else parts.push(`<div class="card" style="padding:4px 16px">${wk.list.slice(0,14).map(x=>`<div class="nr">${x.thumb?`<img class="ph" src="${h(x.thumb)}" alt="" loading="lazy">`:`<span class="ph e">${h(x.title.charAt(0))}</span>`}<div><b>${h(x.title)}<span class="dist">${fmtDist(x.km)}</span></b><p>${W(x.extract.length>260?x.extract.slice(0,257)+"…":x.extract)}</p><div class="lk"><a href="${dirLink(x.lat,x.lng)}" target="_blank" rel="noopener">Como chegar ↗</a><a href="${h(x.url)}" target="_blank" rel="noopener">Wikipédia ↗</a></div></div></div>`).join("")}</div>${wk.r<5000?`<button class="btn ghost wide" data-act="herewiki" data-r="${wk.r*3}">Procurar num raio maior (${fmtDist(wk.r*3/1000)})</button>`:""}`);
+  if(city){ const id=HERE.city;
+    if(!city.custom){ const must=(city.must||[]).slice(0,6); if(must.length) parts.push(`<div class="sec-h"><h3>Imperdíveis de ${h(city.name)}</h3></div><div class="card" style="padding:4px 16px">${must.map(m=>itemHtml(m,id)).join("")}</div><button class="btn ghost wide" data-act="vgo" data-s="cidade" data-city="${id}">Guia completo de ${h(city.name)} ›</button>`);
+      const cs=curiosGeneral(id); if(cs.length){ const k=todayN()%cs.length; const pick=[cs[k], cs[(k+1)%cs.length], cs[(k+2)%cs.length]].filter((c,i,a)=>a.indexOf(c)===i); parts.push(`<div class="sec-h"><h3>Curiosidades de ${h(city.name)}</h3></div><div class="card" style="padding:6px 16px">${pick.map(c=>`<p class="curio">${c.t}</p>`).join("")}</div>`); }
+      const f=foodOfDay(id, todayN()); if(f.length) parts.push(`<div class="sabias food"><span class="eyebrow">Para comer por aqui</span>${f.map(x=>`<p><b>${h(x.t)}</b> <span class="bk ${FOOD_K[x.k][1]}"><i></i>${x.k}</span><br><span class="small">${x.d} <span class="muted">Onde: ${h(x.w)}</span></span></p>`).join("")}</div>`);
+    } else { const a=AUTO[id]; const see=a ? a.items.filter(x=>x.kind==="ver"||x.kind==="fazer").slice(0,6) : []; if(see.length) parts.push(`<div class="sec-h"><h3>Para ver em ${h(city.name)}</h3></div><div class="card" style="padding:4px 16px">${see.map(it=>autoItemHtml(city,it)).join("")}</div><button class="btn ghost wide" data-act="vgo" data-s="cidade" data-city="${id}">Guia de ${h(city.name)} ›</button>`); }
+  }
+  return parts.join("");
+}
 function vgo(screen, city){ if(screen==="rota" && V.screen!=="rota") V.back=V.screen||"home"; if(screen!=="rota") $("#sheet").hidden=true; V.screen=screen; if(city) V.city=city; saveProfiles(); renderViaje(); if(screen!=="rota") window.scrollTo(0,0); }
 function routeSummary(){ const sel=V.dests.filter(id=>DEST[id]); const total=sel.reduce((a,id)=>a+(V.days[id]||0),0); return {sel,total,text: sel.map(id=>`${DEST[id].name} ${V.days[id]||1}d`).join(" → ") + (V.dep===arrivalId() && sel.length>1 ? ` → ${DEST[arrivalId()].name}` : "")}; }
 function renderViaje(){
@@ -6527,9 +6601,10 @@ function renderViaje(){
     const av=availableDays(); const mismatch = av!==null && av>=1 && av!==totalDays;
     html = `<div><h2 style="font-size:24px">Tu viaje</h2><p class="muted small" style="margin-top:4px">${fmtShort(numOf(S.trip))} a ${V.ret?fmtShort(numOf(V.ret)):fmtShort(numOf(S.trip)+totalDays-1)} · ${av!==null&&av>=1?av:totalDays} dias${mismatch?` · <span style="color:var(--bad);font-weight:700">cidades somam ${totalDays}</span>`:""}</p></div>
       ${vnav("home")}
-      ${(()=>{ const t=todayN(); const cur=sel.find(id=>t>=CD[id][0] && t<=CD[id][1]); const next = !cur && t<CD[sel[0]][0] ? sel[0] : null; if(cur){ const k=t-CD[cur][0]+1, nd=V.days[cur]||1; const m=mapOf(cur); return `<div class="todaycard"><div class="eyebrow">${h(fmtDay(t))} · dia ${k} de ${nd}</div><h3>Hoje em ${h(DEST[cur].name)}</h3><div class="row">${m?`<button class="btn main" data-act="vgo" data-s="mapa" data-city="${cur}">Mapa</button>`:""}<button class="btn${m?"":" main"}" data-act="vgo" data-s="roteiro">Roteiro</button><button class="btn" data-act="jnew" data-city="${cur}">Anotar</button><button class="btn" data-act="vgo" data-s="cidade" data-city="${cur}">Guia</button></div></div>`; } if(next){ const dd=CD[next][0]-t; return dd<=10 ? `<div class="todaycard"><div class="eyebrow">Faltam ${dd} ${dd===1?"dia":"dias"}</div><h3>Primeira parada: ${h(DEST[next].name)}</h3><div class="row">${mapOf(next)?`<button class="btn main" data-act="vgo" data-s="mapa" data-city="${next}">Mapa</button>`:""}<button class="btn" data-act="vgo" data-s="roteiro">Roteiro</button><button class="btn" data-act="vgo" data-s="cidade" data-city="${next}">Guia</button></div></div>` : ""; } return ""; })()}
+      ${(()=>{ const t=todayN(); const cur=sel.find(id=>t>=CD[id][0] && t<=CD[id][1]); const next = !cur && t<CD[sel[0]][0] ? sel[0] : null; if(cur){ const k=t-CD[cur][0]+1, nd=V.days[cur]||1; const m=mapOf(cur); return `<div class="todaycard"><div class="eyebrow">${h(fmtDay(t))} · dia ${k} de ${nd}</div><h3>Hoje em ${h(DEST[cur].name)}</h3><div class="row">${m?`<button class="btn main" data-act="vgo" data-s="mapa" data-city="${cur}">Mapa</button>`:""}<button class="btn${m?"":" main"}" data-act="vgo" data-s="roteiro">Roteiro</button><button class="btn" data-act="jnew" data-city="${cur}">Anotar</button><button class="btn" data-act="vgo" data-s="aqui">Onde estou</button></div></div>`; } if(next){ const dd=CD[next][0]-t; return dd<=10 ? `<div class="todaycard"><div class="eyebrow">Faltam ${dd} ${dd===1?"dia":"dias"}</div><h3>Primeira parada: ${h(DEST[next].name)}</h3><div class="row">${mapOf(next)?`<button class="btn main" data-act="vgo" data-s="mapa" data-city="${next}">Mapa</button>`:""}<button class="btn" data-act="vgo" data-s="roteiro">Roteiro</button><button class="btn" data-act="vgo" data-s="cidade" data-city="${next}">Guia</button></div></div>` : ""; } return ""; })()}
       ${searchBox}
       <button class="menu" data-act="vgo" data-s="rota"><span class="ic" style="background:var(--ok-soft);color:var(--ok)">${ICON.plane}</span><span><b>Sua rota</b><span>${h(routeText)}</span><span style="color:var(--cobalt);font-weight:700;margin-top:4px">Editar chegada, volta, cidades e dias</span></span><span class="chev">›</span></button>
+      <button class="menu" data-act="vgo" data-s="aqui" style="margin-top:10px"><span class="ic" style="background:var(--ok-soft);color:var(--ok)">${ICON.plane}</span><span><b>Onde estou</b><span>${HERE && HERE.city && DEST[HERE.city] ? `Última posição: ${h(DEST[HERE.city].name)}. ` : ""}Usa a localização para mostrar o que está perto de você.</span></span><span class="chev">›</span></button>
       <div class="tiles">
         <button class="tile" data-act="vgo" data-s="roteiro"><span class="ic">${ICON.cal}</span><b>Roteiro dia a dia</b><span>${totalDays} dias · ${sel.length} ${sel.length===1?"cidade":"cidades"} · manhã, tarde e noite</span></button>
         <button class="tile" data-act="vgo" data-s="diario"><span class="ic" style="background:var(--saffron-soft);color:#8a5a00">${ICON.pen}</span><b>Meu diário</b><span>${journal().length ? `${journal().length} ${journal().length===1?"anotação":"anotações"} · ${journal().reduce((a,e)=>a+e.photos.length,0)} fotos` : "Suas impressões, fotos e links de cada etapa"}</span></button>
@@ -6624,6 +6699,10 @@ function renderViaje(){
       <button class="btn soft wide" data-act="jnew" data-city="${id}">+ Anotar sobre ${h(d.name)}</button>
       <div class="citynav"><button data-act="vgo" data-s="cidade" data-city="${prev||""}" ${prev?"":"disabled"}>${prev?"← "+h(DEST[prev].name):"← início"}</button><button data-act="vgo" data-s="cidade" data-city="${next||""}" ${next?"":"disabled"}>${next?h(DEST[next].name)+" →":"fim →"}</button></div>
       <button class="btn ghost wide" data-act="vgo" data-s="home">← Voltar para Viaje</button>`;
+  }
+  if(under==="aqui"){
+    html = back("Onde estou") + hereHtml();
+    if(HERE && !HERE_BUSY && !HERE_WIKI && navigator.onLine!==false) setTimeout(()=>hereWiki(1500), 0);
   }
   if(under==="cidades"){
     html = back("Cidades") + `<p class="small muted" style="padding:0 4px">${sel.length} ${sel.length===1?"cidade":"cidades"} na ordem da viagem. Toque para abrir o guia da cidade; mude a ordem e os dias em Sua rota.</p>
@@ -7596,6 +7675,8 @@ document.addEventListener("click", e=>{
     case "vsuggest": { const sg=suggestOrder(); if(!sg) break; const rest=V.dests.filter(id=>!sg.order.includes(id)); V.dests=[...sg.order, ...rest]; saveProfiles(); renderViaje(); toast(`Ordem mais curta: ${Math.round(sg.km)} km no total.`); break; }
     case "jtravadd": { travelers().push({id:"t"+Date.now().toString(36), name:"Família", from:"", to:V.ret||""}); saveProfiles(); renderViaje(); break; }
     case "jtravdel": { V.travelers=travelers().filter(t=>t.id!==el.dataset.id); saveProfiles(); renderViaje(); break; }
+    case "here": { if(V.screen!=="aqui") vgo("aqui"); hereLocate(); break; }
+    case "herewiki": { hereWiki(+el.dataset.r||1500); break; }
     case "mform": { openMapForm(el.dataset.key); break; }
     case "msave": { const key=el.dataset.key; const mid=mapMid($("#m-url").value); if(!mid && $("#m-url").value.trim()){ toast("Não achei o código do mapa no link. Use o link completo do My Maps (com mid=…)."); break; } if(!mid && !(MFORM && MFORM.pts && MFORM.pts.length)){ toast("Cole o link do mapa ou importe o arquivo KML."); break; } maps()[key]={mid: mid||"", title: MFORM.title||"", pts: MFORM.pts||[], layers: MFORM.layers||[], at: Date.now()}; saveProfiles(); $("#sheet").hidden=true; MFORM=null; toast(mid ? "Mapa ligado." : "Pontos guardados."); renderViaje(); break; }
     case "mdel": { if(!confirm("Tirar este mapa e os pontos importados do app? O mapa no My Maps continua igual.")) break; delete maps()[el.dataset.key]; saveProfiles(); $("#sheet").hidden=true; MFORM=null; renderViaje(); break; }
