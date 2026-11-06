@@ -601,6 +601,27 @@ nav.tabs button.on svg{stroke-width:2.4}
 .jthumbs .t button{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;border:0;background:var(--bad);color:#fff;font-weight:800;font-size:12px;line-height:1}
 .filebtn{display:inline-flex;align-items:center;gap:8px;border:1.5px dashed var(--line);border-radius:12px;padding:10px 14px;font-weight:700;color:var(--cobalt);background:var(--paper);cursor:pointer}
 .filebtn input{display:none}
+/* Lugar (check-in) */
+.placehead{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:16px;display:flex;flex-direction:column;gap:8px}
+.placehead h2{font-family:var(--f-display);font-size:24px;line-height:1.15}
+.pbanner{margin:-16px -16px 6px;border-radius:var(--r) var(--r) 0 0;overflow:hidden;background:var(--paper)}
+.pbanner img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
+.placehead .sub{color:var(--muted);font-size:14px}
+.placehead .row{gap:8px} .placehead .row .btn{flex:1;min-height:46px}
+.visited{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--ok);background:var(--ok-soft);border-radius:99px;padding:3px 9px}
+.wikitext{font-size:16px;line-height:1.6}
+.wikitext p{margin:0 0 10px}
+.wikitext.clip{max-height:230px;overflow:hidden;position:relative}
+.wikitext.clip::after{content:"";position:absolute;left:0;right:0;bottom:0;height:70px;background:linear-gradient(transparent,var(--surface))}
+.ph-list .item{padding:10px 0}
+.ph-list .es{font-size:17px;font-weight:600} .ph-list .pt{font-size:13px;color:var(--muted)}
+.ph-list .item .say{margin-left:auto}
+.placerow{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line);text-align:left;width:100%;background:none;border-left:0;border-right:0;border-bottom:0;color:var(--ink)}
+.placerow:first-child{border-top:0}
+.placerow b{display:block;font-size:15px} .placerow span{font-size:12px;color:var(--muted)}
+.placerow .chev{margin-left:auto;color:var(--muted)}
+.chk{font-size:12px;font-weight:700;color:var(--cobalt);background:none;border:0;padding:4px 0;white-space:nowrap}
+
 /* Onde estou */
 .here{background:linear-gradient(135deg,var(--ok),#2f9e6a);color:#fff;border-radius:var(--r);padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px}
 .here .eyebrow{color:rgba(255,255,255,.85)}
@@ -6342,7 +6363,7 @@ function bkTag(k){ const b=BOOK[k]||BOOK.h; return `<span class="bk ${b[1]}"><i>
 function itemHtml(m, id){ const wp=WP_PLACE[m.t]; const thumb = PHOTOS_ON && wp ? photoEl(wp,"sq",m.t) : ""; const cs = typeof id==="string" ? curiosFor(id, m.t) : [];
   const pack = Object.keys(DEST).find(k=>!DEST[k].custom && k!==id && norm(DEST[k].name)===norm(m.t.replace(/\s*\(.*?\)\s*$/,"").replace(/ e .*$/,"")));
   const packLink = pack ? `<p class="small" style="margin-top:4px"><a href="#" data-act="vgo" data-s="cidade" data-city="${pack}" style="color:var(--cobalt);font-weight:700;text-decoration:none">Ver o guia completo de ${h(DEST[pack].name)} ›</a>${V.dests.includes(pack)?"":` · <a href="#" data-act="vaddnamed" data-name="${h(DEST[pack].name)}" style="color:var(--cobalt);font-weight:700;text-decoration:none">pôr na rota</a>`}</p>` : "";
-  return `<div class="item${thumb?" with-thumb":""}">${thumb}<div><div class="hd"><a href="${h(m.link)}" target="_blank" rel="noopener">${h(m.t)}</a><div class="meta2">${bkTag(m.pay===0 ? "g" : (m.book||"h"))}<span class="meta">${h(m.area||m.how||"")}${m.price?` · ${h(m.price)}`:""}</span></div></div><div class="tip">${m.tip}</div>${cs.map(c=>`<p class="curio-in"><b>Curiosidade</b> ${c.t}</p>`).join("")}${packLink}</div></div>`; }
+  return `<div class="item${thumb?" with-thumb":""}">${thumb}<div><div class="hd"><a href="${h(m.link)}" target="_blank" rel="noopener">${h(m.t)}</a><div class="meta2">${bkTag(m.pay===0 ? "g" : (m.book||"h"))}<span class="meta">${h(m.area||m.how||"")}${m.price?` · ${h(m.price)}`:""}</span></div></div><div class="tip">${m.tip}</div>${cs.map(c=>`<p class="curio-in"><b>Curiosidade</b> ${c.t}</p>`).join("")}${packLink}${typeof id==="string"?`<p class="small" style="margin-top:6px"><a href="#" data-act="place" data-t="${h(m.t)}" data-city="${id}" data-wp="${h(WP_PLACE[m.t]||"")}" style="color:var(--cobalt);font-weight:700;text-decoration:none">${visits()[placeKey(m.t)]?"✓ Visitado · abrir o lugar ›":"Abrir o lugar ›"}</a></p>`:""}</div></div>`; }
 let viajeQ = "";
 function viajeSearch(q){
   const n = norm(q.trim()); if(n.length<2) return [];
@@ -6429,7 +6450,7 @@ function jReadForm(){ const e=JFORM; e.d=$("#j-d").value||e.d; e.city=$("#j-city
   if(!e.title && !e.text && !e.photos.length){ toast("Escreva algumas linhas ou ponha uma foto."); return null; }
   if(!e.title){ const first=e.text.replace(/https?:\/\/\S+/g,"").split(/(?<=[.!?…])\s+|\n/)[0].trim(); e.title = first ? (first.length>60 ? first.slice(0,57).trim()+"…" : first.replace(/[.!…]+$/,"")) : JKINDS.find(k=>k[0]===e.kind)[1]+" em "+(DEST[e.city]?DEST[e.city].name:"viagem"); }
   return e; }
-function jSave(){ const e=jReadForm(); if(!e) return; const J=journal(); const i=J.findIndex(x=>x.id===e.id); if(i>=0) J[i]=e; else J.push(e); e.t=Date.now(); saveProfiles(); $("#sheet").hidden=true; JFORM=null; toast("Anotação guardada."); if(V.screen!=="diario" && V.screen!=="cidade") V.screen="diario"; renderViaje(); }
+function jSave(){ const e=jReadForm(); if(!e) return; const J=journal(); const i=J.findIndex(x=>x.id===e.id); if(i>=0) J[i]=e; else J.push(e); e.t=Date.now(); saveProfiles(); $("#sheet").hidden=true; JFORM=null; toast("Anotação guardada."); if(!["diario","cidade","lugar","aqui"].includes(V.screen)) V.screen="diario"; renderViaje(); }
 async function jDelete(id){ if(!confirm("Excluir esta anotação e as fotos dela?")) return; const J=journal(); const e=J.find(x=>x.id===id); if(e) for(const p of e.photos) await jPhotoDel(p); V.journal=J.filter(x=>x.id!==id); saveProfiles(); $("#sheet").hidden=true; JFORM=null; renderViaje(); }
 function jStars(n){ return n ? "★".repeat(n)+"☆".repeat(5-n) : ""; }
 function jEntryHtml(e){ const cityName = DEST[e.city] ? DEST[e.city].name : "No caminho"; const kind=(JKINDS.find(k=>k[0]===e.kind)||[,"Anotação"])[1];
@@ -6557,14 +6578,14 @@ function hereHtml(){
   if(!HERE) return head;
   const parts=[head];
   const pts=hereMapPts(3);
-  if(pts.length) parts.push(`<div class="sec-h"><h3>Do seu mapa, perto daqui</h3></div><div class="card" style="padding:4px 16px">${pts.map(p=>`<div class="nr"><span class="ph e">${h((p.layer||p.n).charAt(0).toUpperCase())}</span><div><b>${h(p.n)}<span class="dist">${fmtDist(p.km)}</span></b>${p.d?`<p>${h(p.d.length>120?p.d.slice(0,120)+"…":p.d)}</p>`:""}<div class="lk"><a href="${dirLink(p.lat,p.lng)}" target="_blank" rel="noopener">Como chegar a pé ↗</a>${p.layer?`<span class="muted">${h(p.layer)}</span>`:""}</div></div></div>`).join("")}</div>`);
+  if(pts.length) parts.push(`<div class="sec-h"><h3>Do seu mapa, perto daqui</h3></div><div class="card" style="padding:4px 16px">${pts.map(p=>`<div class="nr"><span class="ph e">${h((p.layer||p.n).charAt(0).toUpperCase())}</span><div><b>${h(p.n)}<span class="dist">${fmtDist(p.km)}</span></b>${p.d?`<p>${h(p.d.length>120?p.d.slice(0,120)+"…":p.d)}</p>`:""}<div class="lk"><a href="${dirLink(p.lat,p.lng)}" target="_blank" rel="noopener">Como chegar a pé ↗</a><a href="#" data-act="place" data-t="${h(p.n)}" data-city="${h(p.mapKey==="_geral"?(HERE.city||""):p.mapKey)}">Cheguei aqui ›</a></div></div></div>`).join("")}</div>`);
   else if(Object.keys(maps()).some(k=>mapOf(k) && (mapOf(k).pts||[]).length)) parts.push(`<p class="small muted" style="padding:0 4px">Nenhum ponto do seu mapa a menos de 3 km.</p>`);
   const wk=HERE_WIKI;
   parts.push(`<div class="sec-h"><h3>Ao seu redor</h3><span class="small muted">Wikipédia em espanhol · toque numa palavra</span></div>`);
   if(!wk || wk.busy) parts.push(`<div class="card"><p class="small muted">Buscando lugares num raio de ${fmtDist((wk?wk.r:1500)/1000)}…</p></div>`);
   else if(wk.err && !wk.list.length) parts.push(`<div class="card"><p class="small muted">Sem internet para buscar os lugares ao redor (${h(wk.err)}). Os pontos do seu mapa e o pacote da cidade funcionam sem conexão.</p><button class="btn soft" data-act="herewiki" data-r="${wk.r}" style="margin-top:8px">Tentar de novo</button></div>`);
   else if(!wk.list.length) parts.push(`<div class="card"><p class="small muted">Nada na Wikipédia num raio de ${fmtDist(wk.r/1000)}.</p><button class="btn soft" data-act="herewiki" data-r="${wk.r*3}" style="margin-top:8px">Procurar mais longe</button></div>`);
-  else parts.push(`<div class="card" style="padding:4px 16px">${wk.list.slice(0,14).map(x=>`<div class="nr">${x.thumb?`<img class="ph" src="${h(x.thumb)}" alt="" loading="lazy">`:`<span class="ph e">${h(x.title.charAt(0))}</span>`}<div><b>${h(x.title)}<span class="dist">${fmtDist(x.km)}</span></b><p>${W(x.extract.length>260?x.extract.slice(0,257)+"…":x.extract)}</p><div class="lk"><a href="${dirLink(x.lat,x.lng)}" target="_blank" rel="noopener">Como chegar ↗</a><a href="${h(x.url)}" target="_blank" rel="noopener">Wikipédia ↗</a></div></div></div>`).join("")}</div>${wk.r<5000?`<button class="btn ghost wide" data-act="herewiki" data-r="${wk.r*3}">Procurar num raio maior (${fmtDist(wk.r*3/1000)})</button>`:""}`);
+  else parts.push(`<div class="card" style="padding:4px 16px">${wk.list.slice(0,14).map(x=>`<div class="nr">${x.thumb?`<img class="ph" src="${h(x.thumb)}" alt="" loading="lazy">`:`<span class="ph e">${h(x.title.charAt(0))}</span>`}<div><b>${h(x.title)}<span class="dist">${fmtDist(x.km)}</span></b><p>${W(x.extract.length>260?x.extract.slice(0,257)+"…":x.extract)}</p><div class="lk"><a href="${dirLink(x.lat,x.lng)}" target="_blank" rel="noopener">Como chegar ↗</a><a href="#" data-act="place" data-t="${h(x.title)}" data-city="${h(HERE.city||"")}" data-wp="${h(x.title)}">Cheguei aqui ›</a></div></div></div>`).join("")}</div>${wk.r<5000?`<button class="btn ghost wide" data-act="herewiki" data-r="${wk.r*3}">Procurar num raio maior (${fmtDist(wk.r*3/1000)})</button>`:""}`);
   if(city){ const id=HERE.city;
     if(!city.custom){ const must=(city.must||[]).slice(0,6); if(must.length) parts.push(`<div class="sec-h"><h3>Imperdíveis de ${h(city.name)}</h3></div><div class="card" style="padding:4px 16px">${must.map(m=>itemHtml(m,id)).join("")}</div><button class="btn ghost wide" data-act="vgo" data-s="cidade" data-city="${id}">Guia completo de ${h(city.name)} ›</button>`);
       const cs=curiosGeneral(id); if(cs.length){ const k=todayN()%cs.length; const pick=[cs[k], cs[(k+1)%cs.length], cs[(k+2)%cs.length]].filter((c,i,a)=>a.indexOf(c)===i); parts.push(`<div class="sec-h"><h3>Curiosidades de ${h(city.name)}</h3></div><div class="card" style="padding:6px 16px">${pick.map(c=>`<p class="curio">${c.t}</p>`).join("")}</div>`); }
@@ -6573,6 +6594,61 @@ function hereHtml(){
   }
   return parts.join("");
 }
+/* ---------- Lugar: "cheguei aqui" com tudo sobre o lugar ---------- */
+const PLACE_PHRASES={
+  monumento:[["¿Dónde se compran las entradas?","Onde se compram os ingressos?"],["¿Hay descuento para mayores de 65?","Tem desconto para maiores de 65?"],["¿Se pueden hacer fotos?","Pode tirar fotos?"],["¿A qué hora cierra?","A que horas fecha?"],["¿Hay audioguía en portugués?","Tem audioguia em português?"]],
+  igreja:[["¿Se puede entrar ahora o hay misa?","Pode entrar agora ou tem missa?"],["¿Hay que pagar entrada?","Tem que pagar entrada?"],["¿Se puede subir a la torre?","Pode subir na torre?"],["¿A qué hora cierra?","A que horas fecha?"]],
+  comida:[["¿Qué me recomienda?","O que você me recomenda?"],["Una ración de esto, por favor.","Uma porção disto, por favor."],["¿Tiene algo sin gluten?","Tem algo sem glúten?"],["La cuenta, por favor.","A conta, por favor."]],
+  parque:[["¿Por dónde se sube al mirador?","Por onde se sobe ao mirante?"],["¿Es seguro caminar por aquí de noche?","É seguro andar por aqui à noite?"],["¿Dónde hay una fuente de agua?","Onde tem um bebedouro?"]],
+  geral:[["Perdone, ¿me puede hacer una foto?","Com licença, pode tirar uma foto minha?"],["¿Dónde está el baño?","Onde fica o banheiro?"],["¿Cuánto se tarda andando hasta el centro?","Quanto tempo leva a pé até o centro?"]]
+};
+function placeCat(t){ const n=norm(t); if(/catedral|iglesia|igreja|basilica|mezquita|sinagoga|capilla|monasterio|convento|ermita/.test(n)) return "igreja"; if(/mercado|bar|restaurante|tapas|cerveceria|chocolateria|cafe|taberna|bodega|horchateria/.test(n)) return "comida"; if(/parque|jardin|jardines|mirador|playa|rio|paseo|retiro|montjuic|alameda/.test(n)) return "parque"; if(/museo|museu|palacio|alcazar|alhambra|castillo|torre|acueducto|monumento|puente|plaza|teatro|estadio|sagrada|casa|puerta|real/.test(n)) return "monumento"; return "geral"; }
+function placeKey(t){ return norm(String(t||"")).replace(/\s*\(.*?\)\s*$/,"").trim(); }
+function visits(){ if(!V.visited || typeof V.visited!=="object") V.visited={}; return V.visited; }
+function placeItem(city, t){ const d=DEST[city]; if(!d||d.custom) return null; const k=placeKey(t); return [...(d.must||[]), ...(d.daytrips||[])].find(m=>placeKey(m.t)===k || placeKey(m.t).includes(k) || k.includes(placeKey(m.t))) || null; }
+let PLACE_WIKI={};
+async function placeWiki(title){ const key=title; if(PLACE_WIKI[key] && !PLACE_WIKI[key].busy) return PLACE_WIKI[key]; if(PLACE_WIKI[key]) return PLACE_WIKI[key];
+  PLACE_WIKI[key]={busy:true};
+  try{ let t=title; const sr=await wpJson("https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch="+encodeURIComponent(title)+"&srlimit=1&format=json&origin=*"); const hit=sr&&sr.query&&sr.query.search&&sr.query.search[0]; if(hit) t=hit.title;
+    const d=await wpJson("https://es.wikipedia.org/w/api.php?action=query&titles="+encodeURIComponent(t)+"&prop=extracts|pageimages|info|coordinates&explaintext=1&exchars=2200&piprop=thumbnail&pithumbsize=640&inprop=url&format=json&origin=*&redirects=1");
+    const pg=Object.values((d.query&&d.query.pages)||{})[0]||{}; const ex=(pg.extract||"").replace(/\n{2,}/g,"\n").trim();
+    PLACE_WIKI[key]={busy:false, title:pg.title||t, text:ex, thumb:pg.thumbnail&&pg.thumbnail.source||"", url:pg.fullurl||("https://es.wikipedia.org/wiki/"+encodeURIComponent(t)), coord:pg.coordinates&&pg.coordinates[0]?[pg.coordinates[0].lat,pg.coordinates[0].lon]:null};
+  }catch(e){ PLACE_WIKI[key]={busy:false, err:(e&&e.message)||"erro"}; }
+  if(V.screen==="lugar") renderViaje(); return PLACE_WIKI[key];
+}
+function openPlace(t, city, wp){ V.place={t, city:city||(HERE&&HERE.city)||V.city||"", wp:wp||""}; vgo("lugar", V.place.city||null); }
+function placeHtml(){
+  const P=V.place||{}; const t=P.t||"Lugar"; const city=DEST[P.city]?DEST[P.city]:null; const id=P.city; const key=placeKey(t); const vis=visits()[key];
+  const m=city?placeItem(id,t):null; const cs=(city&&!city.custom)?curiosFor(id, m?m.t:t):[]; const cat=placeCat(t);
+  const wpTitle=P.wp || (m && WP_PLACE[m.t]) || (WP_PLACE[t]) || t; const wk=PLACE_WIKI[wpTitle]; if(!wk && navigator.onLine!==false) setTimeout(()=>placeWiki(wpTitle),0);
+  const pts=[]; Object.keys(maps()).forEach(k=>{ const mm=mapOf(k); if(mm) (mm.pts||[]).forEach(pt=>{ if(placeKey(pt.n)===key || placeKey(pt.n).includes(key)) pts.push(pt); }); });
+  const coord = (pts[0]&&pts[0].lat!=null) ? [pts[0].lat,pts[0].lng] : (wk&&wk.coord) || null;
+  const parts=[];
+  parts.push(`<div class="placehead">${wk&&wk.thumb?`<div class="pbanner"><img src="${h(wk.thumb)}" alt="" loading="lazy" onerror="this.parentElement.remove()"></div>`:""}
+    <div class="eyebrow">${city?h(city.name)+" · ":""}${m?"imperdível do pacote":pts.length?"do seu mapa":"lugar"}${vis?` <span class="visited">✓ cheguei ${h(fmtDay(numOf(vis.d)))}</span>`:""}</div>
+    <h2>${h(t)}</h2>
+    ${m?`<div class="sub">${h(m.area||m.how||"")}${m.price?` · ${h(m.price)}`:""} ${bkTag(m.pay===0?"g":(m.book||"h"))}</div>`:""}
+    <div class="row">${vis?`<button class="btn soft" data-act="placenote" data-t="${h(t)}" data-city="${h(id||"")}">Anotar no diário</button>`:`<button class="btn" data-act="placehere" data-t="${h(t)}" data-city="${h(id||"")}">Cheguei aqui</button>`}${coord?`<a class="btn soft" href="${dirLink(coord[0],coord[1])}" target="_blank" rel="noopener">Como chegar ↗</a>`:`<a class="btn soft" href="https://www.google.com/maps/search/${encodeURIComponent(t+(city?" "+city.name:"")+" España")}" target="_blank" rel="noopener">No Google Maps ↗</a>`}</div>
+    ${m&&m.link?`<a href="${h(m.link)}" target="_blank" rel="noopener" class="small" style="color:var(--cobalt);font-weight:700;text-decoration:none">Site oficial / ingressos ↗</a>`:""}</div>`);
+  if(m) parts.push(`<div class="sec-h"><h3>O que saber antes de entrar</h3></div><div class="card"><div class="tip" style="font-size:15px">${m.tip}</div></div>`);
+  if(cs.length) parts.push(`<div class="sec-h"><h3>Curiosidades deste lugar</h3></div><div class="card" style="padding:6px 16px">${cs.map(c=>`<p class="curio">${c.t}</p>`).join("")}</div>`);
+  pts.forEach(pt=>{ if(pt.d) parts.push(`<div class="sec-h"><h3>Do seu mapa</h3></div><div class="card"><p>${h(pt.d)}</p>${pt.layer?`<p class="small muted" style="margin-top:4px">${h(pt.layer)}</p>`:""}</div>`); });
+  parts.push(`<div class="sec-h"><h3>Sobre o lugar</h3><span class="small muted">Wikipédia em espanhol · toque numa palavra</span></div>`);
+  if(!wk || wk.busy) parts.push(`<div class="card"><p class="small muted">Buscando o artigo…</p></div>`);
+  else if(wk.err || !wk.text) parts.push(`<div class="card"><p class="small muted">${wk.err?`Sem internet para buscar o artigo (${h(wk.err)}).`:"Não achei este lugar na Wikipédia em espanhol."}</p><button class="btn soft" data-act="placewiki" data-wp="${h(wpTitle)}" style="margin-top:8px">Tentar de novo</button></div>`);
+  else parts.push(`<div class="card"><div class="wikitext${wk.text.length>700&&!P.full?" clip":""}" id="wk-text">${wk.text.split("\n").filter(Boolean).map(pg=>`<p>${W(pg)}</p>`).join("")}</div>${wk.text.length>700?`<button class="btn ghost wide" data-act="placefull" style="margin-top:8px">${P.full?"Mostrar menos":"Ler mais"}</button>`:""}<p class="small muted" style="margin-top:8px"><a href="${h(wk.url)}" target="_blank" rel="noopener" style="color:var(--cobalt);font-weight:700;text-decoration:none">${h(wk.title)} na Wikipédia ↗</a> · CC BY-SA</p></div>`);
+  const ph=[...PLACE_PHRASES[cat], ...PLACE_PHRASES.geral];
+  parts.push(`<div class="sec-h"><h3>Frases para usar aqui</h3></div><div class="card ph-list" style="padding:4px 16px">${ph.map(([es,pt])=>`<div class="item"><div class="hd" style="align-items:center"><div><div class="es">${W(es)}</div><div class="pt">${h(pt)}</div></div>${sayBtn(es)}</div></div>`).join("")}</div>`);
+  if(city) parts.push(`<button class="btn ghost wide" data-act="vgo" data-s="cidade" data-city="${id}">Guia de ${h(city.name)} ›</button>`);
+  return parts.join("");
+}
+function placeSearch(q){ const n=norm(q.trim()); if(n.length<2) return []; const out=[]; const seen=new Set(); const add=(t,city,sub,wp)=>{ const k=placeKey(t)+"|"+(city||""); if(seen.has(k)) return; seen.add(k); out.push({t,city,sub,wp}); };
+  const cities=[...new Set([HERE&&HERE.city, ...V.dests].filter(id=>id&&DEST[id]))];
+  cities.forEach(id=>{ const d=DEST[id]; [...(d.must||[]),...(d.daytrips||[])].forEach(m=>{ if(norm(m.t).includes(n)) add(m.t,id,`${d.name} · imperdível`,WP_PLACE[m.t]||""); }); const a=AUTO[id]; if(a) a.items.forEach(it=>{ if(norm(it.t).includes(n)) add(it.t,id,`${d.name} · guia automático`); }); });
+  Object.keys(maps()).forEach(k=>{ const mm=mapOf(k); if(mm) (mm.pts||[]).forEach(pt=>{ if(norm(pt.n).includes(n)) add(pt.n, k==="_geral"?(HERE&&HERE.city)||"":k, `do seu mapa${pt.layer?" · "+pt.layer:""}`); }); });
+  if(HERE_WIKI && HERE_WIKI.list) HERE_WIKI.list.forEach(x=>{ if(norm(x.title).includes(n)) add(x.title, HERE&&HERE.city||"", `ao seu redor · ${fmtDist(x.km)}`, x.title); });
+  return out.slice(0,12); }
+let PLACE_Q="";
 function vgo(screen, city){ if(screen==="rota" && V.screen!=="rota") V.back=V.screen||"home"; if(screen!=="rota") $("#sheet").hidden=true; V.screen=screen; if(city) V.city=city; saveProfiles(); renderViaje(); if(screen!=="rota") window.scrollTo(0,0); }
 function routeSummary(){ const sel=V.dests.filter(id=>DEST[id]); const total=sel.reduce((a,id)=>a+(V.days[id]||0),0); return {sel,total,text: sel.map(id=>`${DEST[id].name} ${V.days[id]||1}d`).join(" → ") + (V.dep===arrivalId() && sel.length>1 ? ` → ${DEST[arrivalId()].name}` : "")}; }
 function renderViaje(){
@@ -6700,8 +6776,12 @@ function renderViaje(){
       <div class="citynav"><button data-act="vgo" data-s="cidade" data-city="${prev||""}" ${prev?"":"disabled"}>${prev?"← "+h(DEST[prev].name):"← início"}</button><button data-act="vgo" data-s="cidade" data-city="${next||""}" ${next?"":"disabled"}>${next?h(DEST[next].name)+" →":"fim →"}</button></div>
       <button class="btn ghost wide" data-act="vgo" data-s="home">← Voltar para Viaje</button>`;
   }
+  if(under==="lugar"){
+    const P=V.place||{}; const c=DEST[P.city]; html = back(h(P.t||"Lugar"), c?"cidade":"aqui", c?h(c.name):"Onde estou") + placeHtml();
+  }
   if(under==="aqui"){
-    html = back("Onde estou") + hereHtml();
+    const res=placeSearch(PLACE_Q);
+    html = back("Onde estou") + `<div class="card stack" style="gap:8px;padding:12px 14px"><label class="eyebrow" for="pq">Cheguei em…</label><input class="search" id="pq" type="search" placeholder="Digite o lugar (ex.: Alcázar, Prado, Mercado)" value="${h(PLACE_Q)}" autocomplete="off" style="margin:0">${PLACE_Q.trim().length>=2?(res.length?`<div>${res.map(r=>`<button class="placerow" data-act="place" data-t="${h(r.t)}" data-city="${h(r.city||"")}" data-wp="${h(r.wp||"")}"><div><b>${h(r.t)}</b><span>${h(r.sub)}</span></div><span class="chev">›</span></button>`).join("")}</div>`:`<p class="small muted">Nada com esse nome na rota. <button class="chk" data-act="place" data-t="${h(PLACE_Q.trim())}" data-city="${h((HERE&&HERE.city)||V.city||"")}">Abrir “${h(PLACE_Q.trim())}” mesmo assim ›</button></p>`):`<p class="small muted" style="margin:0">Chegou num lugar? Escreva o nome e abra a página dele: o que saber, curiosidades, o artigo em espanhol, frases para usar ali e o botão “Cheguei aqui”, que marca a visita e anota no diário.</p>`}</div>` + hereHtml();
     if(HERE && !HERE_BUSY && !HERE_WIKI && navigator.onLine!==false) setTimeout(()=>hereWiki(1500), 0);
   }
   if(under==="cidades"){
@@ -7675,6 +7755,11 @@ document.addEventListener("click", e=>{
     case "vsuggest": { const sg=suggestOrder(); if(!sg) break; const rest=V.dests.filter(id=>!sg.order.includes(id)); V.dests=[...sg.order, ...rest]; saveProfiles(); renderViaje(); toast(`Ordem mais curta: ${Math.round(sg.km)} km no total.`); break; }
     case "jtravadd": { travelers().push({id:"t"+Date.now().toString(36), name:"Família", from:"", to:V.ret||""}); saveProfiles(); renderViaje(); break; }
     case "jtravdel": { V.travelers=travelers().filter(t=>t.id!==el.dataset.id); saveProfiles(); renderViaje(); break; }
+    case "place": { e.preventDefault(); openPlace(el.dataset.t, el.dataset.city||null, el.dataset.wp||""); break; }
+    case "placehere": { const t=el.dataset.t, city=el.dataset.city||""; visits()[placeKey(t)]={t, city, d:todayKey(), at:Date.now()}; saveProfiles(); toast(`Visita marcada: ${t}.`); confetti && confetti(); const e2=jNew(city||null, null); e2.kind=placeCat(t)==="comida"?"comida":"lugar"; e2.title=t; openJournalForm(e2); renderViaje(); break; }
+    case "placenote": { const t=el.dataset.t, city=el.dataset.city||""; const e2=jNew(city||null, null); e2.kind=placeCat(t)==="comida"?"comida":"lugar"; e2.title=t; openJournalForm(e2); break; }
+    case "placefull": { V.place.full=!V.place.full; renderViaje(); break; }
+    case "placewiki": { delete PLACE_WIKI[el.dataset.wp]; placeWiki(el.dataset.wp); renderViaje(); break; }
     case "here": { if(V.screen!=="aqui") vgo("aqui"); hereLocate(); break; }
     case "herewiki": { hereWiki(+el.dataset.r||1500); break; }
     case "mform": { openMapForm(el.dataset.key); break; }
@@ -7846,7 +7931,7 @@ document.addEventListener("change", e=>{
   if(el.dataset && el.dataset.act==="jtrav"){ const t=travelers().find(x=>x.id===el.dataset.id); if(t){ t[el.dataset.f]=el.value; saveProfiles(); if(el.dataset.f!=="name") renderViaje(); } return; }
   if(el.dataset && el.dataset.act==="vret"){ V.ret = /^\d{4}-\d{2}-\d{2}$/.test(el.value) ? el.value : null; saveProfiles(); renderViaje(); return; } if(el.dataset && el.dataset.act==="mission"){ S.missions[lvKey(el.dataset.week)] = el.checked; save(); if(el.checked){ const pm=rnd(PRAISE); toast(`Missão cumprida. ${pm[0]} +25 XP`); confetti(); tone("done"); } renderAll(); }
 });
-document.addEventListener("input", e=>{ if(e.target.id==="q"){ phraseQuery=e.target.value; renderPhraseList(); } if(e.target.id==="kq"){ kitQ=e.target.value; kitQFocus=true; renderPhraseList(); } if(e.target.id==="tr-in"){ trInput(e.target.value); } if(e.target.id==="vq"){ const was=viajeQ.trim().length>=2; viajeQ=e.target.value; const is=viajeQ.trim().length>=2; if(was||is) renderViaje(); } });
+document.addEventListener("input", e=>{ if(e.target.id==="q"){ phraseQuery=e.target.value; renderPhraseList(); } if(e.target.id==="kq"){ kitQ=e.target.value; kitQFocus=true; renderPhraseList(); } if(e.target.id==="tr-in"){ trInput(e.target.value); } if(e.target.id==="vq"){ const was=viajeQ.trim().length>=2; viajeQ=e.target.value; const is=viajeQ.trim().length>=2; if(was||is) renderViaje(); } if(e.target.id==="pq"){ const was=PLACE_Q.trim().length>=2; PLACE_Q=e.target.value; const is=PLACE_Q.trim().length>=2; if(was||is){ const pos=e.target.selectionStart; renderViaje(); const q=$("#pq"); if(q){ q.focus(); q.setSelectionRange(pos,pos); } } } });
 $("#sheet").addEventListener("click", e=>{ if(e.target.id==="sheet") $("#sheet").hidden=true; });
 
 /* ============================================================
